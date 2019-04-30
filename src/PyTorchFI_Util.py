@@ -14,7 +14,7 @@ import torch
 import torch.nn as nn
 import random
 
-from src import PyTorchFI_Source_Core as pytorchfi_core
+from pytorchfi import PyTorchFI_Core
 
 INPUT_DATA = None
 BATCH_SIZE = 0
@@ -31,7 +31,7 @@ def init(model, data, **kwargs):
     """
     global MODEL, INPUT_DATA, DATA_SIZE, BATCH_SIZE
     MODEL, INPUT_DATA, DATA_SIZE, BATCH_SIZE = model, data[0], data[0].size(), data[1]
-    pytorchfi_core.init(model, DATA_SIZE[2], DATA_SIZE[3], BATCH_SIZE, **kwargs)
+    PyTorchFI_Core.init(model, DATA_SIZE[2], DATA_SIZE[3], BATCH_SIZE, **kwargs)
 
 
 def declare_weight_fi(index, min_value, max_value):
@@ -39,7 +39,7 @@ def declare_weight_fi(index, min_value, max_value):
     https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/util/utildeclareweightfi/
     """
     global MODEL
-    MODEL = pytorchfi_core.declare_weight_fi(index, min_value, max_value)
+    MODEL = PyTorchFI_Core.declare_weight_fi(index, min_value, max_value)
 
 
 def declare_neuron_fi(**kwargs):
@@ -47,7 +47,7 @@ def declare_neuron_fi(**kwargs):
     https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/util/utildeclareneuronfi/
     """
     global MODEL
-    MODEL = pytorchfi_core.declare_neuron_fi(**kwargs)
+    MODEL = PyTorchFI_Core.declare_neuron_fi(**kwargs)
 
 
 def compare_golden():
@@ -56,7 +56,7 @@ def compare_golden():
     """
     softmax = nn.Softmax(dim=1)
 
-    model = pytorchfi_core.get_original_model()
+    model = PyTorchFI_Core.get_original_model()
     golden_output = model(INPUT_DATA)
     golden_output_softmax = softmax(golden_output)
     golden = list(torch.argmax(golden_output_softmax, dim=1))
