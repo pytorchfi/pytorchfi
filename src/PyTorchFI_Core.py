@@ -157,7 +157,7 @@ def validate_fi(**kwargs):
     if type(CORRUPT_CONV) == list:
         index = kwargs.get("index", -1)
         return not (
-            CORRUPT_CONV < 0
+            CORRUPT_CONV[index] < 0
             or CORRUPT_CONV[index] >= len(OUTPUT_SIZE)
             or CORRUPT_BATCH[index] >= BATCH_SIZE
             or CORRUPT_C[index] > OUTPUT_SIZE[CORRUPT_CONV[index]][1]
@@ -267,8 +267,6 @@ def set_value(self, input, output):
                     )
                     print("Changing value to %d" % CORRUPT_VALUE)
                 output[CORRUPT_BATCH][CORRUPT_C][CORRUPT_H][CORRUPT_W] = CORRUPT_VALUE
-            else:
-                print("Fault injection not valid!")
             CURRENT_CONV = CURRENT_CONV + 1
         else:
             print("Fault injection not valid!")
