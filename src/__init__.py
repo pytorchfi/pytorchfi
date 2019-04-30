@@ -1,1 +1,1 @@
-__all__ = ["PyTorchFI_Source_Core", "PyTorchFI_Source_Util"]
+__all__ = ["PyTorchFI_Core", "PyTorchFI_Util"]
