@@ -2,7 +2,7 @@
 Copyright (c) 2019 University of Illinois
 All rights reserved.
 
-Developed by:         
+Developed by:
                           RSIM Research Group
                           University of Illinois at Urbana-Champaign
                         http://rsim.cs.illinois.edu/
@@ -13,10 +13,9 @@ import random
 import torch
 import torch.nn as nn
 
-MODEL = None
-USE_CUDA = False
+ORIG_MODEL = None
 DEBUG = False
-BATCH_SIZE = 0
+BATCH_SIZE = -1
 
 RANDOM_INJECTION = False
 CUSTOM_INJECTION = False
@@ -33,7 +32,8 @@ MAX_CORRUPT_VALUE = 500
 
 BCHW = []
 OUTPUT_SIZE = []
-CURRENT_CONV = 0
+CURRENT_CONV = -1
+HANDLES = []
 
 
 def fi_reset():
@@ -54,6 +54,12 @@ def fi_reset():
         500,
     )
 
+
+    global HANDLES
+
+    for i in range(len(HANDLES)):
+        HANDLES[i].remove()
+
     if DEBUG:
         print("Fault injector reset")
 
@@ -62,27 +68,36 @@ def init(model, h, w, batch_size, **kwargs):
     """
     https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/core/coreinit/
     """
-    b = kwargs.get("b", 1)
-    use_cuda = kwargs.get("use_cuda", False)
-    c = kwargs.get("c", 3)
 
-    global MODEL
+    fi_reset()
+    global OUTPUT_SIZE
+    OUTPUT_SIZE = []
+
+    b = kwargs.get("b", 1)
+    c = kwargs.get("c", 3)
+    use_cuda = kwargs.get("use_cuda", False)
+
+    global ORIG_MODEL
     if use_cuda:
-        MODEL = nn.DataParallel(model)
+        ORIG_MODEL = nn.DataParallel(model)
     else:
-        MODEL = model
+        ORIG_MODEL = model
 
     global BATCH_SIZE
     BATCH_SIZE = batch_size
 
-    for param in MODEL.modules():
+    handles = []
+    for param in ORIG_MODEL.modules():
         if isinstance(param, nn.Conv2d):
-            param.register_forward_hook(save_output_size)
+            handles.append(param.register_forward_hook(save_output_size))
 
     global BCHW
     BCHW = [b, c, h, w]
 
-    MODEL(torch.randn(b, c, h, w))
+    ORIG_MODEL(torch.randn(b, c, h, w))
+
+    for i in range(len(handles)):
+        handles[i].remove()
 
     if DEBUG:
         print("Model output size:")
@@ -98,9 +113,9 @@ def declare_weight_fi(index, min_value, max_value):
     https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/core/coredeclareweightfi/
     """
     fi_reset()
-    model = copy.deepcopy(MODEL)
-    model.features[index].weight.data.clamp_(min=min_value, max=max_value)
-    return model
+    pfi_model = copy.deepcopy(ORIG_MODEL)
+    pfi_model.features[index].weight.data.clamp_(min=min_value, max=max_value)
+    return pfi_model
 
 
 def declare_neuron_fi(**kwargs):
@@ -139,18 +154,17 @@ def declare_neuron_fi(**kwargs):
         if DEBUG:
             print("Declaring Randomized Fault Injector")
 
-    model = copy.deepcopy(MODEL)
+    pfi_model = copy.deepcopy(ORIG_MODEL)
 
-    for param in model.modules():
+    global HANDLES
+    for param in pfi_model.modules():
         if isinstance(param, nn.Conv2d):
-            if RANDOM_INJECTION:
-                param.register_forward_hook(random_value)
-            elif CUSTOM_INJECTION:
-                param.register_forward_hook(INJECTION_FUNCTION)
+            if CUSTOM_INJECTION:
+                HANDLES.append(param.register_forward_hook(INJECTION_FUNCTION))
             else:
-                param.register_forward_hook(set_value)
+                HANDLES.append(param.register_forward_hook(set_value))
 
-    return model
+    return pfi_model
 
 
 def validate_fi(**kwargs):
@@ -184,33 +198,40 @@ def validate_fi(**kwargs):
             or CORRUPT_W == -1
         )
 
+# generates a random injection (default value range [-1, 1]) in every layer of each batch element
+def random_inj_per_layer(min_val=-1, max_val=1):
+    conv_num = []
+    batch = []
+    c_rand = []
+    w_rand = []
+    h_rand = []
+    value = []
+    for i in range(get_total_batches()):
+        for j in range(get_total_conv()):
+            conv_num.append(j)
+            batch.append(i)
+            c_rand.append(random.randint(0, get_fmaps_num(j) - 1))
+            h_rand.append(random.randint(0, get_fmaps_H(j) - 1))
+            w_rand.append(random.randint(0, get_fmaps_W(j) - 1))
+            value.append(random.randint(min_val, max_val))
+    return declare_neuron_fi(conv_num=conv_num, batch=batch, c=c_rand, h=h_rand, w=w_rand, value=value)
 
-def random_value(self, input, output):
-    global CURRENT_CONV
-    random_batch = random.randint(0, OUTPUT_SIZE[CURRENT_CONV][0] - 1)
-    random_x = random.randint(0, OUTPUT_SIZE[CURRENT_CONV][1] - 1)
-    random_y = random.randint(0, OUTPUT_SIZE[CURRENT_CONV][2] - 1)
-    random_z = random.randint(0, OUTPUT_SIZE[CURRENT_CONV][3] - 1)
-    if CORRUPT_VALUE is not None:
-        value = CORRUPT_VALUE
-    else:
-        value = random.uniform(MIN_CORRUPT_VALUE, MAX_CORRUPT_VALUE)
-
-    if DEBUG:
-        print(
-            "Original value at [%d][%d][%d][%d]: %d"
-            % (
-                random_batch,
-                random_x,
-                random_y,
-                random_z,
-                output[random_batch][random_x][random_y][random_z],
-            )
-        )
-        print("Changing value to %d" % value)
-
-    output[random_batch][random_x][random_y][random_z] = value
-    CURRENT_CONV = CURRENT_CONV + 1
+# generates a single random injection (default value range [-1, 1]) in each batch element
+def random_inj(min_val=-1, max_val=1):
+    conv_num = []
+    batch = []
+    c_rand = []
+    h_rand = []
+    w_rand = []
+    value = []
+    for i in range(get_total_batches()):
+        conv_num.append(random.randint(0, get_total_conv() - 1))
+        batch.append(i)
+        c_rand.append(random.randint(0, get_fmaps_num(conv_num[i]) - 1))
+        h_rand.append(random.randint(0, get_fmaps_H(conv_num[i]) - 1))
+        w_rand.append(random.randint(0, get_fmaps_W(conv_num[i]) - 1))
+        value.append(random.randint(min_val, max_val))
+    return declare_neuron_fi(conv_num=conv_num, batch=batch, c=c_rand, h=h_rand, w=w_rand, value=value)
 
 
 def set_value(self, input, output):
@@ -228,15 +249,11 @@ def set_value(self, input, output):
                             CORRUPT_C[i],
                             CORRUPT_H[i],
                             CORRUPT_W[i],
-                            output[CORRUPT_BATCH[i]][CORRUPT_C[i]][CORRUPT_H[i]][
-                                CORRUPT_W[i]
-                            ],
+                            output[CORRUPT_BATCH[i]][CORRUPT_C[i]][CORRUPT_H[i]][CORRUPT_W[i]],
                         )
                     )
                     print("Changing value to %d" % CORRUPT_VALUE[i])
-                output[CORRUPT_BATCH[i]][CORRUPT_C[i]][CORRUPT_H[i]][
-                    CORRUPT_W[i]
-                ] = CORRUPT_VALUE[i]
+                output[CORRUPT_BATCH[i]][CORRUPT_C[i]][CORRUPT_H[i]][CORRUPT_W[i]] = CORRUPT_VALUE[i]
                 del (
                     CORRUPT_BATCH[i],
                     CORRUPT_C[i],
@@ -281,7 +298,7 @@ def get_original_model():
     """
     https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/core/coregetoriginalmodel/
     """
-    return MODEL
+    return ORIG_MODEL
 
 
 def get_output_size():
@@ -312,3 +329,23 @@ def get_h():
 
 def get_w():
     return BCHW[3]
+
+# returns total batches
+def get_total_batches():
+    return BATCH_SIZE
+
+# returns total number of convs
+def get_total_conv():
+    return len(OUTPUT_SIZE)
+
+# returns total number of fmaps in a layer
+def get_fmaps_num(layer):
+    return OUTPUT_SIZE[layer][1]
+
+# returns fmap H size
+def get_fmaps_H(layer):
+    return OUTPUT_SIZE[layer][2]
+
+# returns fmap W size
+def get_fmaps_W(layer):
+    return OUTPUT_SIZE[layer][3]
