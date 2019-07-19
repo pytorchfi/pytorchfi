@@ -14,10 +14,10 @@ import torch
 import torch.nn as nn
 
 ORIG_MODEL = None
+CORRUPTED_MODEL = None
 DEBUG = False
-BATCH_SIZE = -1
+_BATCH_SIZE = -1
 
-RANDOM_INJECTION = False
 CUSTOM_INJECTION = False
 INJECTION_FUNCTION = None
 
@@ -27,12 +27,9 @@ CORRUPT_C = -1
 CORRUPT_H = -1
 CORRUPT_W = -1
 CORRUPT_VALUE = None
-MIN_CORRUPT_VALUE = -500
-MAX_CORRUPT_VALUE = 500
 
-BCHW = []
 OUTPUT_SIZE = []
-CURRENT_CONV = -1
+CURRENT_CONV = 0
 HANDLES = []
 
 
@@ -40,18 +37,15 @@ def fi_reset():
     """
     https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/core/corefireset/
     """
-    global CURRENT_CONV, RANDOM_INJECTION, CORRUPT_CONV, CORRUPT_BATCH, CORRUPT_C, CORRUPT_H, CORRUPT_W, CORRUPT_VALUE, MIN_CORRUPT_VALUE, MAX_CORRUPT_VALUE
-    CURRENT_CONV, RANDOM_INJECTION, CORRUPT_BATCH, CORRUPT_CONV, CORRUPT_C, CORRUPT_H, CORRUPT_W, CORRUPT_VALUE, MIN_CORRUPT_VALUE, MAX_CORRUPT_VALUE = (
+    global CURRENT_CONV, CORRUPT_CONV, CORRUPT_BATCH, CORRUPT_C, CORRUPT_H, CORRUPT_W, CORRUPT_VALUE
+    CURRENT_CONV, CORRUPT_BATCH, CORRUPT_CONV, CORRUPT_C, CORRUPT_H, CORRUPT_W, CORRUPT_VALUE = (
         0,
-        False,
         -1,
         -1,
         -1,
         -1,
         -1,
         None,
-        -500,
-        500,
     )
 
 
@@ -83,16 +77,13 @@ def init(model, h, w, batch_size, **kwargs):
     else:
         ORIG_MODEL = model
 
-    global BATCH_SIZE
-    BATCH_SIZE = batch_size
+    global _BATCH_SIZE
+    _BATCH_SIZE = batch_size
 
     handles = []
     for param in ORIG_MODEL.modules():
         if isinstance(param, nn.Conv2d):
-            handles.append(param.register_forward_hook(save_output_size))
-
-    global BCHW
-    BCHW = [b, c, h, w]
+            handles.append(param.register_forward_hook(_save_output_size))
 
     ORIG_MODEL(torch.randn(b, c, h, w))
 
@@ -108,14 +99,16 @@ def init(model, h, w, batch_size, **kwargs):
         )
 
 
-def declare_weight_fi(index, min_value, max_value):
+def declare_weight_fi(index, min_value=-1, max_value=1):
     """
     https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/core/coredeclareweightfi/
     """
+    #TODO check injection bounds
     fi_reset()
-    pfi_model = copy.deepcopy(ORIG_MODEL)
-    pfi_model.features[index].weight.data.clamp_(min=min_value, max=max_value)
-    return pfi_model
+    global CORRUPTED_MODEL
+    CORRUPTED_MODEL = copy.deepcopy(ORIG_MODEL)
+    CORRUPTED_MODEL.features[index].weight.data.clamp_(min=min_value, max=max_value)
+    return CORRUPTED_MODEL
 
 
 def declare_neuron_fi(**kwargs):
@@ -129,15 +122,13 @@ def declare_neuron_fi(**kwargs):
             global CUSTOM_INJECTION, INJECTION_FUNCTION
             CUSTOM_INJECTION, INJECTION_FUNCTION = True, kwargs.get("function")
         else:
-            global CORRUPT_CONV, CORRUPT_BATCH, CORRUPT_C, CORRUPT_H, CORRUPT_W, CORRUPT_VALUE, MIN_CORRUPT_VALUE, MAX_CORRUPT_VALUE
+            global CORRUPT_CONV, CORRUPT_BATCH, CORRUPT_C, CORRUPT_H, CORRUPT_W, CORRUPT_VALUE
             CORRUPT_CONV = kwargs.get("conv_num", -1)
             CORRUPT_BATCH = kwargs.get("batch", -1)
             CORRUPT_C = kwargs.get("c", -1)
             CORRUPT_H = kwargs.get("h", -1)
             CORRUPT_W = kwargs.get("w", -1)
             CORRUPT_VALUE = kwargs.get("value", None)
-            MIN_CORRUPT_VALUE = kwargs.get("min_value", -500)
-            MAX_CORRUPT_VALUE = kwargs.get("max_value", 500)
 
             if DEBUG:
                 print("Declaring Specified Fault Injector")
@@ -146,103 +137,58 @@ def declare_neuron_fi(**kwargs):
                 print(
                     "%s, %s, %s, %s" % (CORRUPT_BATCH, CORRUPT_C, CORRUPT_H, CORRUPT_W)
                 )
-
     else:
-        global RANDOM_INJECTION
-        RANDOM_INJECTION = True
+        raise ValueError("Please specify an injection or injection function")
 
-        if DEBUG:
-            print("Declaring Randomized Fault Injector")
+    # make a deep copy of the input model to corrupt
+    global CORRUPTED_MODEL
+    CORRUPTED_MODEL = copy.deepcopy(ORIG_MODEL)
 
-    pfi_model = copy.deepcopy(ORIG_MODEL)
-
+    # attach hook with injection functions to each conv module
     global HANDLES
-    for param in pfi_model.modules():
+    for param in CORRUPTED_MODEL.modules():
         if isinstance(param, nn.Conv2d):
             if CUSTOM_INJECTION:
                 HANDLES.append(param.register_forward_hook(INJECTION_FUNCTION))
             else:
-                HANDLES.append(param.register_forward_hook(set_value))
+                HANDLES.append(param.register_forward_hook(_set_value))
 
-    return pfi_model
+    return CORRUPTED_MODEL
 
 
-def validate_fi(**kwargs):
+def assert_inj_bounds(**kwargs):
+    # checks for specfic injection out of a list
     if type(CORRUPT_CONV) == list:
         index = kwargs.get("index", -1)
-        return not (
-            CORRUPT_CONV[index] < 0
-            or CORRUPT_CONV[index] >= len(OUTPUT_SIZE)
-            or CORRUPT_BATCH[index] >= BATCH_SIZE
-            or CORRUPT_C[index] > OUTPUT_SIZE[CORRUPT_CONV[index]][1]
-            or CORRUPT_H[index] > OUTPUT_SIZE[CORRUPT_CONV[index]][2]
-            or CORRUPT_W[index] > OUTPUT_SIZE[CORRUPT_CONV[index]][3]
-            or CORRUPT_CONV == -1
-            or CORRUPT_BATCH == -1
-            or CORRUPT_C == -1
-            or CORRUPT_H == -1
-            or CORRUPT_W == -1
-        )
+        assert CORRUPT_CONV[index] >= 0 and CORRUPT_CONV[index] < get_total_conv(), "invalid conv"
+        assert CORRUPT_BATCH[index] >= 0 and CORRUPT_BATCH[index] < _BATCH_SIZE, "invalid batch"
+        assert CORRUPT_C[index] >= 0 and CORRUPT_C[index] < \
+            OUTPUT_SIZE[CORRUPT_CONV[index]][1], "invalid c"
+        assert CORRUPT_H[index] >= 0 and CORRUPT_H[index] < \
+            OUTPUT_SIZE[CORRUPT_CONV[index]][2], "invalid h"
+        assert CORRUPT_W[index] >= 0 and CORRUPT_W[index] < \
+            OUTPUT_SIZE[CORRUPT_CONV[index]][3], "invalid w"
+    # checks for single injection
     else:
-        return not (
-            CORRUPT_CONV < 0
-            or CORRUPT_CONV >= len(OUTPUT_SIZE)
-            or CORRUPT_BATCH >= BATCH_SIZE
-            or CORRUPT_C > OUTPUT_SIZE[CORRUPT_CONV][1]
-            or CORRUPT_H > OUTPUT_SIZE[CORRUPT_CONV][2]
-            or CORRUPT_W > OUTPUT_SIZE[CORRUPT_CONV][3]
-            or CORRUPT_CONV == -1
-            or CORRUPT_BATCH == -1
-            or CORRUPT_C == -1
-            or CORRUPT_H == -1
-            or CORRUPT_W == -1
-        )
-
-# generates a random injection (default value range [-1, 1]) in every layer of each batch element
-def random_inj_per_layer(min_val=-1, max_val=1):
-    conv_num = []
-    batch = []
-    c_rand = []
-    w_rand = []
-    h_rand = []
-    value = []
-    for i in range(get_total_batches()):
-        for j in range(get_total_conv()):
-            conv_num.append(j)
-            batch.append(i)
-            c_rand.append(random.randint(0, get_fmaps_num(j) - 1))
-            h_rand.append(random.randint(0, get_fmaps_H(j) - 1))
-            w_rand.append(random.randint(0, get_fmaps_W(j) - 1))
-            value.append(random.randint(min_val, max_val))
-    return declare_neuron_fi(conv_num=conv_num, batch=batch, c=c_rand, h=h_rand, w=w_rand, value=value)
-
-# generates a single random injection (default value range [-1, 1]) in each batch element
-def random_inj(min_val=-1, max_val=1):
-    conv_num = []
-    batch = []
-    c_rand = []
-    h_rand = []
-    w_rand = []
-    value = []
-    for i in range(get_total_batches()):
-        conv_num.append(random.randint(0, get_total_conv() - 1))
-        batch.append(i)
-        c_rand.append(random.randint(0, get_fmaps_num(conv_num[i]) - 1))
-        h_rand.append(random.randint(0, get_fmaps_H(conv_num[i]) - 1))
-        w_rand.append(random.randint(0, get_fmaps_W(conv_num[i]) - 1))
-        value.append(random.randint(min_val, max_val))
-    return declare_neuron_fi(conv_num=conv_num, batch=batch, c=c_rand, h=h_rand, w=w_rand, value=value)
+        assert CORRUPT_CONV >= 0 and CORRUPT_CONV < get_total_conv(), "invalid conv"
+        assert CORRUPT_BATCH >= 0 and CORRUPT_BATCH < _BATCH_SIZE, "invalid batch"
+        assert CORRUPT_C >= 0 and CORRUPT_C < OUTPUT_SIZE[CORRUPT_CONV][1], "invalid c"
+        assert CORRUPT_H >= 0 and CORRUPT_H < OUTPUT_SIZE[CORRUPT_CONV][2], "invalid h"
+        assert CORRUPT_W >= 0 and CORRUPT_W < OUTPUT_SIZE[CORRUPT_CONV][3], "invalid w"
 
 
-def set_value(self, input, output):
+def _set_value(self, input, output):
     global CURRENT_CONV, CORRUPT_BATCH, CORRUPT_C, CORRUPT_H, CORRUPT_W, CORRUPT_VALUE, CORRUPT_CONV
 
     if type(CORRUPT_CONV) == list:
-        try:
-            i = CORRUPT_CONV.index(CURRENT_CONV)
-            if validate_fi(index=i):
-                if DEBUG:
-                    print(
+        # extract injections in this layer
+        inj_list = list(filter(lambda x: CORRUPT_CONV[x] == CURRENT_CONV, range(len(CORRUPT_CONV))))
+        # perform each injection for this layer
+        for i in inj_list:
+            # check that the injection indices are valid
+            assert_inj_bounds(index=i)
+            if DEBUG:
+                print(
                         "Original value at [%d][%d][%d][%d]: %d"
                         % (
                             CORRUPT_BATCH[i],
@@ -252,47 +198,36 @@ def set_value(self, input, output):
                             output[CORRUPT_BATCH[i]][CORRUPT_C[i]][CORRUPT_H[i]][CORRUPT_W[i]],
                         )
                     )
-                    print("Changing value to %d" % CORRUPT_VALUE[i])
-                output[CORRUPT_BATCH[i]][CORRUPT_C[i]][CORRUPT_H[i]][CORRUPT_W[i]] = CORRUPT_VALUE[i]
-                del (
-                    CORRUPT_BATCH[i],
-                    CORRUPT_C[i],
-                    CORRUPT_CONV[i],
-                    CORRUPT_H[i],
-                    CORRUPT_W[i],
-                    CORRUPT_VALUE[i],
-                )
-            else:
-                print("Fault injection not valid!")
-        except ValueError:
-            pass
+                print("Changing value to %d" % CORRUPT_VALUE[i])
+            # inject value
+            output[CORRUPT_BATCH[i]][CORRUPT_C[i]][CORRUPT_H[i]][CORRUPT_W[i]] = CORRUPT_VALUE[i]
+        # useful for injection hooks
+        CURRENT_CONV += 1
 
-        CURRENT_CONV = CURRENT_CONV + 1
-    else:
-        if validate_fi():
-            if CURRENT_CONV == CORRUPT_CONV:
-                if DEBUG:
-                    print(
-                        "Original value at [%d][%d][%d][%d]: %d"
-                        % (
-                            CORRUPT_BATCH,
-                            CORRUPT_C,
-                            CORRUPT_H,
-                            CORRUPT_W,
-                            output[CORRUPT_BATCH][CORRUPT_C][CORRUPT_H][CORRUPT_W],
-                        )
+    else: # single injection (not a list of injections)
+        # check that the injection indices are valid
+        assert_inj_bounds()
+        if CURRENT_CONV == CORRUPT_CONV:
+            if DEBUG:
+                print(
+                    "Original value at [%d][%d][%d][%d]: %d"
+                    % (
+                        CORRUPT_BATCH,
+                        CORRUPT_C,
+                        CORRUPT_H,
+                        CORRUPT_W,
+                        output[CORRUPT_BATCH][CORRUPT_C][CORRUPT_H][CORRUPT_W],
                     )
-                    print("Changing value to %d" % CORRUPT_VALUE)
-                output[CORRUPT_BATCH][CORRUPT_C][CORRUPT_H][CORRUPT_W] = CORRUPT_VALUE
-            CURRENT_CONV = CURRENT_CONV + 1
-        else:
-            print("Fault injection not valid!")
+                )
+                print("Changing value to %d" % CORRUPT_VALUE)
+            # inject value
+            output[CORRUPT_BATCH][CORRUPT_C][CORRUPT_H][CORRUPT_W] = CORRUPT_VALUE
+        CURRENT_CONV += 1
 
 
-def save_output_size(self, input, output):
+def _save_output_size(self, input, output):
     global OUTPUT_SIZE
     OUTPUT_SIZE.append(list(output.size()))
-
 
 def get_original_model():
     """
@@ -300,6 +235,8 @@ def get_original_model():
     """
     return ORIG_MODEL
 
+def get_corrupted_model():
+    return CORRUPTED_MODEL
 
 def get_output_size():
     """
@@ -307,32 +244,9 @@ def get_output_size():
     """
     return OUTPUT_SIZE
 
-
-def get_bchw():
-    """
-    https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/core/coregetbchw/
-    """
-    return BCHW
-
-
-def get_b():
-    return BCHW[0]
-
-
-def get_c():
-    return BCHW[1]
-
-
-def get_h():
-    return BCHW[2]
-
-
-def get_w():
-    return BCHW[3]
-
 # returns total batches
 def get_total_batches():
-    return BATCH_SIZE
+    return _BATCH_SIZE
 
 # returns total number of convs
 def get_total_conv():
