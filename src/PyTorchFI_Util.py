@@ -34,7 +34,7 @@ def random_inj_per_layer(min_val=-1, max_val=1):
             c_rand.append(random.randint(0, core.get_fmaps_num(j) - 1))
             h_rand.append(random.randint(0, core.get_fmaps_H(j) - 1))
             w_rand.append(random.randint(0, core.get_fmaps_W(j) - 1))
-            value.append(random.randint(min_val, max_val))
+            value.append(random.randuniform(min_val, max_val))
     return core.declare_neuron_fi(conv_num=conv_num, batch=batch, c=c_rand, h=h_rand, w=w_rand, value=value)
 
 
@@ -52,7 +52,7 @@ def random_inj(min_val=-1, max_val=1):
         c_rand.append(random.randint(0, core.get_fmaps_num(conv_num[i]) - 1))
         h_rand.append(random.randint(0, core.get_fmaps_H(conv_num[i]) - 1))
         w_rand.append(random.randint(0, core.get_fmaps_W(conv_num[i]) - 1))
-        value.append(random.randint(min_val, max_val))
+        value.append(random.randuniform(min_val, max_val))
     return core.declare_neuron_fi(conv_num=conv_num, batch=batch, c=c_rand, h=h_rand, w=w_rand, value=value)
 
 
@@ -80,7 +80,7 @@ def time_model(model, input_data, iterations=100):
     https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/util/utiltimemodel/
     """
     start_time = time.time()
-    for i in range(iterations)
+    for i in range(iterations):
         model(input_data)
     end_time = time.time()
     return (end_time - start_time) / iterations
