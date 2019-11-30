@@ -99,17 +99,58 @@ def init(model, h, w, batch_size, **kwargs):
         )
 
 
-def declare_weight_fi(index, min_value=-1, max_value=1):
+def declare_weight_fi(**kwargs):
     """
     https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/core/coredeclareweightfi/
     """
-    #TODO check injection bounds
     fi_reset()
+    custom_function = False
+    zero_layer = False
+    if kwargs:
+        if "function" in kwargs:
+            # custom function specified injection
+            custom_function, function = True, kwargs.get("function")
+            corrupt_idx = kwargs.get("index", 0)
+        elif (not kwargs.get("zero", False)):
+            # specified injection
+            corrupt_value = kwargs.get("value", -1)
+            corrupt_idx = kwargs.get("index", 0)
+        else:
+            # zero layer
+            zero_layer = True
+        corrupt_layer = kwargs.get("layer", -1)
+    else:
+        raise ValueError("Please specify an injection or injection function")
+
+    # make deep copy of input model to corrupt
     global CORRUPTED_MODEL
     CORRUPTED_MODEL = copy.deepcopy(ORIG_MODEL)
-    CORRUPTED_MODEL.features[index].weight.data.clamp_(min=min_value, max=max_value)
-    return CORRUPTED_MODEL
 
+    curr_layer = 0
+    orig_value = 0
+    for name, param in CORRUPTED_MODEL.named_parameters():
+        if (name.split('.')[-1] == 'weight'):
+            if (curr_layer == corrupt_layer):
+                if zero_layer:
+                    param.data[:] = 0
+                    if DEBUG:
+                        print("Zero weight layer")
+                        print("Layer index: %s" % corrupt_layer)
+                else:
+                    orig_value = param.data[tuple(corrupt_idx)].item()
+                    # Use function if specified
+                    if custom_function:
+                        corrupt_value = function(param.data[tuple(corrupt_idx)])
+                    # Inject corrupt value
+                    param.data[tuple(corrupt_idx)] = corrupt_value
+                    if DEBUG:
+                        print("Weight Injection")
+                        print("Layer index: %s" % corrupt_layer)
+                        print("Module: %s" % name)
+                        print("Original value: %s" % orig_value)
+                        print("Injected value: %s" % corrupt_value)
+            curr_layer += 1
+    return CORRUPTED_MODEL
 
 def declare_neuron_fi(**kwargs):
     """

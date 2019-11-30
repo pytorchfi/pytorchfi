@@ -18,8 +18,11 @@ from pytorchfi import PyTorchFI_Core as core
 
 DEBUG = False
 
+# replace specified layer of weights with zeroes
+def zero_layer_weights(zero_layer=0):
+    return core.declare_weight_fi(layer=zero_layer, zero=True)
 
-# generates a random injection (default value range [-1, 1]) in every layer of each batch element
+# generates a random neuron injection (default value range [-1, 1]) in every layer of each batch element
 def random_inj_per_layer(min_val=-1, max_val=1):
     conv_num = []
     batch = []
@@ -38,7 +41,7 @@ def random_inj_per_layer(min_val=-1, max_val=1):
     return core.declare_neuron_fi(conv_num=conv_num, batch=batch, c=c_rand, h=h_rand, w=w_rand, value=value)
 
 
-# generates a single random injection (default value range [-1, 1]) in each batch element
+# generates a single neuron random injection (default value range [-1, 1]) in each batch element
 def random_inj(min_val=-1, max_val=1):
     conv_num = []
     batch = []
