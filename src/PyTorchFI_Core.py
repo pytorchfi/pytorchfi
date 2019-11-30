@@ -111,13 +111,17 @@ def declare_weight_fi(**kwargs):
             # custom function specified injection
             custom_function, function = True, kwargs.get("function")
             corrupt_idx = kwargs.get("index", 0)
-        elif (not kwargs.get("zero", False)):
-            # specified injection
-            corrupt_value = kwargs.get("value", -1)
-            corrupt_idx = kwargs.get("index", 0)
-        else:
+        elif kwargs.get("zero", False):
             # zero layer
             zero_layer = True
+        elif kwargs.get("rand", False):
+            rand_inj = True
+            min_val = kwargs.get("min_rand_val")
+            max_val = kwargs.get("max_rand_val")
+        else:
+            # specified injection
+            corrupt_value = kwargs.get("value", -1)
+            corrupt_idx = kwargs.get("index", -1)
         corrupt_layer = kwargs.get("layer", -1)
     else:
         raise ValueError("Please specify an injection or injection function")
@@ -126,8 +130,15 @@ def declare_weight_fi(**kwargs):
     global CORRUPTED_MODEL
     CORRUPTED_MODEL = copy.deepcopy(ORIG_MODEL)
 
+    # get number of weight files
+    num_layers = 0
+    for name, param in CORRUPTED_MODEL.named_parameters():
+        if (name.split('.')[-1] == 'weight'):
+            num_layers += 1
     curr_layer = 0
     orig_value = 0
+    if rand_inj:
+        corrupt_layer = random.randint(0, num_layers-1)
     for name, param in CORRUPTED_MODEL.named_parameters():
         if (name.split('.')[-1] == 'weight'):
             if (curr_layer == corrupt_layer):
@@ -137,13 +148,18 @@ def declare_weight_fi(**kwargs):
                         print("Zero weight layer")
                         print("Layer index: %s" % corrupt_layer)
                 else:
+                    if rand_inj:
+                        corrupt_value = random.uniform(min_val, max_val)
+                        corrupt_idx = list()
+                        for dim in param.size():
+                            corrupt_idx.append(random.randint(0, dim-1))
                     orig_value = param.data[tuple(corrupt_idx)].item()
                     # Use function if specified
                     if custom_function:
                         corrupt_value = function(param.data[tuple(corrupt_idx)])
                     # Inject corrupt value
                     param.data[tuple(corrupt_idx)] = corrupt_value
-                    if DEBUG:
+                    if True:
                         print("Weight Injection")
                         print("Layer index: %s" % corrupt_layer)
                         print("Module: %s" % name)
