@@ -22,6 +22,10 @@ DEBUG = False
 def zero_layer_weights(zero_layer=0):
     return core.declare_weight_fi(layer=zero_layer, zero=True)
 
+# generates a random weight injection (default range [-1, 1])
+def random_weight_inj(min_val=-1, max_val=1):
+    return core.declare_weight_fi(rand=True, min_rand_val=min_val, max_rand_val=max_val)
+
 # generates a random neuron injection (default value range [-1, 1]) in every layer of each batch element
 def random_inj_per_layer(min_val=-1, max_val=1):
     conv_num = []
