@@ -34,9 +34,6 @@ HANDLES = []
 
 
 def fi_reset():
-    """
-    https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/core/corefireset/
-    """
     global CURRENT_CONV, CORRUPT_CONV, CORRUPT_BATCH, CORRUPT_C, CORRUPT_H, CORRUPT_W, CORRUPT_VALUE
     CURRENT_CONV, CORRUPT_BATCH, CORRUPT_CONV, CORRUPT_C, CORRUPT_H, CORRUPT_W, CORRUPT_VALUE = (
         0,
@@ -59,9 +56,7 @@ def fi_reset():
 
 
 def init(model, h, w, batch_size, **kwargs):
-    """
-    https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/core/coreinit/
-    """
+
 
     fi_reset()
     global OUTPUT_SIZE
@@ -100,9 +95,7 @@ def init(model, h, w, batch_size, **kwargs):
 
 
 def declare_weight_fi(**kwargs):
-    """
-    https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/core/coredeclareweightfi/
-    """
+
     fi_reset()
     custom_function = False
     zero_layer = False
@@ -169,9 +162,7 @@ def declare_weight_fi(**kwargs):
     return CORRUPTED_MODEL
 
 def declare_neuron_fi(**kwargs):
-    """
-    https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/core/coredeclareneuronfi/
-    """
+
     fi_reset()
 
     if kwargs:
@@ -287,18 +278,12 @@ def _save_output_size(self, input, output):
     OUTPUT_SIZE.append(list(output.size()))
 
 def get_original_model():
-    """
-    https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/core/coregetoriginalmodel/
-    """
     return ORIG_MODEL
 
 def get_corrupted_model():
     return CORRUPTED_MODEL
 
 def get_output_size():
-    """
-    https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/core/coregetoutputsize/
-    """
     return OUTPUT_SIZE
 
 # returns total batches

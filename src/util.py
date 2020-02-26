@@ -64,9 +64,6 @@ def random_inj(min_val=-1, max_val=1):
 
 
 def compare_golden(input_data):
-    """
-    https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/util/utilcomparegolden/
-    """
     softmax = nn.Softmax(dim=1)
 
     model = core.get_original_model()
@@ -83,9 +80,6 @@ def compare_golden(input_data):
 
 
 def time_model(model, input_data, iterations=100):
-    """
-    https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/util/utiltimemodel/
-    """
     start_time = time.time()
     for i in range(iterations):
         model(input_data)
@@ -94,9 +88,6 @@ def time_model(model, input_data, iterations=100):
 
 
 def random_batch_fi_gen(conv_number, fmap_number, H_size, W_size, min_value, max_value):
-    """
-    https://n3a9.github.io/pytorchfi-docs-beta/docs/functionlist/util/utilrandfigen/
-    """
     conv_fi = [conv_number] * core.get_total_batches()
     batch_fi = list(range(core.get_total_batches()))
     c_fi = [fmap_number] * core.get_total_batches()
