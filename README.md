@@ -4,9 +4,11 @@
 
 PyTorchFI is a runtime fault injector tool for PyTorch to simulate bit flips within the neural network. Check us out on PyPI [here](https://pypi.org/project/pytorchfi/).
 
+The documentation can be found at [pytorchfi.github.io](https://pytorchfi.github.io/).
+
 ## Installation
 
-### Via Pip
+**Pip**
 
 Install using `pip install pytorchfi` Then in your project source files:
 
@@ -14,17 +16,13 @@ Install using `pip install pytorchfi` Then in your project source files:
 import pytorchfi
 ```
 
-### From Source
+**From Source**
 
 Download this repository into your project folder. Then in your project source files:
 
 ```python
 from pytorchfi import core
 ```
-
-## Documentation
-
-The documentation can be found at [pytorchfi.github.io](https://pytorchfi.github.io/).
 
 ## Code
 
