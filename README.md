@@ -6,9 +6,7 @@ PyTorchFI is a runtime fault injector tool for PyTorch to simulate bit flips wit
 
 The documentation can be found at [pytorchfi.github.io](https://pytorchfi.github.io/).
 
-### Usage
-
-#### Installation
+### Installation
 
 **From Pip**
 
@@ -18,7 +16,7 @@ Install using `pip install pytorchfi` Then in your project source files:
 
 Download this repository into your project folder.
 
-#### Importing
+### Usage
 
 Import the entire package:
 
