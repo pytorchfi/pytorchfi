@@ -16,7 +16,6 @@ import random
 
 from pytorchfi import core
 
-DEBUG = False
 
 # replace specified layer of weights with zeroes
 def zero_layer_weights(zero_layer=0):
@@ -105,7 +104,3 @@ def random_batch_fi_gen(conv_number, fmap_number, H_size, W_size, min_value, max
 
     return [conv_fi, batch_fi, c_fi, h_fi, w_fi, val_fi]
 
-
-def set_debug(debug):
-    global DEBUG
-    DEBUG = debug

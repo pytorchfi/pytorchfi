@@ -35,8 +35,6 @@ class core:
         self.CURRENT_CONV = 0
         self.HANDLES = []
 
-        self.OUTPUT_SIZE = []
-
         b = kwargs.get("b", 1)
         c = kwargs.get("c", 3)
         use_cuda = kwargs.get("use_cuda", False)
