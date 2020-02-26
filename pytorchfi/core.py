@@ -334,3 +334,12 @@ def get_fmaps_H(layer):
 # returns fmap W size
 def get_fmaps_W(layer):
     return OUTPUT_SIZE[layer][3]
+
+
+def get_fmap_HW(layer):
+    return tuple(OUTPUT_SIZE[layer[2:4]])
+
+
+def set_debug(debug):
+    global DEBUG
+    DEBUG = debug
