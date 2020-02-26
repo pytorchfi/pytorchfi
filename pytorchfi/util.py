@@ -22,9 +22,11 @@ DEBUG = False
 def zero_layer_weights(zero_layer=0):
     return core.declare_weight_fi(layer=zero_layer, zero=True)
 
+
 # generates a random weight injection (default range [-1, 1])
 def random_weight_inj(min_val=-1, max_val=1):
     return core.declare_weight_fi(rand=True, min_rand_val=min_val, max_rand_val=max_val)
+
 
 # generates a random neuron injection (default value range [-1, 1]) in every layer of each batch element
 def random_inj_per_layer(min_val=-1, max_val=1):
@@ -42,17 +44,15 @@ def random_inj_per_layer(min_val=-1, max_val=1):
             h_rand.append(random.randint(0, core.get_fmaps_H(j) - 1))
             w_rand.append(random.randint(0, core.get_fmaps_W(j) - 1))
             value.append(random.uniform(min_val, max_val))
-    return core.declare_neuron_fi(conv_num=conv_num, batch=batch, c=c_rand, h=h_rand, w=w_rand, value=value)
+    return core.declare_neuron_fi(
+        conv_num=conv_num, batch=batch, c=c_rand, h=h_rand, w=w_rand, value=value
+    )
 
 
 # generates a single neuron random injection (default value range [-1, 1]) in each batch element
 def random_inj(min_val=-1, max_val=1):
-    conv_num = []
-    batch = []
-    c_rand = []
-    h_rand = []
-    w_rand = []
-    value = []
+    conv_num, batch, c_rand, h_rand, w_rand, value = ([] for i in range(6))
+
     for i in range(core.get_total_batches()):
         conv_num.append(random.randint(0, core.get_total_conv() - 1))
         batch.append(i)
@@ -60,7 +60,10 @@ def random_inj(min_val=-1, max_val=1):
         h_rand.append(random.randint(0, core.get_fmaps_H(conv_num[i]) - 1))
         w_rand.append(random.randint(0, core.get_fmaps_W(conv_num[i]) - 1))
         value.append(random.uniform(min_val, max_val))
-    return core.declare_neuron_fi(conv_num=conv_num, batch=batch, c=c_rand, h=h_rand, w=w_rand, value=value)
+
+    return core.declare_neuron_fi(
+        conv_num=conv_num, batch=batch, c=c_rand, h=h_rand, w=w_rand, value=value
+    )
 
 
 def compare_golden(input_data):
@@ -81,7 +84,7 @@ def compare_golden(input_data):
 
 def time_model(model, input_data, iterations=100):
     start_time = time.time()
-    for i in range(iterations):
+    for _ in range(iterations):
         model(input_data)
     end_time = time.time()
     return (end_time - start_time) / iterations
@@ -95,7 +98,7 @@ def random_batch_fi_gen(conv_number, fmap_number, H_size, W_size, min_value, max
     w_fi = []
     val_fi = []
 
-    for i in range(core.get_total_batches()):
+    for _ in range(core.get_total_batches()):
         h_fi.append(random.randint(0, H_size - 1))
         w_fi.append(random.randint(0, W_size - 1))
         val_fi.append(random.uniform(min_value, max_value))

@@ -63,7 +63,6 @@ def fi_reset():
 
 
 def init(model, h, w, batch_size, **kwargs):
-
     fi_reset()
     global OUTPUT_SIZE
     OUTPUT_SIZE = []
@@ -73,10 +72,7 @@ def init(model, h, w, batch_size, **kwargs):
     use_cuda = kwargs.get("use_cuda", False)
 
     global ORIG_MODEL
-    if use_cuda:
-        ORIG_MODEL = nn.DataParallel(model)
-    else:
-        ORIG_MODEL = model
+    ORIG_MODEL = nn.DataParallel(model) if use_cuda else model
 
     global _BATCH_SIZE
     _BATCH_SIZE = batch_size
@@ -101,10 +97,10 @@ def init(model, h, w, batch_size, **kwargs):
 
 
 def declare_weight_fi(**kwargs):
-
     fi_reset()
     custom_function = False
     zero_layer = False
+
     if kwargs:
         if "function" in kwargs:
             # custom function specified injection
@@ -136,6 +132,7 @@ def declare_weight_fi(**kwargs):
             num_layers += 1
     curr_layer = 0
     orig_value = 0
+
     if rand_inj:
         corrupt_layer = random.randint(0, num_layers - 1)
     for name, param in CORRUPTED_MODEL.named_parameters():
@@ -158,7 +155,7 @@ def declare_weight_fi(**kwargs):
                         corrupt_value = function(param.data[tuple(corrupt_idx)])
                     # Inject corrupt value
                     param.data[tuple(corrupt_idx)] = corrupt_value
-                    if True:
+                    if DEBUG:
                         print("Weight Injection")
                         print("Layer index: %s" % corrupt_layer)
                         print("Module: %s" % name)
@@ -169,7 +166,6 @@ def declare_weight_fi(**kwargs):
 
 
 def declare_neuron_fi(**kwargs):
-
     fi_reset()
 
     if kwargs:
@@ -217,29 +213,31 @@ def assert_inj_bounds(**kwargs):
         index = kwargs.get("index", -1)
         assert (
             CORRUPT_CONV[index] >= 0 and CORRUPT_CONV[index] < get_total_conv()
-        ), "invalid conv"
+        ), "Invalid convolution!"
         assert (
             CORRUPT_BATCH[index] >= 0 and CORRUPT_BATCH[index] < _BATCH_SIZE
-        ), "invalid batch"
+        ), "Invalid batch!"
         assert (
             CORRUPT_C[index] >= 0
             and CORRUPT_C[index] < OUTPUT_SIZE[CORRUPT_CONV[index]][1]
-        ), "invalid c"
+        ), "Invalid C!"
         assert (
             CORRUPT_H[index] >= 0
             and CORRUPT_H[index] < OUTPUT_SIZE[CORRUPT_CONV[index]][2]
-        ), "invalid h"
+        ), "Invalid H!"
         assert (
             CORRUPT_W[index] >= 0
             and CORRUPT_W[index] < OUTPUT_SIZE[CORRUPT_CONV[index]][3]
-        ), "invalid w"
+        ), "Invalid W!"
     # checks for single injection
     else:
-        assert CORRUPT_CONV >= 0 and CORRUPT_CONV < get_total_conv(), "invalid conv"
-        assert CORRUPT_BATCH >= 0 and CORRUPT_BATCH < _BATCH_SIZE, "invalid batch"
-        assert CORRUPT_C >= 0 and CORRUPT_C < OUTPUT_SIZE[CORRUPT_CONV][1], "invalid c"
-        assert CORRUPT_H >= 0 and CORRUPT_H < OUTPUT_SIZE[CORRUPT_CONV][2], "invalid h"
-        assert CORRUPT_W >= 0 and CORRUPT_W < OUTPUT_SIZE[CORRUPT_CONV][3], "invalid w"
+        assert (
+            CORRUPT_CONV >= 0 and CORRUPT_CONV < get_total_conv()
+        ), "Invalid convolution!"
+        assert CORRUPT_BATCH >= 0 and CORRUPT_BATCH < _BATCH_SIZE, "Invalid batch!"
+        assert CORRUPT_C >= 0 and CORRUPT_C < OUTPUT_SIZE[CORRUPT_CONV][1], "Invalid C!"
+        assert CORRUPT_H >= 0 and CORRUPT_H < OUTPUT_SIZE[CORRUPT_CONV][2], "Invalid H!"
+        assert CORRUPT_W >= 0 and CORRUPT_W < OUTPUT_SIZE[CORRUPT_CONV][3], "Invalid W!"
 
 
 def _set_value(self, input, output):
