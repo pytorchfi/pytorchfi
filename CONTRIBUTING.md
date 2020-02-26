@@ -30,3 +30,5 @@ When creating an issue, add a label for easier classification. Here are a breakd
 | `bug` :beetle:         | Bug report with the current application on the master branch.                                     |
 | `documentation` :book: | An issue with the documentation. This may include incorrect or insufficient information.          |
 | `feature` :star2:      | A new feature request for the application. This will be paired with a priority label if accepted. |
+| `duplicate` :gemini:   | This issue or pull request already exists.                                                        |
+| `question` :question:  | Further information is requested.                                                                 |
