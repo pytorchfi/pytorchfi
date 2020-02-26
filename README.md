@@ -6,25 +6,31 @@ PyTorchFI is a runtime fault injector tool for PyTorch to simulate bit flips wit
 
 The documentation can be found at [pytorchfi.github.io](https://pytorchfi.github.io/).
 
-## Installation
+### Installation
 
-#### Pip
+**From Pip**
 
 Install using `pip install pytorchfi` Then in your project source files:
+
+**From Source**
+
+Download this repository into your project folder.
+
+### Usage
+
+Import the entire package:
 
 ```python
 import pytorchfi
 ```
 
-#### From Source
-
-Download this repository into your project folder. Then in your project source files:
+Import a specific module:
 
 ```python
 from pytorchfi import core
 ```
 
-## Code
+### Code
 
 #### Structure
 
@@ -34,7 +40,11 @@ The main source code of PyTorchFI is held in `pytorchfi`, which carries both `Co
 
 All python code is formatted with [black](https://black.readthedocs.io/en/stable/).
 
-## Contributors
+### Contributing
+
+Before contributing, please refer to our [contributing guidelines](https://github.com/pytorchfi/pytorchfi/blob/master/CONTRIBUTING.md).
+
+### Contributors
 
 - [Sarita V. Adve](http://sadve.cs.illinois.edu/) (UIUC)
 - [Neeraj Aggarwal](https://neerajaggarwal.com) (UIUC)
@@ -43,6 +53,6 @@ All python code is formatted with [black](https://black.readthedocs.io/en/stable
 - [Abdulrahman Mahmoud](http://amahmou2.web.engr.illinois.edu/) (UIUC)
 - [Alex Nobbe](https://github.com/Alexn99) (UIUC)
 
-## License
+### License
 
 [NCSA License](https://opensource.org/licenses/NCSA)
