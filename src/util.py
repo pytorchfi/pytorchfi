@@ -14,7 +14,7 @@ import torch
 import torch.nn as nn
 import random
 
-from pytorchfi import PyTorchFI_Core as core
+from pytorchfi import core
 
 DEBUG = False
 
