@@ -8,7 +8,7 @@ The documentation can be found at [pytorchfi.github.io](https://pytorchfi.github
 
 ## Installation
 
-**Pip**
+#### Pip
 
 Install using `pip install pytorchfi` Then in your project source files:
 
@@ -16,7 +16,7 @@ Install using `pip install pytorchfi` Then in your project source files:
 import pytorchfi
 ```
 
-**From Source**
+#### From Source
 
 Download this repository into your project folder. Then in your project source files:
 
@@ -26,11 +26,11 @@ from pytorchfi import core
 
 ## Code
 
-### Structure
+#### Structure
 
-The main source code of PyTorchFI is held in `src`, which carries both `Core` and `Util` implementations.
+The main source code of PyTorchFI is held in `pytorchfi`, which carries both `Core` and `Util` implementations.
 
-### Formatting
+#### Formatting
 
 All python code is formatted with [black](https://black.readthedocs.io/en/stable/).
 
