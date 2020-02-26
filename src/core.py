@@ -35,7 +35,15 @@ HANDLES = []
 
 def fi_reset():
     global CURRENT_CONV, CORRUPT_CONV, CORRUPT_BATCH, CORRUPT_C, CORRUPT_H, CORRUPT_W, CORRUPT_VALUE
-    CURRENT_CONV, CORRUPT_BATCH, CORRUPT_CONV, CORRUPT_C, CORRUPT_H, CORRUPT_W, CORRUPT_VALUE = (
+    (
+        CURRENT_CONV,
+        CORRUPT_BATCH,
+        CORRUPT_CONV,
+        CORRUPT_C,
+        CORRUPT_H,
+        CORRUPT_W,
+        CORRUPT_VALUE,
+    ) = (
         0,
         -1,
         -1,
@@ -44,7 +52,6 @@ def fi_reset():
         -1,
         None,
     )
-
 
     global HANDLES
 
@@ -56,7 +63,6 @@ def fi_reset():
 
 
 def init(model, h, w, batch_size, **kwargs):
-
 
     fi_reset()
     global OUTPUT_SIZE
@@ -126,15 +132,15 @@ def declare_weight_fi(**kwargs):
     # get number of weight files
     num_layers = 0
     for name, param in CORRUPTED_MODEL.named_parameters():
-        if (name.split('.')[-1] == 'weight'):
+        if name.split(".")[-1] == "weight":
             num_layers += 1
     curr_layer = 0
     orig_value = 0
     if rand_inj:
-        corrupt_layer = random.randint(0, num_layers-1)
+        corrupt_layer = random.randint(0, num_layers - 1)
     for name, param in CORRUPTED_MODEL.named_parameters():
-        if (name.split('.')[-1] == 'weight'):
-            if (curr_layer == corrupt_layer):
+        if name.split(".")[-1] == "weight":
+            if curr_layer == corrupt_layer:
                 if zero_layer:
                     param.data[:] = 0
                     if DEBUG:
@@ -145,7 +151,7 @@ def declare_weight_fi(**kwargs):
                         corrupt_value = random.uniform(min_val, max_val)
                         corrupt_idx = list()
                         for dim in param.size():
-                            corrupt_idx.append(random.randint(0, dim-1))
+                            corrupt_idx.append(random.randint(0, dim - 1))
                     orig_value = param.data[tuple(corrupt_idx)].item()
                     # Use function if specified
                     if custom_function:
@@ -160,6 +166,7 @@ def declare_weight_fi(**kwargs):
                         print("Injected value: %s" % corrupt_value)
             curr_layer += 1
     return CORRUPTED_MODEL
+
 
 def declare_neuron_fi(**kwargs):
 
@@ -208,14 +215,24 @@ def assert_inj_bounds(**kwargs):
     # checks for specfic injection out of a list
     if type(CORRUPT_CONV) == list:
         index = kwargs.get("index", -1)
-        assert CORRUPT_CONV[index] >= 0 and CORRUPT_CONV[index] < get_total_conv(), "invalid conv"
-        assert CORRUPT_BATCH[index] >= 0 and CORRUPT_BATCH[index] < _BATCH_SIZE, "invalid batch"
-        assert CORRUPT_C[index] >= 0 and CORRUPT_C[index] < \
-            OUTPUT_SIZE[CORRUPT_CONV[index]][1], "invalid c"
-        assert CORRUPT_H[index] >= 0 and CORRUPT_H[index] < \
-            OUTPUT_SIZE[CORRUPT_CONV[index]][2], "invalid h"
-        assert CORRUPT_W[index] >= 0 and CORRUPT_W[index] < \
-            OUTPUT_SIZE[CORRUPT_CONV[index]][3], "invalid w"
+        assert (
+            CORRUPT_CONV[index] >= 0 and CORRUPT_CONV[index] < get_total_conv()
+        ), "invalid conv"
+        assert (
+            CORRUPT_BATCH[index] >= 0 and CORRUPT_BATCH[index] < _BATCH_SIZE
+        ), "invalid batch"
+        assert (
+            CORRUPT_C[index] >= 0
+            and CORRUPT_C[index] < OUTPUT_SIZE[CORRUPT_CONV[index]][1]
+        ), "invalid c"
+        assert (
+            CORRUPT_H[index] >= 0
+            and CORRUPT_H[index] < OUTPUT_SIZE[CORRUPT_CONV[index]][2]
+        ), "invalid h"
+        assert (
+            CORRUPT_W[index] >= 0
+            and CORRUPT_W[index] < OUTPUT_SIZE[CORRUPT_CONV[index]][3]
+        ), "invalid w"
     # checks for single injection
     else:
         assert CORRUPT_CONV >= 0 and CORRUPT_CONV < get_total_conv(), "invalid conv"
@@ -230,29 +247,35 @@ def _set_value(self, input, output):
 
     if type(CORRUPT_CONV) == list:
         # extract injections in this layer
-        inj_list = list(filter(lambda x: CORRUPT_CONV[x] == CURRENT_CONV, range(len(CORRUPT_CONV))))
+        inj_list = list(
+            filter(lambda x: CORRUPT_CONV[x] == CURRENT_CONV, range(len(CORRUPT_CONV)))
+        )
         # perform each injection for this layer
         for i in inj_list:
             # check that the injection indices are valid
             assert_inj_bounds(index=i)
             if DEBUG:
                 print(
-                        "Original value at [%d][%d][%d][%d]: %d"
-                        % (
-                            CORRUPT_BATCH[i],
-                            CORRUPT_C[i],
-                            CORRUPT_H[i],
-                            CORRUPT_W[i],
-                            output[CORRUPT_BATCH[i]][CORRUPT_C[i]][CORRUPT_H[i]][CORRUPT_W[i]],
-                        )
+                    "Original value at [%d][%d][%d][%d]: %d"
+                    % (
+                        CORRUPT_BATCH[i],
+                        CORRUPT_C[i],
+                        CORRUPT_H[i],
+                        CORRUPT_W[i],
+                        output[CORRUPT_BATCH[i]][CORRUPT_C[i]][CORRUPT_H[i]][
+                            CORRUPT_W[i]
+                        ],
                     )
+                )
                 print("Changing value to %d" % CORRUPT_VALUE[i])
             # inject value
-            output[CORRUPT_BATCH[i]][CORRUPT_C[i]][CORRUPT_H[i]][CORRUPT_W[i]] = CORRUPT_VALUE[i]
+            output[CORRUPT_BATCH[i]][CORRUPT_C[i]][CORRUPT_H[i]][
+                CORRUPT_W[i]
+            ] = CORRUPT_VALUE[i]
         # useful for injection hooks
         CURRENT_CONV += 1
 
-    else: # single injection (not a list of injections)
+    else:  # single injection (not a list of injections)
         # check that the injection indices are valid
         assert_inj_bounds()
         if CURRENT_CONV == CORRUPT_CONV:
@@ -277,30 +300,38 @@ def _save_output_size(self, input, output):
     global OUTPUT_SIZE
     OUTPUT_SIZE.append(list(output.size()))
 
+
 def get_original_model():
     return ORIG_MODEL
+
 
 def get_corrupted_model():
     return CORRUPTED_MODEL
 
+
 def get_output_size():
     return OUTPUT_SIZE
+
 
 # returns total batches
 def get_total_batches():
     return _BATCH_SIZE
 
+
 # returns total number of convs
 def get_total_conv():
     return len(OUTPUT_SIZE)
+
 
 # returns total number of fmaps in a layer
 def get_fmaps_num(layer):
     return OUTPUT_SIZE[layer][1]
 
+
 # returns fmap H size
 def get_fmaps_H(layer):
     return OUTPUT_SIZE[layer][2]
+
 
 # returns fmap W size
 def get_fmaps_W(layer):

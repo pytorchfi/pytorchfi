@@ -19,7 +19,7 @@ import pytorchfi
 Download this repository into your project folder. Then in your project source files:
 
 ```python
-from src import PyTorchFI_Core
+from pytorchfi import core
 ```
 
 ## Documentation
