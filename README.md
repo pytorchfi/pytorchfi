@@ -1,40 +1,52 @@
 # PyTorchFI
 
+![pypi shield](https://img.shields.io/pypi/dm/pytorchfi?color=da67f7)
+
 PyTorchFI is a runtime fault injector tool for PyTorch to simulate bit flips within the neural network. Check us out on PyPI [here](https://pypi.org/project/pytorchfi/).
 
-## Installation
+The documentation can be found at [pytorchfi.github.io](https://pytorchfi.github.io/).
 
-### Via Pip
+### Usage
+
+#### Installation
+
+**From Pip**
 
 Install using `pip install pytorchfi` Then in your project source files:
+
+**From Source**
+
+Download this repository into your project folder.
+
+#### Importing
+
+Import the entire package:
 
 ```python
 import pytorchfi
 ```
 
-### From Source
-
-Download this repository into your project folder. Then in your project source files:
+Import a specific module:
 
 ```python
-from src import PyTorchFI_Core
+from pytorchfi import core
 ```
 
-## Documentation
+### Code
 
-The documentation can be found at [https://pytorchfi.github.io/docs/](https://pytorchfi.github.io/docs/).
+#### Structure
 
-## Code
+The main source code of PyTorchFI is held in `pytorchfi`, which carries both `Core` and `Util` implementations.
 
-### Structure
-
-The main source code of PyTorchFI is held in `src`, which carries both `Core` and `Util` implementations.
-
-### Formatting
+#### Formatting
 
 All python code is formatted with [black](https://black.readthedocs.io/en/stable/).
 
-## Contributors
+### Contributing
+
+Before contributing, please refer to our [contributing guidelines](https://github.com/pytorchfi/pytorchfi/blob/master/CONTRIBUTING.md).
+
+### Contributors
 
 - [Sarita V. Adve](http://sadve.cs.illinois.edu/) (UIUC)
 - [Neeraj Aggarwal](https://neerajaggarwal.com) (UIUC)
@@ -43,6 +55,6 @@ All python code is formatted with [black](https://black.readthedocs.io/en/stable
 - [Abdulrahman Mahmoud](http://amahmou2.web.engr.illinois.edu/) (UIUC)
 - [Alex Nobbe](https://github.com/Alexn99) (UIUC)
 
-## License
+### License
 
 [NCSA License](https://opensource.org/licenses/NCSA)
