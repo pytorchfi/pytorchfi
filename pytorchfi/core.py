@@ -9,7 +9,8 @@ import torch.nn as nn
 
 from pytorchfi import error_models
 
-class core:
+
+class fault_injection:
     def __init__(self, model, h, w, batch_size, **kwargs):
         self.ORIG_MODEL = None
         self.CORRUPTED_MODEL = None

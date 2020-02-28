@@ -11,7 +11,7 @@ import random
 from pytorchfi import core
 
 
-class util(core):
+class util(core.fault_injection):
     # replace specified layer of weights with zeroes
     def zero_layer_weights(self, zero_layer=0):
         return self.declare_weight_fi(layer=zero_layer, zero=True)
