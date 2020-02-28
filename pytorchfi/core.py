@@ -1,11 +1,5 @@
 """
-Copyright (c) 2019 University of Illinois
-All rights reserved.
-
-Developed by:
-                          RSIM Research Group
-                          University of Illinois at Urbana-Champaign
-                        http://rsim.cs.illinois.edu/
+pytorchfi.core contains the core functionality for fault injections.
 """
 
 import copy

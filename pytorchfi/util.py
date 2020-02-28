@@ -1,11 +1,5 @@
 """
-Copyright (c) 2019 University of Illinois
-All rights reserved.
-
-Developed by:
-                          RSIM Research Group
-                          University of Illinois at Urbana-Champaign
-                        http://rsim.cs.illinois.edu/
+pytorchfi.util contains utility functions to help the user generate fault injections and determine their impact.
 """
 
 import os.path
@@ -17,16 +11,16 @@ import random
 from pytorchfi import core
 
 
-class classification(core):
+class util(core):
     # replace specified layer of weights with zeroes
     def zero_layer_weights(self, zero_layer=0):
         return self.declare_weight_fi(layer=zero_layer, zero=True)
 
-
     # generates a random weight injection (default range [-1, 1])
     def random_weight_inj(self, min_val=-1, max_val=1):
-        return self.declare_weight_fi(rand=True, min_rand_val=min_val, max_rand_val=max_val)
-
+        return self.declare_weight_fi(
+            rand=True, min_rand_val=min_val, max_rand_val=max_val
+        )
 
     # generates a random neuron injection (default value range [-1, 1]) in every layer of each batch element
     def random_inj_per_layer(self, min_val=-1, max_val=1):
@@ -48,7 +42,6 @@ class classification(core):
             conv_num=conv_num, batch=batch, c=c_rand, h=h_rand, w=w_rand, value=value
         )
 
-
     # generates a single neuron random injection (default value range [-1, 1]) in each batch element
     def random_inj(self, min_val=-1, max_val=1):
         conv_num, batch, c_rand, h_rand, w_rand, value = ([] for i in range(6))
@@ -65,7 +58,6 @@ class classification(core):
             conv_num=conv_num, batch=batch, c=c_rand, h=h_rand, w=w_rand, value=value
         )
 
-
     def compare_golden(self, input_data):
         softmax = nn.Softmax(dim=1)
 
@@ -81,7 +73,6 @@ class classification(core):
 
         return [golden, corrupted]
 
-
     def time_model(self, model, input_data, iterations=100):
         start_time = time.time()
         for _ in range(iterations):
@@ -89,8 +80,9 @@ class classification(core):
         end_time = time.time()
         return (end_time - start_time) / iterations
 
-
-    def random_batch_fi_gen(self, conv_number, fmap_number, H_size, W_size, min_value, max_value):
+    def random_batch_fi_gen(
+        self, conv_number, fmap_number, H_size, W_size, min_value, max_value
+    ):
         conv_fi = [conv_number] * self.get_total_batches()
         batch_fi = list(range(self.get_total_batches()))
         c_fi = [fmap_number] * self.get_total_batches()
