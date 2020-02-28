@@ -1,22 +1,53 @@
-# PyTorchFI
+<h1 align="center">
+  <a href="https://pytorchfi.github.io/"><img src="https://user-images.githubusercontent.com/7104017/75485879-22e79400-5971-11ea-9376-2d898034c23a.png" width="150"></a>
+  <br/>
+    PyTorchFI
+  </br>
+</h1>
 
-![pypi shield](https://img.shields.io/pypi/dm/pytorchfi?color=da67f7)
+<p align="center">
+    <a href="https://pypi.org/project/pytorchfi/"><img src="https://img.shields.io/pypi/dm/pytorchfi?color=da67f7"></a>
+    <a href="https://opensource.org/licenses/NCSA"><img src="https://img.shields.io/badge/license-NCSA-blue"></a>
+</p>
 
-PyTorchFI is a runtime fault injector tool for PyTorch to simulate bit flips within the neural network. Check us out on PyPI [here](https://pypi.org/project/pytorchfi/).
+<h4 align="center">A project by <a href="http://rsim.cs.uiuc.edu/" target="_blank">RSim Research Group</a> in collaboration with <a href="https://www.nvidia.com/en-us/research/" target="_blank">NVIDIA Research.</a></h4>
 
-The documentation can be found at [pytorchfi.github.io](https://pytorchfi.github.io/).
+<p align="center">
+  <a href="#background">Background</a> •
+  <a href="#usage">Usage</a> •
+  <a href="#technologies">Code</a> •
+  <a href="#contributing">Contributing</a> •
+  <a href="#contributors">Contributors</a> •
+  <a href="#license">License</a>
+</p>
 
-### Installation
+## Background
+
+PyTorchFI is a runtime perturbation tool for deep neural networks (DNNs), implemented for the popular PyTorch deep learning platform. PyTorchFI enables users to perform perturbation on weights or neurons of a DNN during runtime. It is extremely versatile for dependability and reliability research, with applications including resiliency analysis of classification networks, resiliency analysis of object detection networks, analysis of models robust to adversarial attacks, training resilient models, and for DNN interpertability.
+
+For example, this is an object detection network before a fault injection:
+
+<img src="https://user-images.githubusercontent.com/7104017/75512346-c313dc00-59b6-11ea-9563-95f642493e4e.png" width="750">
+
+This is the same object detection network after a fault injection:
+
+<img src="https://user-images.githubusercontent.com/7104017/75512345-c313dc00-59b6-11ea-856c-c8c0918eb7b6.png" width="750">
+
+Download on PyPI [here](https://pypi.org/project/pytorchfi/), or take a look at our documentation at [pytorchfi.github.io](https://pytorchfi.github.io/).
+
+## Usage
+
+### Installing
 
 **From Pip**
 
-Install using `pip install pytorchfi` Then in your project source files:
+Install using `pip install pytorchfi`
 
 **From Source**
 
 Download this repository into your project folder.
 
-### Usage
+### Importing
 
 Import the entire package:
 
@@ -30,21 +61,21 @@ Import a specific module:
 from pytorchfi import core
 ```
 
-### Code
+## Code
 
-#### Structure
+### Structure
 
-The main source code of PyTorchFI is held in `pytorchfi`, which carries both `Core` and `Util` implementations.
+The main source code of PyTorchFI is held in `pytorchfi`, which carries both `core` and `util` implementations.
 
-#### Formatting
+### Formatting
 
 All python code is formatted with [black](https://black.readthedocs.io/en/stable/).
 
-### Contributing
+## Contributing
 
 Before contributing, please refer to our [contributing guidelines](https://github.com/pytorchfi/pytorchfi/blob/master/CONTRIBUTING.md).
 
-### Contributors
+## Contributors
 
 - [Sarita V. Adve](http://sadve.cs.illinois.edu/) (UIUC)
 - [Neeraj Aggarwal](https://neerajaggarwal.com) (UIUC)
@@ -53,6 +84,6 @@ Before contributing, please refer to our [contributing guidelines](https://githu
 - [Abdulrahman Mahmoud](http://amahmou2.web.engr.illinois.edu/) (UIUC)
 - [Alex Nobbe](https://github.com/Alexn99) (UIUC)
 
-### License
+## License
 
-[NCSA License](https://opensource.org/licenses/NCSA)
+[NCSA](https://opensource.org/licenses/NCSA) License. Copyright © 2020 [RSim Research Group](http://rsim.cs.uiuc.edu/).
