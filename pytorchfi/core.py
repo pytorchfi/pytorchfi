@@ -156,6 +156,8 @@ class fault_injection:
 
     def declare_neuron_fi(self, **kwargs):
         self.fi_reset()
+        CUSTOM_INJECTION = False
+        INJECTION_FUNCTION = False
 
         if kwargs:
             if "function" in kwargs:
@@ -246,6 +248,7 @@ class fault_injection:
             ), "Invalid W!"
 
     def _set_value(self, input, output):
+        CURRENT_CONV = 0
         if type(self.CORRUPT_CONV) == list:
             # extract injections in this layer
             inj_list = list(
