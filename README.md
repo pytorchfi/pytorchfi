@@ -23,9 +23,17 @@
 
 ## Background
 
-PyTorchFI is a runtime fault injector tool for PyTorch to simulate bit flips within the neural network. Check us out on PyPI [here](https://pypi.org/project/pytorchfi/).
+PyTorchFI is a runtime perturbation tool for deepneural networks (DNNs), implemented for the popular PyTorch deep learning platform. PyTorchFI enables users to perform perturbations on weights or neurons within a convolution operation of DNNs at runtime. It is extremely versatile for dependability and reliability research, including resiliency analysis of classification networks, resiliency analysis of object detection networks, analysis of models robust to adversarial attacks, training resilient models, and for DNN interpertability.
 
-The documentation can be found at [pytorchfi.github.io](https://pytorchfi.github.io/).
+For example, this is an object detection network before a fault injection:
+
+<img src="https://user-images.githubusercontent.com/7104017/75512346-c313dc00-59b6-11ea-9563-95f642493e4e.png" width="750">
+
+this is the same object detection network after a fault injection:
+
+<img src="https://user-images.githubusercontent.com/7104017/75512345-c313dc00-59b6-11ea-856c-c8c0918eb7b6.png" width="750">
+
+Download on PyPI [here](https://pypi.org/project/pytorchfi/), or take a look at our documentation at [pytorchfi.github.io](https://pytorchfi.github.io/).
 
 ## Usage
 
