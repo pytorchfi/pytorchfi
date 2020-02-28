@@ -7,6 +7,7 @@ import random
 import torch
 import torch.nn as nn
 
+from pytorchfi import error_models
 
 class core:
     def __init__(self, model, h, w, batch_size, **kwargs):
