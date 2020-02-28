@@ -89,6 +89,7 @@ class fault_injection:
         self.fi_reset()
         custom_function = False
         zero_layer = False
+        rand_inj = False
 
         if kwargs:
             if "function" in kwargs:
@@ -137,7 +138,8 @@ class fault_injection:
                             corrupt_idx = list()
                             for dim in param.size():
                                 corrupt_idx.append(random.randint(0, dim - 1))
-                        orig_value = param.data[tuple(corrupt_idx)].item()
+                        corrupt_idx = tuple(corrupt_idx) if isinstance(corrupt_idx, list)
+                        orig_value = param.data[corrupt_idx].item()
                         # Use function if specified
                         if custom_function:
                             corrupt_value = function(param.data[tuple(corrupt_idx)])
