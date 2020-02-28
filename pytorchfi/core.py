@@ -60,7 +60,16 @@ class fault_injection:
                 )
             )
 
+
     def fi_reset(self):
+        _fi_state_reset(self)
+        self.CORRUPTED_MODEL = None
+
+        if self.DEBUG:
+            print("Fault injector fully reset")
+
+
+    def _fi_state_reset(self):
         (
             self.CURRENT_CONV,
             self.CORRUPT_BATCH,
@@ -83,10 +92,10 @@ class fault_injection:
             self.HANDLES[i].remove()
 
         if self.DEBUG:
-            print("Fault injector reset")
+            print("Fault injector state reset")
 
     def declare_weight_fi(self, **kwargs):
-        self.fi_reset()
+        self._fi_state_reset()
         custom_function = False
         zero_layer = False
         rand_inj = False
@@ -155,7 +164,7 @@ class fault_injection:
         return self.CORRUPTED_MODEL
 
     def declare_neuron_fi(self, **kwargs):
-        self.fi_reset()
+        self._fi_state_reset()
         CUSTOM_INJECTION = False
         INJECTION_FUNCTION = False
 
@@ -306,7 +315,7 @@ class fault_injection:
                 ] = self.CORRUPT_VALUE
             CURRENT_CONV += 1
 
-    def _save_output_size(self, input, output):
+    def _save_output_size(self, module, input, output):
         self.OUTPUT_SIZE.append(list(output.size()))
 
     def get_original_model(self):
