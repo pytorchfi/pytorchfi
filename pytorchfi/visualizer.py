@@ -1,22 +1,29 @@
 import matplotlib
 import numpy as np
+import matplotlib.image as mpimg 
 import matplotlib.pyplot as plt
+import os
 
-data = np.genfromtxt('test.csv', delimiter=',')
+images = os.listdir('Images/')
+
+#data = np.genfromtxt('test.csv', delimiter=',')
 
 fig = plt.figure()
 
-column_count = 5
+row_count = len(images)
 
-for column in range(1, column_count + 1):
+for row in range(1, row_count):
 
-	ax = fig.add_subplot(1, column_count, column)
+	ax = fig.add_subplot(row_count, 1, row)
 
-	ax.imshow(data, interpolation = 'bilinear')
+	ax.imshow(mpimg.imread('./Images/' + images[row - 1]), interpolation = 'bilinear')
 
 	ax.axis('off')
+	
 
-fig.subplots_adjust(wspace=0)
+fig.subplots_adjust(hspace=0)
+
+fig.suptitle('Vulnerability Visualization')
 
 plt.show()
 
