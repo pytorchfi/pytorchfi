@@ -6,17 +6,33 @@ data = np.genfromtxt('test.csv', delimiter=',')
 
 intensity_data = [[]]
 curr_layer = 0
-for i in range(len(data)):
-    if data[i][1] != curr_layer:
-        curr_layer += 1
-        intensity_data.append([])
-    intensity_data[curr_layer].append(data[i][3])
-print(intensity_data)
-graph = np.array([np.array(x) for x in intensity_data])
-fig, ax = plt.subplots()
-im = ax.imshow(intensity_data, interpolation='bilinear')
-cbar = ax.figure.colorbar(im, ax=ax, cmap='YlGn')
-cbar.ax.set_ylabel('Vulnerability', rotation=-90, va='bottom')
+
+fig = plt.figure()
+
+column_count = 2
+
+for column in range(1, column_count + 1):
+
+	ax = fig.add_subplot(1, column_count, column)
+
+	ax.imshow(data, interpolation = 'bilinear')
+
+	ax.axis('off')
+
+#ax2 = fig.add_subplot(1, 2, 2)
+
+#ax2.imshow(data, interpolation='bilinear')
+
+#ax1.axis('off')
+
+#ax2.axis('off')
+
+fig.subplots_adjust(wspace=0)
+
+
+#cbar1 = ax[0].figure.colorbar(im1, ax=ax, cmap='YlGn')
+#cbar2 = ax[0,1].figure.colorbar(im2, ax=ax, cmap='YlGn')
+#cbar1.ax[0,0].set_ylabel('Vulnerability', rotation=-90, va='bottom')
 plt.show()
 
-print(layer_data)
+#print(layer_data)
