@@ -30,6 +30,7 @@ slider_ax = plt.axes([0.1, 0.12, 0.8, 0.05])
 
 a_slider = Slider(slider_ax, 'Layer', a_min, a_max, valinit=a_init, valfmt='%d')
 
+
 def update(layer):
 	print("UPDATE RECEIVED: CURRENT LAYER IS ::" + str(layer) + " \n")
 	chart_list[int(layer - 1)].imshow(mpimg.imread('./Images/' + images[int(layer) - 1]), interpolation = 'bilinear')
