@@ -58,14 +58,12 @@ class fault_injection:
                 )
             )
 
-
     def fi_reset(self):
         _fi_state_reset(self)
         self.CORRUPTED_MODEL = None
 
         if self.DEBUG:
             print("Fault injector fully reset")
-
 
     def _fi_state_reset(self):
         (
@@ -145,13 +143,17 @@ class fault_injection:
                             corrupt_idx = list()
                             for dim in param.size():
                                 corrupt_idx.append(random.randint(0, dim - 1))
-                        corrupt_idx = tuple(corrupt_idx) if isinstance(corrupt_idx, list)
+                        corrupt_idx = (
+                            tuple(corrupt_idx)
+                            if isinstance(corrupt_idx, list)
+                            else corrupt_idx
+                        )
                         orig_value = param.data[corrupt_idx].item()
                         # Use function if specified
                         if custom_function:
                             corrupt_value = function(param.data[tuple(corrupt_idx)])
                         # Inject corrupt value
-                        param.data[tuple(corrupt_idx)] = corrupt_value
+                        param.data[corrupt_idx] = corrupt_value
                         if self.DEBUG:
                             print("Weight Injection")
                             print("Layer index: %s" % corrupt_layer)
