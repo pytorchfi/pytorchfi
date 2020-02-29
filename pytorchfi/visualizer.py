@@ -17,6 +17,4 @@ fig, ax = plt.subplots()
 im = ax.imshow(intensity_data, interpolation='bilinear')
 cbar = ax.figure.colorbar(im, ax=ax, cmap='YlGn')
 cbar.ax.set_ylabel('Vulnerability', rotation=-90, va='bottom')
-plt.show()
-
-print(layer_data)
+plt.savefig("map")
