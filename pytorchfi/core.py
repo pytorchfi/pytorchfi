@@ -59,7 +59,7 @@ class fault_injection:
             )
 
     def fi_reset(self):
-        _fi_state_reset(self)
+        self._fi_state_reset()
         self.CORRUPTED_MODEL = None
 
         if self.DEBUG:
