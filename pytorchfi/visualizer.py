@@ -15,6 +15,7 @@ a_max = chart_count - 1
 a_init = 0
 slider_position = 0
 
+index_list = list(range(0, chart_count))
 chart_list = list(range(0, chart_count))
 
 fig = plt.figure()
@@ -33,6 +34,7 @@ for chart in range(0, chart_count):
 	chart_list[chart].set_position([0.25, 0.3, 0.5, 0.5])
 	chart_list[chart].axis('off')
 	chart_list[chart] = plt.imshow(image)
+	index_list[chart] = chart
 
 	# print("For loop (2) Chart file is: " + str(chart_list[chart]) + "\n");
 	# print("(2)      Chart is: " + str(chart) + "\n")
@@ -46,7 +48,9 @@ chart_list[0].set_visible(True)
 
 slider_ax = plt.axes([0.1, 0.12, 0.8, 0.05])
 
-a_slider = Slider(slider_ax, 'Layer', a_min, a_max, valinit=a_init, valfmt='%d')
+a_slider = Slider(slider_ax, 'Layer', a_min, a_max, a_init, '%d')
+slider_ax.xaxis.set_visible(True)
+slider_ax.set_xticks(index_list)
 
 def update(layer):
 	global slider_position
@@ -62,7 +66,7 @@ def change_check(number):
 	
 a_slider.on_changed(change_check)
 
-fig.suptitle('Vulnerability Visualization')
-
+text = fig.suptitle('Vulnerability Visualization', size='xx-large')
+text.set_fontweight('black')
 plt.show()
 
