@@ -58,14 +58,12 @@ class fault_injection:
                 )
             )
 
-
     def fi_reset(self):
-        _fi_state_reset(self)
+        self._fi_state_reset()
         self.CORRUPTED_MODEL = None
 
         if self.DEBUG:
             print("Fault injector fully reset")
-
 
     def _fi_state_reset(self):
         (
@@ -145,13 +143,17 @@ class fault_injection:
                             corrupt_idx = list()
                             for dim in param.size():
                                 corrupt_idx.append(random.randint(0, dim - 1))
-                        corrupt_idx = tuple(corrupt_idx) if isinstance(corrupt_idx, list)
+                        corrupt_idx = (
+                            tuple(corrupt_idx)
+                            if isinstance(corrupt_idx, list)
+                            else corrupt_idx
+                        )
                         orig_value = param.data[corrupt_idx].item()
                         # Use function if specified
                         if custom_function:
                             corrupt_value = function(param.data[tuple(corrupt_idx)])
                         # Inject corrupt value
-                        param.data[tuple(corrupt_idx)] = corrupt_value
+                        param.data[corrupt_idx] = corrupt_value
                         if self.DEBUG:
                             print("Weight Injection")
                             print("Layer index: %s" % corrupt_layer)
@@ -255,7 +257,6 @@ class fault_injection:
             ), "Invalid W!"
 
     def _set_value(self, input, output):
-        CURRENT_CONV = 0
         if type(self.CORRUPT_CONV) == list:
             # extract injections in this layer
             inj_list = list(
@@ -287,7 +288,7 @@ class fault_injection:
                     self.CORRUPT_W[i]
                 ] = self.CORRUPT_VALUE[i]
             # useful for injection hooks
-            CURRENT_CONV += 1
+            self.CURRENT_CONV += 1
 
         else:  # single injection (not a list of injections)
             # check that the injection indices are valid
