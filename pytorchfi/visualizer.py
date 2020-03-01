@@ -10,38 +10,71 @@ images = os.listdir('Images/')
 #data = np.genfromtxt('test.csv', delimiter=',')
 
 chart_count = len(images)
-a_min = 1
-a_max = chart_count
+a_min = 0
+a_max = chart_count - 1
 a_init = 0
+slider_position = 0
 
 chart_list = list(range(0, chart_count))
 
 fig = plt.figure()
 
-#print("Number of images is " + str(len(images)) + "\n")
-
 for chart in range(0, chart_count):
 
-	chart_list[chart] = fig.add_subplot(chart_count, 1, chart)
+	#chart_list[chart] = plt.imshow(mpimg.imread('./Images/' + images[chart]))
+	print("\n")
+	print("-------------------------------------------------\n")
+	image = mpimg.imread('Images/' + images[chart])
+	print("THIS IS THE " + str(chart) + "th TIME THIS LOOP HAS HAPPENED")
+	print("For loop (1) Chart file is: " + str(chart_list[chart]) + "\n");
+	print("(1)      Chart is: " + str(chart) + "\n")
+	print("(1)      image is: " + images[chart] + "\n")
+
+	chart_list[chart] = fig.add_subplot(1, chart_count, chart)
+	chart_list[chart].set_position([0.4, 0.5, 0.5, 0.5])
 	chart_list[chart].axis('off')
+	chart_list[chart] = plt.imshow(image)
+
+
+	print("For loop (2) Chart file is: " + str(chart_list[chart]) + "\n");
+	print("(2)      Chart is: " + str(chart) + "\n")
+	print("(2)      image is: " + images[chart] + "\n")
+	print("-------------------------------------------------\n")
+	print("\n")
+
+	chart_list[chart].set_visible(False)
+
+chart_list[0].set_visible(True)
 
 slider_ax = plt.axes([0.1, 0.12, 0.8, 0.05])
 
-
 a_slider = Slider(slider_ax, 'Layer', a_min, a_max, valinit=a_init, valfmt='%d')
 
-
 def update(layer):
+	global slider_position
+	chart_list[slider_position].set_visible(False)
+	chart_list[layer].set_visible(True)
+
+	#if(slider_position == 1):
+	# if(slider_position == 5):
+	# 	chart_list[0].set_visible(True)
+
+	print("Slider Position is: " + str(slider_position) + "\n")	
+
 	print("UPDATE RECEIVED: CURRENT LAYER IS ::" + str(layer) + " \n")
-	chart_list[int(layer - 1)].imshow(mpimg.imread('./Images/' + images[int(layer) - 1]), interpolation = 'bilinear')
-	chart_list[int(layer) - 1].axis('off')
+	print("image is " + images[layer] + "\n")
+	print("Chart file is: " + str(chart_list[layer]) + "\n");
+	slider_position = layer
 
-
-a_slider.on_changed(update)
-
-
+def change_check(number):
+	number = int(number)
+	global slider_position
+	if(number != slider_position):
+		update(number)
 	
-fig.suptitle('Vulnerability Visualization')
+a_slider.on_changed(change_check)
+
+#fig.suptitle('Vulnerability Visualization')
 
 plt.show()
 
