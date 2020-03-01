@@ -5,6 +5,8 @@ from matplotlib.widgets import Slider
 import matplotlib.pyplot as plt
 import os
 
+plt.rcParams['toolbar'] = 'None'
+
 images = os.listdir('Images/')
 
 #data = np.genfromtxt('test.csv', delimiter=',')
@@ -19,6 +21,7 @@ index_list = list(range(0, chart_count))
 chart_list = list(range(0, chart_count))
 
 fig = plt.figure()
+
 
 for chart in range(0, chart_count):
 
@@ -58,7 +61,9 @@ def change_check(number):
 	
 a_slider.on_changed(change_check)
 
-text = fig.suptitle('Vulnerability Visualization', size='xx-large')
+fig.set_facecolor('#595959')
+
+text = fig.suptitle('Layered Vulnerability Visualization', size='xx-large')
 text.set_fontweight('black')
 plt.show()
 
