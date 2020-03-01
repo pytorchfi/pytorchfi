@@ -21,26 +21,24 @@ fig = plt.figure()
 
 for chart in range(0, chart_count):
 
-	#chart_list[chart] = plt.imshow(mpimg.imread('./Images/' + images[chart]))
-	print("\n")
-	print("-------------------------------------------------\n")
+
+
 	image = mpimg.imread('Images/' + images[chart])
-	print("THIS IS THE " + str(chart) + "th TIME THIS LOOP HAS HAPPENED")
-	print("For loop (1) Chart file is: " + str(chart_list[chart]) + "\n");
-	print("(1)      Chart is: " + str(chart) + "\n")
-	print("(1)      image is: " + images[chart] + "\n")
+	# print("This is the " + str(chart) + "th time this loop has happened")
+	# print("For loop (1) Chart file is: " + str(chart_list[chart]) + "\n");
+	# print("(1)      Chart is: " + str(chart) + "\n")
+	# print("(1)      image is: " + images[chart] + "\n")
 
 	chart_list[chart] = fig.add_subplot(1, chart_count, chart)
-	chart_list[chart].set_position([0.4, 0.5, 0.5, 0.5])
+	chart_list[chart].set_position([0.25, 0.3, 0.5, 0.5])
 	chart_list[chart].axis('off')
 	chart_list[chart] = plt.imshow(image)
 
-
-	print("For loop (2) Chart file is: " + str(chart_list[chart]) + "\n");
-	print("(2)      Chart is: " + str(chart) + "\n")
-	print("(2)      image is: " + images[chart] + "\n")
-	print("-------------------------------------------------\n")
-	print("\n")
+	# print("For loop (2) Chart file is: " + str(chart_list[chart]) + "\n");
+	# print("(2)      Chart is: " + str(chart) + "\n")
+	# print("(2)      image is: " + images[chart] + "\n")
+	# print("-------------------------------------------------\n")
+	# print("\n")
 
 	chart_list[chart].set_visible(False)
 
@@ -54,16 +52,6 @@ def update(layer):
 	global slider_position
 	chart_list[slider_position].set_visible(False)
 	chart_list[layer].set_visible(True)
-
-	#if(slider_position == 1):
-	# if(slider_position == 5):
-	# 	chart_list[0].set_visible(True)
-
-	print("Slider Position is: " + str(slider_position) + "\n")	
-
-	print("UPDATE RECEIVED: CURRENT LAYER IS ::" + str(layer) + " \n")
-	print("image is " + images[layer] + "\n")
-	print("Chart file is: " + str(chart_list[layer]) + "\n");
 	slider_position = layer
 
 def change_check(number):
@@ -74,7 +62,7 @@ def change_check(number):
 	
 a_slider.on_changed(change_check)
 
-#fig.suptitle('Vulnerability Visualization')
+fig.suptitle('Vulnerability Visualization')
 
 plt.show()
 
