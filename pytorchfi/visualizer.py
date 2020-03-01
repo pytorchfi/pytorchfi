@@ -46,9 +46,7 @@ def update(layer):
 
 	chart_list[layer].set_visible(True)
 	chart_list[slider_position].set_visible(False)
-	print("new position is: " + str(layer) + "\n")
-	print("slide position is: " + str(layer) + "\n")
-	print("\n")
+
 	slider_position = layer
 
 
