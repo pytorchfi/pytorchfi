@@ -5,11 +5,7 @@ import numpy as np
 import os
 import sys
 
-"""
-Creates heatmap of the vulnerabilities for a single layer
-"""
-
-
+# Creates a heatmap of the vulnerabilities for a single layer
 def heat_map(numpy_data, layer_count, output_dir):
     fig = plt.figure(figsize=(20, 20))
     ax = fig.add_subplot(111)
@@ -22,11 +18,7 @@ def heat_map(numpy_data, layer_count, output_dir):
         plt.savefig(output_dir + "/Layer-" + str(layer_count) + "-Heat Map")
 
 
-"""
-Creates bar graph sorted by layer number
-"""
-
-
+# Creates a bar graph of vulnerabilites per feature
 def sequential_bar_graph(numpy_data, layer_count, output_dir):
     fig = plt.figure(figsize=(20, 20))
     ax = fig.add_subplot(111)
@@ -42,11 +34,7 @@ def sequential_bar_graph(numpy_data, layer_count, output_dir):
         plt.savefig(output_dir + "/Layer-" + str(layer_count + 1) + "-Seq-Bar-Graph")
 
 
-"""
-Creates bar graph sorted by vulnerability
-"""
-
-
+# Creates bar graph of vulnerabilites per feature, sorted by vulnerability
 def nonsequential_bar_graph(numpy_data, layer_count, output_dir):
     fig = plt.figure(figsize=(20, 20))
     ax = fig.add_subplot(111)
@@ -64,11 +52,7 @@ def nonsequential_bar_graph(numpy_data, layer_count, output_dir):
         plt.savefig("Graphs/Layer-" + str(layer_count) + "-NonSeq-Bar-Graph")
 
 
-"""
-Quick sort functions
-"""
-
-
+# Quick sort functions
 def partition(arr, low, high):
     i = low - 1
     pivot = arr[high]
@@ -88,12 +72,8 @@ def quicksort(arr, low, high):
         quicksort(arr, pi + 1, high)
 
 
-"""
-Gets the data points of each layer, then calls the generator
-to output the graphs of each layer
-"""
-
-
+# Gets the data points of each layer, then calls the generator
+# to output the graphs of each layer
 def generate_graph(file_name, generator, output_dir):
     try:
         input_file = open(file_name)
@@ -114,6 +94,7 @@ def generate_graph(file_name, generator, output_dir):
         print("Input file does not exist/does not have read permissions")
     finally:
         input_file.close()
+
 
 """
 Parameters
@@ -146,4 +127,3 @@ if __name__ == "__main__":
         generate_graph(file_name, heat_map, output_dir)
     else:
         print("Invalid graph type")
-
