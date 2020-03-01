@@ -1,6 +1,7 @@
-import matplotlib
-import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+from matplotlib.widgets import Slider
+import numpy as np
 import os
 import sys
 
@@ -114,7 +115,6 @@ def generate_graph(file_name, generator, output_dir):
     finally:
         input_file.close()
 
-
 """
 Parameters
 """
@@ -122,6 +122,7 @@ Parameters
 graph_type_param = "type="
 file_name_param = "file="
 output_dir_param = "dir="
+
 
 if __name__ == "__main__":
     graph_type = ""
@@ -145,3 +146,4 @@ if __name__ == "__main__":
         generate_graph(file_name, heat_map, output_dir)
     else:
         print("Invalid graph type")
+
