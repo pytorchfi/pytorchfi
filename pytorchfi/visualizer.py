@@ -2,6 +2,7 @@ import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import sys
 
 '''
 Creates heatmap of the vulnerabilities for a single layer
@@ -73,6 +74,10 @@ def quicksort(arr, low, high):
         quicksort(arr, low, pi-1)
         quicksort(arr, pi+1, high)
 
+'''
+Gets the data points of each layer, then calls the generator
+to output the graphs of each layer
+'''
 def generate_graph(file_name, generator, output_dir):
     try:
         input_file = open(file_name)
@@ -89,24 +94,39 @@ def generate_graph(file_name, generator, output_dir):
             graph_data[0].append(float(csv_arr[3]))
             csv_line = input_file.readline()
         generator(np.array(graph_data), layer_count, output_dir)
+    except FileNotFoundError:
+        print("Input file does not exist/does not have read permissions")
     finally:
         input_file.close()
 
-if __name__ == "__main__":
-    print("Select the graph you would like to generate:")
-    print("(1) Sequential Bar Graph")
-    print("(2) Non-Sequential Bar Graph")
-    print("(3) Heatmap")
-    selection = str(input())
-    file_name = str(input("Path to the CSV File: "))
-    output_dir = str(input("Output directory: "))
+'''
+Parameters
+'''
+# Graph types: seq-bar, non-seq-bar, heat-map
+graph_type_param = "type="
+file_name_param = "file="
+output_dir_param = "dir="
 
-    if selection == "1":
+if __name__ == "__main__":
+    graph_type = ""
+    file_name = ""
+    output_dir = ""
+    for arg in sys.argv[1:]:
+        if graph_type_param in arg:
+            graph_type = arg[len(graph_type_param):]
+        elif file_name_param in arg:
+            file_name = arg[len(file_name_param):]
+        elif output_dir in arg:
+            output_dir = arg[len(output_dir_param):]
+        else:
+            print("Invalid parameter")
+
+    if graph_type == "seq-bar":
           generate_graph(file_name, sequential_bar_graph, output_dir)
-    elif selection == "2":
+    elif graph_type == "non-seq-bar":
           generate_graph(file_name, nonsequential_bar_graph, output_dir)
-    elif selection == "3":
+    elif graph_type == "heat-map":
           generate_graph(file_name, heat_map, output_dir)
     else:
-          print("Selection not valid.")
+          print("Invalid graph type")
 
