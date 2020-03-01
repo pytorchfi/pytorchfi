@@ -257,7 +257,6 @@ class fault_injection:
             ), "Invalid W!"
 
     def _set_value(self, input, output):
-        CURRENT_CONV = 0
         if type(self.CORRUPT_CONV) == list:
             # extract injections in this layer
             inj_list = list(
@@ -289,7 +288,7 @@ class fault_injection:
                     self.CORRUPT_W[i]
                 ] = self.CORRUPT_VALUE[i]
             # useful for injection hooks
-            CURRENT_CONV += 1
+            self.CURRENT_CONV += 1
 
         else:  # single injection (not a list of injections)
             # check that the injection indices are valid
