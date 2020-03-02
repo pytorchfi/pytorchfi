@@ -10,8 +10,6 @@
     <a href="https://opensource.org/licenses/NCSA"><img src="https://img.shields.io/badge/license-NCSA-blue"></a>
 </p>
 
-<h4 align="center">A project by <a href="http://rsim.cs.uiuc.edu/" target="_blank">RSim Research Group</a> in collaboration with <a href="https://www.nvidia.com/en-us/research/" target="_blank">NVIDIA Research.</a></h4>
-
 <p align="center">
   <a href="#background">Background</a> •
   <a href="#usage">Usage</a> •
@@ -83,6 +81,10 @@ Before contributing, please refer to our [contributing guidelines](https://githu
 - [Siva Kumar Sastry Hari](https://research.nvidia.com/person/siva-hari) (NVIDIA)
 - [Abdulrahman Mahmoud](http://amahmou2.web.engr.illinois.edu/) (UIUC)
 - [Alex Nobbe](https://github.com/Alexn99) (UIUC)
+
+## Funding Sources
+
+This project was funded in part by the [Applications Driving Architectures (ADA) Research Center](https://adacenter.org/), a JUMP Center co-sponsored by SRC and DARPA, and in collaboration with NVIDIA Research.
 
 ## License
 
