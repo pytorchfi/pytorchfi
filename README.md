@@ -13,7 +13,7 @@
 <p align="center">
   <a href="#background">Background</a> •
   <a href="#usage">Usage</a> •
-  <a href="#technologies">Code</a> •
+  <a href="#code">Code</a> •
   <a href="#contributing">Contributing</a> •
   <a href="#contributors">Contributors</a> •
   <a href="#license">License</a>
