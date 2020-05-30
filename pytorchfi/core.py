@@ -33,7 +33,7 @@ class fault_injection:
         c = kwargs.get("c", 3)
         use_cuda = kwargs.get("use_cuda", False)
 
-        self.ORIG_MODEL = nn.DataParallel(model) if use_cuda else model
+        self.ORIG_MODEL = model
 
         self._BATCH_SIZE = batch_size
 
