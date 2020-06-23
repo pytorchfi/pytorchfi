@@ -1,7 +1,5 @@
-#==========================p======#
-# PyTorchFI Testing Environment
-# Use:
-#   $python test.py
+#=================================#
+# PyTorchFI Unit Tests
 #=================================#
 
 import unittest
@@ -11,7 +9,10 @@ from .util_test import *
 from pytorchfi.core import fault_injection as pfi_core
 
 
-class TestNeuronSingle(unittest.TestCase):
+class TestNeuronCPUSingle(unittest.TestCase):
+    """
+    Testing focuses on *neuron* perturbations on the *CPU* with a *single* batch element.
+    """
 
     def setUp(self):
         # parameters
@@ -19,8 +20,7 @@ class TestNeuronSingle(unittest.TestCase):
         self.WORKERS = 64
         self.DATASETS = os.environ['ML_DATASETS']
         self.img_size = 32
-
-        self.USE_GPU = True
+        self.USE_GPU = False
 
         # get model and dataset
         self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS, self.DATASETS)
@@ -44,13 +44,10 @@ class TestNeuronSingle(unittest.TestCase):
 
     def test_orig_model(self):
         """
-        Test PytorchFI init()
+        Test PytorchFI get_original_model()
         """
         p = pfi_core(self.model, self.img_size, self.img_size, self.BATCH_SIZE, use_cuda=self.USE_GPU, FP16 = False)
         self.faulty_model = p.get_original_model()
-
-        print(self.faulty_model)
-        print(self.model)
 
         self.assertTrue(self.faulty_model is self.model)
 
