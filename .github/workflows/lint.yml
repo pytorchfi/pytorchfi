@@ -1,2 +1,15 @@
-- name: Python Lint (isort/black)
-  uses: wrboyce/python-lint-action@v1.0.0
+name: "Lint"
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 18 * * 0"
+
+jobs:
+  CodeQL-Build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Python Lint (isort/black)
+        uses: wrboyce/python-lint-action@v1.0.0
