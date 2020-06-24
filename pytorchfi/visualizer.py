@@ -1,8 +1,9 @@
 import os
 import sys
 
-import matplotlib.pyplot as plt
 import numpy as np
+
+import matplotlib.pyplot as plt
 
 
 # Creates a heatmap of the vulnerabilities for a single layer
