@@ -2,11 +2,14 @@
 # PyTorchFI Unit Tests
 # =================================#
 
+import os
 import unittest
-import torch, os
-from .util_test import *
+
+import torch
 
 from pytorchfi.core import fault_injection as pfi_core
+
+from .util_test import *
 
 
 class TestCoreGetFuncs(unittest.TestCase):
@@ -126,4 +129,3 @@ class TestCoreGetFuncs(unittest.TestCase):
         )
 
         self.assertTrue(allPass)  # for AlexNet on CIFAR
-
