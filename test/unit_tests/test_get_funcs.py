@@ -6,7 +6,6 @@ import os
 import unittest
 
 import torch
-
 from pytorchfi.core import fault_injection as pfi_core
 
 from .util_test import *
