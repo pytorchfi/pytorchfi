@@ -5,7 +5,6 @@ orbs:
 
 jobs:
   build-and-test:
-    working_directory: ~/pytorchfi
     executor: python/default
     steps:
       - checkout
@@ -13,7 +12,9 @@ jobs:
       - python/install-deps
       - python/save-cache
       - run:
-          command: ./manage.py test
+          command: 
+            cd pytorchfi
+            ./manage.py test
           name: Test
 
 workflows:
