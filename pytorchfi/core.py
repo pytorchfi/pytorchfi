@@ -355,8 +355,9 @@ class fault_injection:
     def get_fmaps_W(self, layer):
         return self.OUTPUT_SIZE[layer][3]
 
+    # returns a tuple with (H,W) size of fmaps in a layer
     def get_fmap_HW(self, layer):
-        return tuple(self.OUTPUT_SIZE[layer[2:4]])
+        return (self.get_fmaps_H(layer), self.get_fmaps_W(layer))
 
     def set_debug(self, debug):
         self.DEBUG = debug
