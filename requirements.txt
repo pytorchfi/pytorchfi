@@ -15,7 +15,6 @@ numpy==1.17.2
 pathspec==0.7.0
 pep8==1.7.1
 pycodestyle==2.5.0
-pygame==1.9.6
 pylint==2.4.4
 regex==2020.2.20
 rope==0.16.0
