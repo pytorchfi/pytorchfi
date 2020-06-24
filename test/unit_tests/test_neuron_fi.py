@@ -17,20 +17,18 @@ class TestNeuronFIgpu(unittest.TestCase):
     """
 
     def setUp(self):
-        torch.manual_seed(0) # for reproducability in testing
+        torch.manual_seed(0)  # for reproducability in testing
 
         # parameters
         self.BATCH_SIZE = 1
         self.WORKERS = 1
-        self.DATASETS = os.environ['ML_DATASETS']
+        self.DATASETS = os.environ["ML_DATASETS"]
         self.img_size = 32
         self.USE_GPU = True
 
         # get model and dataset
         self.model, self.dataset = helper_setUp_CIFAR10(
-            self.BATCH_SIZE,
-            self.WORKERS,
-            self.DATASETS
+            self.BATCH_SIZE, self.WORKERS, self.DATASETS
         )
         self.dataiter = iter(self.dataset)
 
@@ -51,7 +49,7 @@ class TestNeuronFIgpu(unittest.TestCase):
             self.img_size,
             self.img_size,
             self.BATCH_SIZE,
-            use_cuda=self.USE_GPU
+            use_cuda=self.USE_GPU,
         )
 
     def test_neuronFI_singleElement(self):
@@ -59,23 +57,18 @@ class TestNeuronFIgpu(unittest.TestCase):
         Test PytorchFI declare_neuron_fi() function
         """
         # perturbation location
-        batch_i = 0 # batch
-        conv_i = 4 # layer
-        c_i = 0 # fmap number in layer
-        h_i = 1 # h coordinate in fmap
-        w_i = 1 # w coordinate in fmap
+        batch_i = 0  # batch
+        conv_i = 4  # layer
+        c_i = 0  # fmap number in layer
+        h_i = 1  # h coordinate in fmap
+        w_i = 1  # w coordinate in fmap
 
         # perturbation value
         inj_value_i = 10000.0
 
         # declare neuron fi
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i,
-            conv_num=conv_i,
-            c=c_i,
-            h=h_i,
-            w=w_i,
-            value=inj_value_i
+            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i
         )
 
         ### check output matches (corruption is benign)
@@ -85,7 +78,6 @@ class TestNeuronFIgpu(unittest.TestCase):
 
         self.assertTrue(not torch.all(corrupted_output_1.eq(self.output)))
 
-
         # declare neuron fi
         self.inj_model = self.p.declare_neuron_fi(
             batch=batch_i,
@@ -93,7 +85,7 @@ class TestNeuronFIgpu(unittest.TestCase):
             c=c_i,
             h=h_i,
             w=w_i,
-            value=0       # original (uncorrupted value) was 0
+            value=0,  # original (uncorrupted value) was 0
         )
 
         self.inj_model.eval()
@@ -102,15 +94,9 @@ class TestNeuronFIgpu(unittest.TestCase):
 
         self.assertTrue(torch.all(uncorrupted_output.eq(self.output)))
 
-
         ### check override works
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i,
-            conv_num=conv_i,
-            c=c_i,
-            h=h_i,
-            w=w_i,
-            value=inj_value_i * 2
+            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i * 2
         )
 
         # check output
@@ -128,20 +114,18 @@ class TestNeuronFIcpu(unittest.TestCase):
     """
 
     def setUp(self):
-        torch.manual_seed(0) # for reproducability in testing
+        torch.manual_seed(0)  # for reproducability in testing
 
         # parameters
         self.BATCH_SIZE = 1
         self.WORKERS = 1
-        self.DATASETS = os.environ['ML_DATASETS']
+        self.DATASETS = os.environ["ML_DATASETS"]
         self.img_size = 32
         self.USE_GPU = False
 
         # get model and dataset
         self.model, self.dataset = helper_setUp_CIFAR10(
-            self.BATCH_SIZE,
-            self.WORKERS,
-            self.DATASETS
+            self.BATCH_SIZE, self.WORKERS, self.DATASETS
         )
         self.dataiter = iter(self.dataset)
 
@@ -162,7 +146,7 @@ class TestNeuronFIcpu(unittest.TestCase):
             self.img_size,
             self.img_size,
             self.BATCH_SIZE,
-            use_cuda=self.USE_GPU
+            use_cuda=self.USE_GPU,
         )
 
     def test_neuronFI_singleElement(self):
@@ -170,23 +154,18 @@ class TestNeuronFIcpu(unittest.TestCase):
         Test PytorchFI declare_neuron_fi() function
         """
         # perturbation location
-        batch_i = 0     # batch
-        conv_i = 4      # layer
-        c_i = 0           # fmap number in layer
-        h_i = 1           # h coordinate in fmap
-        w_i = 1           # w coordinate in fmap
+        batch_i = 0  # batch
+        conv_i = 4  # layer
+        c_i = 0  # fmap number in layer
+        h_i = 1  # h coordinate in fmap
+        w_i = 1  # w coordinate in fmap
 
         # perturbation value
         inj_value_i = 10000.0
 
         # declare neuron fi
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i,
-            conv_num=conv_i,
-            c=c_i,
-            h=h_i,
-            w=w_i,
-            value=inj_value_i
+            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i
         )
 
         ### check output matches (corruption is benign)
@@ -196,7 +175,6 @@ class TestNeuronFIcpu(unittest.TestCase):
 
         self.assertTrue(not torch.all(corrupted_output_1.eq(self.output)))
 
-
         # declare neuron fi
         self.inj_model = self.p.declare_neuron_fi(
             batch=batch_i,
@@ -204,7 +182,7 @@ class TestNeuronFIcpu(unittest.TestCase):
             c=c_i,
             h=h_i,
             w=w_i,
-            value=0       # original (uncorrupted value) was 0
+            value=0,  # original (uncorrupted value) was 0
         )
 
         self.inj_model.eval()
@@ -213,15 +191,9 @@ class TestNeuronFIcpu(unittest.TestCase):
 
         self.assertTrue(torch.all(uncorrupted_output.eq(self.output)))
 
-
         ### check override works
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i,
-            conv_num=conv_i,
-            c=c_i,
-            h=h_i,
-            w=w_i,
-            value=inj_value_i * 2
+            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i * 2
         )
 
         # check output
@@ -239,20 +211,18 @@ class TestNeuronFIgpuBatch(unittest.TestCase):
     """
 
     def setUp(self):
-        torch.manual_seed(0) # for reproducability in testing
+        torch.manual_seed(0)  # for reproducability in testing
 
         # parameters
         self.BATCH_SIZE = 4
         self.WORKERS = 1
-        self.DATASETS = os.environ['ML_DATASETS']
+        self.DATASETS = os.environ["ML_DATASETS"]
         self.img_size = 32
         self.USE_GPU = True
 
         # get model and dataset
         self.model, self.dataset = helper_setUp_CIFAR10(
-            self.BATCH_SIZE,
-            self.WORKERS,
-            self.DATASETS
+            self.BATCH_SIZE, self.WORKERS, self.DATASETS
         )
         self.dataiter = iter(self.dataset)
 
@@ -273,7 +243,7 @@ class TestNeuronFIgpuBatch(unittest.TestCase):
             self.img_size,
             self.img_size,
             self.BATCH_SIZE,
-            use_cuda=self.USE_GPU
+            use_cuda=self.USE_GPU,
         )
 
     def test_neuronFI_batch_1(self):
@@ -281,23 +251,18 @@ class TestNeuronFIgpuBatch(unittest.TestCase):
         Test PytorchFI declare_neuron_fi() with a batch; only one element in the batch corrupted
         """
         # perturbation location
-        batch_i = 2     # batch
-        conv_i = 4      # layer
-        c_i = 0           # fmap number in layer
-        h_i = 1           # h coordinate in fmap
-        w_i = 1           # w coordinate in fmap
+        batch_i = 2  # batch
+        conv_i = 4  # layer
+        c_i = 0  # fmap number in layer
+        h_i = 1  # h coordinate in fmap
+        w_i = 1  # w coordinate in fmap
 
         # perturbation value
         inj_value_i = 10000.0
 
         # declare neuron fi
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i,
-            conv_num=conv_i,
-            c=c_i,
-            h=h_i,
-            w=w_i,
-            value=inj_value_i
+            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i
         )
 
         ### check output matches (corruption is benign)
@@ -310,29 +275,23 @@ class TestNeuronFIgpuBatch(unittest.TestCase):
         self.assertTrue(not torch.all(corrupted_output_1[2].eq(self.output[2])))
         self.assertTrue(torch.all(corrupted_output_1[3].eq(self.output[3])))
 
-
     def test_neuronFI_batch_2(self):
         """
         Test PytorchFI declare_neuron_fi() with a batch; multiple elements in the batch corrupted
         """
         # perturbation location
-        batch_i = [0, 2, 3]     # batch
-        conv_i = [1, 2, 4]      # layer
-        c_i = [3, 1, 1]           # fmap number in layer
-        h_i = [1, 0, 1]           # h coordinate in fmap
-        w_i = [0, 1, 0]           # w coordinate in fmap
+        batch_i = [0, 2, 3]  # batch
+        conv_i = [1, 2, 4]  # layer
+        c_i = [3, 1, 1]  # fmap number in layer
+        h_i = [1, 0, 1]  # h coordinate in fmap
+        w_i = [0, 1, 0]  # w coordinate in fmap
 
         # perturbation value
         inj_value_i = [10000.0, 10000.0, 10000.0]
 
         # declare neuron fi
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i,
-            conv_num=conv_i,
-            c=c_i,
-            h=h_i,
-            w=w_i,
-            value=inj_value_i
+            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i
         )
 
         ### check output matches (corruption is benign)
@@ -352,20 +311,18 @@ class TestNeuronFIcpuBatch(unittest.TestCase):
     """
 
     def setUp(self):
-        torch.manual_seed(0) # for reproducability in testing
+        torch.manual_seed(0)  # for reproducability in testing
 
         # parameters
         self.BATCH_SIZE = 4
         self.WORKERS = 1
-        self.DATASETS = os.environ['ML_DATASETS']
+        self.DATASETS = os.environ["ML_DATASETS"]
         self.img_size = 32
         self.USE_GPU = False
 
         # get model and dataset
         self.model, self.dataset = helper_setUp_CIFAR10(
-            self.BATCH_SIZE,
-            self.WORKERS,
-            self.DATASETS
+            self.BATCH_SIZE, self.WORKERS, self.DATASETS
         )
         self.dataiter = iter(self.dataset)
 
@@ -386,7 +343,7 @@ class TestNeuronFIcpuBatch(unittest.TestCase):
             self.img_size,
             self.img_size,
             self.BATCH_SIZE,
-            use_cuda=self.USE_GPU
+            use_cuda=self.USE_GPU,
         )
 
     def test_neuronFI_batch_1(self):
@@ -394,23 +351,18 @@ class TestNeuronFIcpuBatch(unittest.TestCase):
         Test PytorchFI declare_neuron_fi() with a batch; only one element in the batch corrupted
         """
         # perturbation location
-        batch_i = 2     # batch
-        conv_i = 4      # layer
-        c_i = 0           # fmap number in layer
-        h_i = 1           # h coordinate in fmap
-        w_i = 1           # w coordinate in fmap
+        batch_i = 2  # batch
+        conv_i = 4  # layer
+        c_i = 0  # fmap number in layer
+        h_i = 1  # h coordinate in fmap
+        w_i = 1  # w coordinate in fmap
 
         # perturbation value
         inj_value_i = 10000.0
 
         # declare neuron fi
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i,
-            conv_num=conv_i,
-            c=c_i,
-            h=h_i,
-            w=w_i,
-            value=inj_value_i
+            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i
         )
 
         ### check output matches (corruption is benign)
@@ -423,29 +375,23 @@ class TestNeuronFIcpuBatch(unittest.TestCase):
         self.assertTrue(not torch.all(corrupted_output_1[2].eq(self.output[2])))
         self.assertTrue(torch.all(corrupted_output_1[3].eq(self.output[3])))
 
-
     def test_neuronFI_batch_2(self):
         """
         Test PytorchFI declare_neuron_fi() with a batch; multiple elements in the batch corrupted
         """
         # perturbation location
-        batch_i = [0, 2, 3]     # batch
-        conv_i = [1, 2, 4]      # layer
-        c_i = [3, 1, 1]           # fmap number in layer
-        h_i = [1, 0, 1]           # h coordinate in fmap
-        w_i = [0, 1, 0]           # w coordinate in fmap
+        batch_i = [0, 2, 3]  # batch
+        conv_i = [1, 2, 4]  # layer
+        c_i = [3, 1, 1]  # fmap number in layer
+        h_i = [1, 0, 1]  # h coordinate in fmap
+        w_i = [0, 1, 0]  # w coordinate in fmap
 
         # perturbation value
         inj_value_i = [10000.0, 10000.0, 10000.0]
 
         # declare neuron fi
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i,
-            conv_num=conv_i,
-            c=c_i,
-            h=h_i,
-            w=w_i,
-            value=inj_value_i
+            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i
         )
 
         ### check output matches (corruption is benign)
