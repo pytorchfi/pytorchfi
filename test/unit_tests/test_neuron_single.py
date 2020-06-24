@@ -38,7 +38,7 @@ class TestNeuronCPUSingle(unittest.TestCase):
         """
         Test PytorchFI init()
         """
-        p = pfi_core(self.model, self.img_size, self.img_size, self.BATCH_SIZE, use_cuda=self.USE_GPU, FP16 = False)
+        p = pfi_core(self.model, self.img_size, self.img_size, self.BATCH_SIZE, use_cuda=self.USE_GPU)
 
         self.assertTrue(True)
 
@@ -46,7 +46,7 @@ class TestNeuronCPUSingle(unittest.TestCase):
         """
         Test PytorchFI get_original_model()
         """
-        p = pfi_core(self.model, self.img_size, self.img_size, self.BATCH_SIZE, use_cuda=self.USE_GPU, FP16 = False)
+        p = pfi_core(self.model, self.img_size, self.img_size, self.BATCH_SIZE, use_cuda=self.USE_GPU)
         self.faulty_model = p.get_original_model()
 
         self.assertTrue(self.faulty_model is self.model)
@@ -83,7 +83,7 @@ class TestNeuronGPUSingle(unittest.TestCase):
         """
         Test PytorchFI init() with GPU
         """
-        p = pfi_core(self.model, self.img_size, self.img_size, self.BATCH_SIZE, use_cuda=self.USE_GPU, FP16 = False)
+        p = pfi_core(self.model, self.img_size, self.img_size, self.BATCH_SIZE, use_cuda=self.USE_GPU)
 
         self.assertTrue(True)
 
@@ -91,7 +91,7 @@ class TestNeuronGPUSingle(unittest.TestCase):
         """
         Test PytorchFI get_original_model() with GPU
         """
-        p = pfi_core(self.model, self.img_size, self.img_size, self.BATCH_SIZE, use_cuda=self.USE_GPU, FP16 = False)
+        p = pfi_core(self.model, self.img_size, self.img_size, self.BATCH_SIZE, use_cuda=self.USE_GPU)
         self.faulty_model = p.get_original_model()
 
         self.assertTrue(self.faulty_model is self.model)
