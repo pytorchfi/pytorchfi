@@ -51,7 +51,6 @@ class TestNeuronCPUSingle(unittest.TestCase):
             self.img_size,
             self.BATCH_SIZE,
             use_cuda=self.USE_GPU,
-            FP16=False,
         )
 
         self.assertTrue(True)
@@ -66,7 +65,6 @@ class TestNeuronCPUSingle(unittest.TestCase):
             self.img_size,
             self.BATCH_SIZE,
             use_cuda=self.USE_GPU,
-            FP16=False,
         )
         self.faulty_model = p.get_original_model()
 
@@ -112,7 +110,6 @@ class TestNeuronGPUSingle(unittest.TestCase):
             self.img_size,
             self.BATCH_SIZE,
             use_cuda=self.USE_GPU,
-            FP16=False,
         )
 
         self.assertTrue(True)
@@ -127,7 +124,6 @@ class TestNeuronGPUSingle(unittest.TestCase):
             self.img_size,
             self.BATCH_SIZE,
             use_cuda=self.USE_GPU,
-            FP16=False,
         )
         self.faulty_model = p.get_original_model()
 
