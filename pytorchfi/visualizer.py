@@ -1,10 +1,8 @@
 import os
 import sys
 
-import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.widgets import Slider
 
 
 # Creates a heatmap of the vulnerabilities for a single layer
@@ -12,7 +10,7 @@ def heat_map(numpy_data, layer_count, output_dir):
     fig = plt.figure(figsize=(20, 20))
     ax = fig.add_subplot(111)
     ax.axis("off")
-    im = ax.imshow(numpy_data, interpolation="bilinear")
+    # im = ax.imshow(numpy_data, interpolation="bilinear")
     try:
         plt.savefig(output_dir + "/Layer-" + str(layer_count) + "-Heat Map")
     except FileNotFoundError:
@@ -79,7 +77,7 @@ def quicksort(arr, low, high):
 def generate_graph(file_name, generator, output_dir):
     try:
         input_file = open(file_name)
-        name_line = input_file.readline()
+        _name_line = input_file.readline()
         csv_line = input_file.readline()
         layer_count = 0
         graph_data = [[]]
