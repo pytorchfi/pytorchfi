@@ -51,8 +51,6 @@ class fault_injection:
 
         self.ORIG_MODEL(_dummyTensor)
 
-
-
         for i in range(len(handles)):
             handles[i].remove()
 
@@ -270,7 +268,7 @@ class fault_injection:
             # extract injections in this layer
             inj_list = list(
                 filter(
-                    lambda x: self.CORRUPT_CONV[x] == CURRENT_CONV,
+                    lambda x: self.CORRUPT_CONV[x] == self.CURRENT_CONV,
                     range(len(self.CORRUPT_CONV)),
                 )
             )
@@ -302,7 +300,7 @@ class fault_injection:
         else:  # single injection (not a list of injections)
             # check that the injection indices are valid
             self.assert_inj_bounds()
-            if CURRENT_CONV == self.CORRUPT_CONV:
+            if self.CURRENT_CONV == self.CORRUPT_CONV:
                 if self.DEBUG:
                     print(
                         "Original value at [%d][%d][%d][%d]: %d"
