@@ -7,7 +7,7 @@ on:
     - cron: "0 18 * * 0"
 
 jobs:
-  CodeQL-Build:
+  lint:
     runs-on: ubuntu-latest
 
     steps:

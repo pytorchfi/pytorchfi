@@ -1,11 +1,13 @@
 # ========================================#
 # Commonly used functions during testing
 # ========================================#
-import torch, os
+import os
+
+import torch
 import torch.nn as nn
+import torchvision.datasets as datasets
 import torchvision.models as models
 import torchvision.transforms as transforms
-import torchvision.datasets as datasets
 
 
 #####################################################################################
@@ -110,4 +112,3 @@ def helper_setUp_CIFAR10(batchsize, workers, dataset_path):
     # model.load_state_dict(checkpoint)
 
     return model, val_loader
-
