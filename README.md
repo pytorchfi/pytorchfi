@@ -6,6 +6,7 @@
 </h1>
 
 <p align="center">
+    <img src="https://img.shields.io/circleci/build/github/pytorchfi/pytorchfi/master"></img>
     <a href="https://pypi.org/project/pytorchfi/"><img src="https://img.shields.io/pypi/dm/pytorchfi?color=da67f7"></a>
     <a href="https://opensource.org/licenses/NCSA"><img src="https://img.shields.io/badge/license-NCSA-blue"></a>
 </p>
