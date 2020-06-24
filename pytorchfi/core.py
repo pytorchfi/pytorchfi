@@ -264,7 +264,7 @@ class fault_injection:
                 and self.CORRUPT_W < self.OUTPUT_SIZE[self.CORRUPT_CONV][3]
             ), "Invalid W!"
 
-    def _set_value(self, input, output):
+    def _set_value(self, model, input, output):
         if type(self.CORRUPT_CONV) == list:
             # extract injections in this layer
             inj_list = list(
