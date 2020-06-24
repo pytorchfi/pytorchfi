@@ -5,6 +5,7 @@ orbs:
 
 jobs:
   build-and-test:
+    working_directory: ~/pytorchfi
     executor: python/default
     steps:
       - checkout
