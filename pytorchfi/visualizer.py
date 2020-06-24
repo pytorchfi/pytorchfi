@@ -1,11 +1,9 @@
 import os
 import sys
 
-
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
-
 from matplotlib.widgets import Slider
 
 
