@@ -19,5 +19,5 @@ jobs:
       - run: git checkout HEAD^2
         if: ${{ github.event_name == 'pull_request' }}
 
-      - name: Python Lint (isort/black)
-        uses: wrboyce/python-lint-action@master
+      - name: Python style check
+        uses: bulv1ne/python-style-check@v0.3
