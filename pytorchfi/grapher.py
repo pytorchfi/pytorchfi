@@ -1,9 +1,11 @@
-import matplotlib
-import numpy as np
-import matplotlib.image as mpimg
-from matplotlib.widgets import Slider
-import matplotlib.pyplot as plt
 import os
+
+import numpy as np
+
+import matplotlib
+import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
+from matplotlib.widgets import Slider
 
 plt.rcParams["toolbar"] = "None"
 
@@ -66,4 +68,3 @@ fig.set_facecolor("#808080")
 text = fig.suptitle("Layered Vulnerability Visualization", size="xx-large")
 text.set_fontweight("black")
 plt.show()
-

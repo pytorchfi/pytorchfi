@@ -1,9 +1,12 @@
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-from matplotlib.widgets import Slider
-import numpy as np
 import os
 import sys
+
+import numpy as np
+
+import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
+from matplotlib.widgets import Slider
+
 
 # Creates a heatmap of the vulnerabilities for a single layer
 def heat_map(numpy_data, layer_count, output_dir):
