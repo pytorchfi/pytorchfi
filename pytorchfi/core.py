@@ -31,18 +31,27 @@ class fault_injection:
 
         b = kwargs.get("b", 1)
         c = kwargs.get("c", 3)
-        use_cuda = kwargs.get("use_cuda", False)
+        use_cuda = kwargs.get("use_cuda", next(model.parameters()).is_cuda)
+        model_dtype = next(model.parameters()).dtype
 
         self.ORIG_MODEL = model
 
         self._BATCH_SIZE = batch_size
 
+        # perform a dummy inference to profile the model
         handles = []
         for param in self.ORIG_MODEL.modules():
             if isinstance(param, nn.Conv2d):
                 handles.append(param.register_forward_hook(self._save_output_size))
 
-        self.ORIG_MODEL(torch.randn(b, c, h, w))
+        if use_cuda is False:
+            _dummyTensor = torch.randn(b, c, h, w, dtype=model_dtype)
+        else:
+            _dummyTensor = torch.randn(b, c, h, w, dtype=model_dtype, device="cuda")
+
+        self.ORIG_MODEL(_dummyTensor)
+
+
 
         for i in range(len(handles)):
             handles[i].remove()
