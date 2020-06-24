@@ -1,0 +1,31 @@
+name: "Lint"
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 18 * * 0"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - run: git checkout HEAD^2
+        if: ${{ github.event_name == 'pull_request' }}
+
+      - name: Python Code Quality and Lint
+        uses: ricardochaves/python-lint@v1.1.0
+        with:
+          use-pylint: false
+          use-pycodestyle: false
+          use-flake8: false
+          use-black: true
+          use-mypy: false
+          use-isort: true
+          extra-flake8-options: --ignore=E203,E501

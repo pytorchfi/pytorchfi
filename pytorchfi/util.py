@@ -3,11 +3,11 @@ pytorchfi.util contains utility functions to help the user generate fault inject
 """
 
 import os.path
+import random
 import time
+
 import torch
 import torch.nn as nn
-import random
-
 from pytorchfi import core
 
 
