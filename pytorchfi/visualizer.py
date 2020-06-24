@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-
 # Creates a heatmap of the vulnerabilities for a single layer
 def heat_map(numpy_data, layer_count, output_dir):
     fig = plt.figure(figsize=(20, 20))
