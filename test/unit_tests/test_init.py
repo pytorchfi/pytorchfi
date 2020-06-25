@@ -194,7 +194,7 @@ class TestDtypes:
             use_cuda=self.USE_GPU,
         )
 
-    @pytest.mark.skip(reason="Currently failing")
+    @pytest.mark.skip(reason="Experimental in PyTorch")
     def test_INT8_cpu(self):
         """
         TODO: More comprehensive test
