@@ -61,7 +61,9 @@ from pytorchfi import core
 
 ### Testing
 
-`python -m unittest -v`
+```bash
+pytest
+```
 
 ## Code
 
