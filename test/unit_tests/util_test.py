@@ -106,10 +106,5 @@ def helper_setUp_CIFAR10(batchsize, workers):
         testset, batch_size=batchsize, shuffle=False, num_workers=workers
     )
 
-    # Model prep
     model = alexnet(num_classes=10)
-    # ckpt_name = "model_best_pth.tar"
-    # checkpoint = torch.load(ckpt_name)
-    # model.load_state_dict(checkpoint)
-
     return model, val_loader

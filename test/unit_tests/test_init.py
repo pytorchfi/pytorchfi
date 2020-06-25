@@ -191,12 +191,11 @@ class TestDtypes(unittest.TestCase):
 
         self.assertTrue(True)
 
+    @unittest.skipIf(not torch.cuda.is_available(), "GPU not supported on this machine")
     def test_fp16_gpu(self):
         """
         Test PytorchFI with FP16 model datatype on GPU
         """
-        @unittest.skipIf(not self.USE_GPU, "GPU not supported on this machine")
-
         if self.USE_GPU:
             self.model.cuda()
 
