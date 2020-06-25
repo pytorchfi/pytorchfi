@@ -136,6 +136,7 @@ class TestDtypes(unittest.TestCase):
         self.WORKERS = 64
         self.DATASETS = "./data"
         self.img_size = 32
+        self.USE_GPU = torch.cuda.is_available()
 
         # get model and dataset
         self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS)
@@ -148,8 +149,6 @@ class TestDtypes(unittest.TestCase):
         """
         Test PytorchFI with FP32 model datatype on GPU
         """
-        self.USE_GPU = torch.cuda.is_available()
-
         if self.USE_GPU:
             self.model.cuda()
         self.model.eval()
@@ -173,8 +172,6 @@ class TestDtypes(unittest.TestCase):
         """
         Test PytorchFI with FP32 model datatype on CPU
         """
-        self.USE_GPU = torch.cuda.is_available()
-
         if self.USE_GPU:
             self.model.cuda()
         self.model.eval()
@@ -198,28 +195,28 @@ class TestDtypes(unittest.TestCase):
         """
         Test PytorchFI with FP16 model datatype on GPU
         """
-        self.USE_GPU = torch.cuda.is_available()
+        @unittest.skipIf(not self.USE_GPU, "GPU not supported on this machine")
 
         if self.USE_GPU:
             self.model.cuda()
 
-            # fp16
-            self.model.half()
+        # fp16
+        self.model.half()
 
-            self.model.eval()
+        self.model.eval()
 
-            torch.no_grad()
-            if self.USE_GPU is True:
-                self.images = self.images.cuda()
-            self.output = self.model(self.images.half())
+        torch.no_grad()
+        if self.USE_GPU is True:
+            self.images = self.images.cuda()
+        self.output = self.model(self.images.half())
 
-            p = pfi_core(
-                self.model,
-                self.img_size,
-                self.img_size,
-                self.BATCH_SIZE,
-                use_cuda=self.USE_GPU,
-            )
+        p = pfi_core(
+            self.model,
+            self.img_size,
+            self.img_size,
+            self.BATCH_SIZE,
+            use_cuda=self.USE_GPU,
+        )
 
         self.assertTrue(True)
 
@@ -227,8 +224,6 @@ class TestDtypes(unittest.TestCase):
         """
         Test PytorchFI with INT8 model datatype on CPU
         """
-        self.USE_GPU = torch.cuda.is_available()
-
         if self.USE_GPU:
             self.model.cuda()
 
