@@ -5,14 +5,14 @@ pytorchfi.core contains the core functionality for fault injections.
 import copy
 import random
 
-import logger
+import logging
 import torch
 import torch.nn as nn
 
 
 class fault_injection:
     def __init__(self, model, h, w, batch_size, **kwargs):
-        logger.basicConfig(format="%(asctime)-15s %(clientip)s %(user)-8s %(message)s")
+        logging.basicConfig(format="%(asctime)-15s %(clientip)s %(user)-8s %(message)s")
         self.ORIG_MODEL = None
         self.CORRUPTED_MODEL = None
         self._BATCH_SIZE = -1
@@ -52,8 +52,8 @@ class fault_injection:
         for i in range(len(handles)):
             handles[i].remove()
 
-        logger.info("Model output size")
-        logger.info(
+        logging.info("Model output size")
+        logging.info(
             "\n".join(
                 [
                     "".join(["{:4}".format(item) for item in row])
@@ -65,7 +65,7 @@ class fault_injection:
     def fi_reset(self):
         self._fi_state_reset()
         self.CORRUPTED_MODEL = None
-        logger.info("Reset fault injector")
+        logging.info("Reset fault injector")
 
     def _fi_state_reset(self):
         (
@@ -128,8 +128,8 @@ class fault_injection:
                 if curr_layer == corrupt_layer:
                     if zero_layer:
                         param.data[:] = 0
-                        logger.info("Zero weight layer")
-                        logger.info("Layer index: %s" % corrupt_layer)
+                        logging.info("Zero weight layer")
+                        logging.info("Layer index: %s" % corrupt_layer)
                     else:
                         if rand_inj:
                             corrupt_value = random.uniform(min_val, max_val)
@@ -146,11 +146,11 @@ class fault_injection:
                             corrupt_value = function(param.data[tuple(corrupt_idx)])
 
                         param.data[corrupt_idx] = corrupt_value
-                        logger.info("Weight Injection")
-                        logger.info("Layer index: %s" % corrupt_layer)
-                        logger.info("Module: %s" % name)
-                        logger.info("Original value: %s" % orig_value)
-                        logger.info("Injected value: %s" % corrupt_value)
+                        logging.info("Weight Injection")
+                        logging.info("Layer index: %s" % corrupt_layer)
+                        logging.info("Module: %s" % name)
+                        logging.info("Original value: %s" % orig_value)
+                        logging.info("Injected value: %s" % corrupt_value)
 
                 curr_layer += 1
         return self.CORRUPTED_MODEL
@@ -171,10 +171,10 @@ class fault_injection:
                 self.CORRUPT_W = kwargs.get("w", -1)
                 self.CORRUPT_VALUE = kwargs.get("value", None)
 
-                logger.info("Declaring Specified Fault Injector")
-                logger.info("Convolution: %s" % self.CORRUPT_CONV)
-                logger.info("Batch, x, y, z:")
-                logger.info(
+                logging.info("Declaring Specified Fault Injector")
+                logging.info("Convolution: %s" % self.CORRUPT_CONV)
+                logging.info("Batch, x, y, z:")
+                logging.info(
                     "%s, %s, %s, %s"
                     % (
                         self.CORRUPT_BATCH,
@@ -251,7 +251,7 @@ class fault_injection:
             )
             for i in inj_list:
                 self.assert_inj_bounds(index=i)
-                logger.info(
+                logging.info(
                     "Original value at [%d][%d][%d][%d]: %d"
                     % (
                         self.CORRUPT_BATCH[i],
@@ -263,7 +263,7 @@ class fault_injection:
                         ][self.CORRUPT_W[i]],
                     )
                 )
-                logger.info("Changing value to %d" % self.CORRUPT_VALUE[i])
+                logging.info("Changing value to %d" % self.CORRUPT_VALUE[i])
                 output[self.CORRUPT_BATCH[i]][self.CORRUPT_C[i]][self.CORRUPT_H[i]][
                     self.CORRUPT_W[i]
                 ] = self.CORRUPT_VALUE[i]
@@ -272,7 +272,7 @@ class fault_injection:
         else:
             self.assert_inj_bounds()
             if self.CURRENT_CONV == self.CORRUPT_CONV:
-                logger.info(
+                logging.info(
                     "Original value at [%d][%d][%d][%d]: %d"
                     % (
                         self.CORRUPT_BATCH,
@@ -284,7 +284,7 @@ class fault_injection:
                         ],
                     )
                 )
-                logger.info("Changing value to %d" % self.CORRUPT_VALUE)
+                logging.info("Changing value to %d" % self.CORRUPT_VALUE)
                 output[self.CORRUPT_BATCH][self.CORRUPT_C][self.CORRUPT_H][
                     self.CORRUPT_W
                 ] = self.CORRUPT_VALUE
