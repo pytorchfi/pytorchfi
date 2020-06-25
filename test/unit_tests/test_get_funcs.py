@@ -22,7 +22,7 @@ class TestCoreGetFuncs(unittest.TestCase):
         self.WORKERS = 64
         self.DATASETS = "./data"
         self.img_size = 32
-        self.USE_GPU = False
+        self.USE_GPU = torch.cuda.is_available()
 
         # get model and dataset
         self.model, self.dataset = helper_setUp_CIFAR10(

@@ -24,7 +24,8 @@ class TestNeuronFIgpu(unittest.TestCase):
         self.WORKERS = 1
         self.DATASETS = "./data"
         self.img_size = 32
-        self.USE_GPU = False
+        self.USE_GPU = torch.cuda.is_available()
+
 
         # get model and dataset
         self.model, self.dataset = helper_setUp_CIFAR10(
@@ -121,7 +122,8 @@ class TestNeuronFIcpu(unittest.TestCase):
         self.WORKERS = 1
         self.DATASETS = "./data"
         self.img_size = 32
-        self.USE_GPU = False
+        self.USE_GPU = torch.cuda.is_available()
+
 
         # get model and dataset
         self.model, self.dataset = helper_setUp_CIFAR10(
@@ -218,7 +220,8 @@ class TestNeuronFIgpuBatch(unittest.TestCase):
         self.WORKERS = 1
         self.DATASETS = "./data"
         self.img_size = 32
-        self.USE_GPU = False
+        self.USE_GPU = torch.cuda.is_available()
+
 
         # get model and dataset
         self.model, self.dataset = helper_setUp_CIFAR10(
@@ -318,7 +321,8 @@ class TestNeuronFIcpuBatch(unittest.TestCase):
         self.WORKERS = 1
         self.DATASETS = "./data"
         self.img_size = 32
-        self.USE_GPU = False
+        self.USE_GPU = torch.cuda.is_available()
+
 
         # get model and dataset
         self.model, self.dataset = helper_setUp_CIFAR10(
