@@ -20,7 +20,7 @@ jobs:
             $HOME/.local/bin/coverage report
             $HOME/.local/bin/coverage html  # open htmlcov/index.html in a browser
           name: Code Coverage
-    - store_artifacts:
+      - store_artifacts:
         path: htmlcov
 
 workflows:
