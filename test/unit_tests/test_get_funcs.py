@@ -2,7 +2,6 @@
 # PyTorchFI Unit Tests
 # =================================#
 
-import os
 import unittest
 
 import torch
@@ -13,21 +12,18 @@ from .util_test import *
 
 class TestCoreGetFuncs(unittest.TestCase):
     """
-    Testing focuses on *neuron* perturbations on the *CPU* with a *single* batch element.
+    Testing focuses on neuron perturbations on the CPU with a single batch element.
     """
 
     def setUp(self):
         # parameters
         self.BATCH_SIZE = 1024
         self.WORKERS = 64
-        self.DATASETS = os.environ["ML_DATASETS"]
         self.img_size = 32
-        self.USE_GPU = True
+        self.USE_GPU = torch.cuda.is_available()
 
         # get model and dataset
-        self.model, self.dataset = helper_setUp_CIFAR10(
-            self.BATCH_SIZE, self.WORKERS, self.DATASETS
-        )
+        self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS)
         if self.USE_GPU:
             self.model.cuda()
         self.dataiter = iter(self.dataset)

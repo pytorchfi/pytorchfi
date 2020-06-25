@@ -5,6 +5,7 @@ import os
 
 import torch
 import torch.nn as nn
+import torchvision
 import torchvision.datasets as datasets
 import torchvision.models as models
 import torchvision.transforms as transforms
@@ -88,7 +89,7 @@ def helper_setUp_IMAGENET(batchsize, workers, dataset_path):
     return model, val_loader
 
 
-def helper_setUp_CIFAR10(batchsize, workers, dataset_path):
+def helper_setUp_CIFAR10(batchsize, workers):
 
     # Dataset prep
     transform = transforms.Compose(
@@ -98,17 +99,12 @@ def helper_setUp_CIFAR10(batchsize, workers, dataset_path):
         ]
     )
 
-    testset = datasets.CIFAR10(
-        root=dataset_path + "/CIFAR", train=False, download=True, transform=transform
+    testset = torchvision.datasets.CIFAR10(
+        root="./data", train=False, download=True, transform=transform
     )
     val_loader = torch.utils.data.DataLoader(
         testset, batch_size=batchsize, shuffle=False, num_workers=workers
     )
 
-    # Model prep
     model = alexnet(num_classes=10)
-    # ckpt_name = "model_best_pth.tar"
-    # checkpoint = torch.load(ckpt_name)
-    # model.load_state_dict(checkpoint)
-
     return model, val_loader

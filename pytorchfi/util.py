@@ -1,5 +1,6 @@
 """
-pytorchfi.util contains utility functions to help the user generate fault injections and determine their impact.
+pytorchfi.util contains utility functions to help the user generate fault
+injections and determine their impact.
 """
 
 import os.path
