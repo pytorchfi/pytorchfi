@@ -62,7 +62,7 @@ from pytorchfi import core
 
 ### Testing
 
-`python -m unittest -v -f`
+`python -m unittest -v`
 
 ## Code
 

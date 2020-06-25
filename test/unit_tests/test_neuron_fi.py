@@ -68,7 +68,7 @@ class TestNeuronFIgpu(unittest.TestCase):
             batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i
         )
 
-        ### check output matches (corruption is benign)
+        # check output matches (corruption is benign)
         self.inj_model.eval()
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)

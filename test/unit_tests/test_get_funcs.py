@@ -2,7 +2,6 @@
 # PyTorchFI Unit Tests
 # =================================#
 
-import os
 import unittest
 
 import torch
@@ -13,7 +12,7 @@ from .util_test import *
 
 class TestCoreGetFuncs(unittest.TestCase):
     """
-    Testing focuses on *neuron* perturbations on the *CPU* with a *single* batch element.
+    Testing focuses on neuron perturbations on the CPU with a single batch element.
     """
 
     def setUp(self):
