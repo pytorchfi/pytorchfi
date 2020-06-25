@@ -3,11 +3,12 @@ pytorchfi.core contains the core functionality for fault injections.
 """
 
 import copy
-import logger
 import random
 
 import torch
 import torch.nn as nn
+
+import logger
 
 
 class fault_injection:
