@@ -60,6 +60,10 @@ Import a specific module:
 from pytorchfi import core
 ```
 
+### Testing
+
+`python -m unittest -v -f`
+
 ## Code
 
 ### Structure

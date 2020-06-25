@@ -20,7 +20,7 @@ class TestNeuronCPUSingle(unittest.TestCase):
         # parameters
         self.BATCH_SIZE = 1024
         self.WORKERS = 64
-        self.DATASETS = os.environ["ML_DATASETS"]
+        self.DATASETS = "./data"
         self.img_size = 32
         self.USE_GPU = False
 
@@ -79,9 +79,9 @@ class TestNeuronGPUSingle(unittest.TestCase):
         # parameters
         self.BATCH_SIZE = 1024
         self.WORKERS = 64
-        self.DATASETS = os.environ["ML_DATASETS"]
+        self.DATASETS = "./data"
         self.img_size = 32
-        self.USE_GPU = True
+        self.USE_GPU = False
 
         # get model and dataset
         self.model, self.dataset = helper_setUp_CIFAR10(
@@ -138,7 +138,7 @@ class TestDtypes(unittest.TestCase):
         # parameters
         self.BATCH_SIZE = 1024
         self.WORKERS = 64
-        self.DATASETS = os.environ["ML_DATASETS"]
+        self.DATASETS = "./data"
         self.img_size = 32
 
         # get model and dataset
@@ -154,7 +154,7 @@ class TestDtypes(unittest.TestCase):
         """
         Test PytorchFI with FP32 model datatype on GPU
         """
-        self.USE_GPU = True
+        self.USE_GPU = False
 
         if self.USE_GPU:
             self.model.cuda()
@@ -204,28 +204,28 @@ class TestDtypes(unittest.TestCase):
         """
         Test PytorchFI with FP16 model datatype on GPU
         """
-        self.USE_GPU = True
+        self.USE_GPU = False
 
         if self.USE_GPU:
             self.model.cuda()
 
-        # fp16
-        self.model.half()
+            # fp16
+            self.model.half()
 
-        self.model.eval()
+            self.model.eval()
 
-        torch.no_grad()
-        if self.USE_GPU is True:
-            self.images = self.images.cuda()
-        self.output = self.model(self.images.half())
+            torch.no_grad()
+            if self.USE_GPU is True:
+                self.images = self.images.cuda()
+            self.output = self.model(self.images.half())
 
-        p = pfi_core(
-            self.model,
-            self.img_size,
-            self.img_size,
-            self.BATCH_SIZE,
-            use_cuda=self.USE_GPU,
-        )
+            p = pfi_core(
+                self.model,
+                self.img_size,
+                self.img_size,
+                self.BATCH_SIZE,
+                use_cuda=self.USE_GPU,
+            )
 
         self.assertTrue(True)
 

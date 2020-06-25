@@ -20,9 +20,9 @@ class TestCoreGetFuncs(unittest.TestCase):
         # parameters
         self.BATCH_SIZE = 1024
         self.WORKERS = 64
-        self.DATASETS = os.environ["ML_DATASETS"]
+        self.DATASETS = "./data"
         self.img_size = 32
-        self.USE_GPU = True
+        self.USE_GPU = False
 
         # get model and dataset
         self.model, self.dataset = helper_setUp_CIFAR10(
