@@ -3,6 +3,8 @@ import unittest
 import torch
 from pytorchfi.core import fault_injection as pfi_core
 
+from util_test import helper_setUp_CIFAR10
+
 
 class TestCoreGetFuncs(unittest.TestCase):
     """
