@@ -22,7 +22,6 @@ class TestNeuronFIgpu(unittest.TestCase):
         # parameters
         self.BATCH_SIZE = 1
         self.WORKERS = 1
-        self.DATASETS = "./data"
         self.img_size = 32
         self.USE_GPU = torch.cuda.is_available()
 
@@ -117,7 +116,6 @@ class TestNeuronFIcpu(unittest.TestCase):
         # parameters
         self.BATCH_SIZE = 1
         self.WORKERS = 1
-        self.DATASETS = "./data"
         self.img_size = 32
         self.USE_GPU = torch.cuda.is_available()
 
@@ -212,7 +210,6 @@ class TestNeuronFIgpuBatch(unittest.TestCase):
         # parameters
         self.BATCH_SIZE = 4
         self.WORKERS = 1
-        self.DATASETS = "./data"
         self.img_size = 32
         self.USE_GPU = torch.cuda.is_available()
 
@@ -310,7 +307,6 @@ class TestNeuronFIcpuBatch(unittest.TestCase):
         # parameters
         self.BATCH_SIZE = 4
         self.WORKERS = 1
-        self.DATASETS = "./data"
         self.img_size = 32
         self.USE_GPU = torch.cuda.is_available()
 

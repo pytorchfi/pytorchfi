@@ -20,7 +20,6 @@ class TestNeuronCPUSingle(unittest.TestCase):
         # parameters
         self.BATCH_SIZE = 1024
         self.WORKERS = 64
-        self.DATASETS = "./data"
         self.img_size = 32
         self.USE_GPU = torch.cuda.is_available()
 
@@ -77,7 +76,6 @@ class TestNeuronGPUSingle(unittest.TestCase):
         # parameters
         self.BATCH_SIZE = 1024
         self.WORKERS = 64
-        self.DATASETS = "./data"
         self.img_size = 32
         self.USE_GPU = torch.cuda.is_available()
 
@@ -134,7 +132,6 @@ class TestDtypes(unittest.TestCase):
         # parameters
         self.BATCH_SIZE = 1024
         self.WORKERS = 64
-        self.DATASETS = "./data"
         self.img_size = 32
         self.USE_GPU = torch.cuda.is_available()
 
