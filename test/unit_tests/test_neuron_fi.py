@@ -1,17 +1,15 @@
-import unittest
-
 import torch
 from pytorchfi.core import fault_injection as pfi_core
 
 from .util_test import helper_setUp_CIFAR10
 
 
-class TestNeuronFIgpu(unittest.TestCase):
+class TestNeuronFIgpu:
     """
     Testing focuses on neuron perturbations on GPU with batch = 1.
     """
 
-    def setUp(self):
+    def setup_class(self):
         torch.manual_seed(0)
 
         self.BATCH_SIZE = 1
@@ -78,16 +76,16 @@ class TestNeuronFIgpu(unittest.TestCase):
         with torch.no_grad():
             corrupted_output_2 = self.inj_model(self.images)
 
-        self.assertTrue(not torch.all(corrupted_output_2.eq(self.output)))
-        self.assertTrue(torch.all(corrupted_output_2.eq(corrupted_output_2)))
+        assert not torch.all(corrupted_output_2.eq(self.output))
+        assert torch.all(corrupted_output_2.eq(corrupted_output_2))
 
 
-class TestNeuronFIcpu(unittest.TestCase):
+class TestNeuronFIcpu:
     """
     Testing focuses on neuron perturbations on CPU with batch = 1.
     """
 
-    def setUp(self):
+    def setup_class(self):
         torch.manual_seed(0)
 
         self.BATCH_SIZE = 1
@@ -154,16 +152,16 @@ class TestNeuronFIcpu(unittest.TestCase):
         with torch.no_grad():
             corrupted_output_2 = self.inj_model(self.images)
 
-        self.assertTrue(not torch.all(corrupted_output_2.eq(self.output)))
-        self.assertTrue(torch.all(corrupted_output_2.eq(corrupted_output_2)))
+        assert not torch.all(corrupted_output_2.eq(self.output))
+        assert torch.all(corrupted_output_2.eq(corrupted_output_2))
 
 
-class TestNeuronFIgpuBatch(unittest.TestCase):
+class TestNeuronFIgpuBatch:
     """
     Testing focuses on neuron perturbations on GPU with batch = N.
     """
 
-    def setUp(self):
+    def setup_class(self):
         torch.manual_seed(0)
 
         self.BATCH_SIZE = 4
@@ -211,10 +209,10 @@ class TestNeuronFIgpuBatch(unittest.TestCase):
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        self.assertTrue(torch.all(corrupted_output_1[0].eq(self.output[0])))
-        self.assertTrue(torch.all(corrupted_output_1[1].eq(self.output[1])))
-        self.assertTrue(not torch.all(corrupted_output_1[2].eq(self.output[2])))
-        self.assertTrue(torch.all(corrupted_output_1[3].eq(self.output[3])))
+        assert torch.all(corrupted_output_1[0].eq(self.output[0]))
+        assert torch.all(corrupted_output_1[1].eq(self.output[1]))
+        assert not torch.all(corrupted_output_1[2].eq(self.output[2]))
+        assert torch.all(corrupted_output_1[3].eq(self.output[3]))
 
     def test_neuronFI_batch_2(self):
 
@@ -234,18 +232,18 @@ class TestNeuronFIgpuBatch(unittest.TestCase):
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        self.assertTrue(not torch.all(corrupted_output_1[0].eq(self.output[0])))
-        self.assertTrue(torch.all(corrupted_output_1[1].eq(self.output[1])))
-        self.assertTrue(not torch.all(corrupted_output_1[2].eq(self.output[2])))
-        self.assertTrue(not torch.all(corrupted_output_1[3].eq(self.output[3])))
+        assert not torch.all(corrupted_output_1[0].eq(self.output[0]))
+        assert torch.all(corrupted_output_1[1].eq(self.output[1]))
+        assert not torch.all(corrupted_output_1[2].eq(self.output[2]))
+        assert not torch.all(corrupted_output_1[3].eq(self.output[3]))
 
 
-class TestNeuronFIcpuBatch(unittest.TestCase):
+class TestNeuronFIcpuBatch:
     """
     Testing focuses on neuron perturbations on cpu with batch = N.
     """
 
-    def setUp(self):
+    def setup_class(self):
         torch.manual_seed(0)
 
         self.BATCH_SIZE = 4
@@ -292,10 +290,10 @@ class TestNeuronFIcpuBatch(unittest.TestCase):
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        self.assertTrue(torch.all(corrupted_output_1[0].eq(self.output[0])))
-        self.assertTrue(torch.all(corrupted_output_1[1].eq(self.output[1])))
-        self.assertTrue(not torch.all(corrupted_output_1[2].eq(self.output[2])))
-        self.assertTrue(torch.all(corrupted_output_1[3].eq(self.output[3])))
+        assert torch.all(corrupted_output_1[0].eq(self.output[0]))
+        assert torch.all(corrupted_output_1[1].eq(self.output[1]))
+        assert not torch.all(corrupted_output_1[2].eq(self.output[2]))
+        assert torch.all(corrupted_output_1[3].eq(self.output[3]))
 
     def test_neuronFI_batch_2(self):
         batch_i = [0, 2, 3]
@@ -314,7 +312,7 @@ class TestNeuronFIcpuBatch(unittest.TestCase):
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        self.assertTrue(not torch.all(corrupted_output_1[0].eq(self.output[0])))
-        self.assertTrue(torch.all(corrupted_output_1[1].eq(self.output[1])))
-        self.assertTrue(not torch.all(corrupted_output_1[2].eq(self.output[2])))
-        self.assertTrue(not torch.all(corrupted_output_1[3].eq(self.output[3])))
+        assert not torch.all(corrupted_output_1[0].eq(self.output[0]))
+        assert torch.all(corrupted_output_1[1].eq(self.output[1]))
+        assert not torch.all(corrupted_output_1[2].eq(self.output[2]))
+        assert not torch.all(corrupted_output_1[3].eq(self.output[3]))

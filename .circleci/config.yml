@@ -12,16 +12,8 @@ jobs:
       - python/install-deps
       - python/save-cache
       - run:
-          command: python -m unittest -v
+          command: pytest
           name: Test
-      - run:
-          name: Code Coverage
-          command: |
-            $HOME/.local/bin/coverage run -m unittest -v
-            $HOME/.local/bin/coverage report
-            $HOME/.local/bin/coverage html
-      - store_artifacts:
-          path: htmlcov
 
 workflows:
   main:

@@ -1,17 +1,15 @@
-import unittest
-
 import torch
 from pytorchfi.core import fault_injection as pfi_core
 
 from .util_test import helper_setUp_CIFAR10
 
 
-class TestCoreGetFuncs(unittest.TestCase):
+class TestCoreGetFuncs:
     """
     Testing focuses on neuron perturbations on the CPU with a single batch element.
     """
 
-    def setUp(self):
+    def setup_class(self):
         self.BATCH_SIZE = 1024
         self.WORKERS = 64
         self.img_size = 32
@@ -46,38 +44,38 @@ class TestCoreGetFuncs(unittest.TestCase):
             [1, 256, 2, 2],
             [1, 256, 2, 2],
         ]
-        self.assertEqual(self.p.get_output_size(), shape)  # for AlexNet
+        assert self.p.get_output_size() == shape
 
     def test_get_total_batches(self):
-        self.assertEqual(self.p.get_total_batches(), self.BATCH_SIZE)
+        assert self.p.get_total_batches() == self.BATCH_SIZE
 
     def test_get_total_conv(self):
-        self.assertEqual(self.p.get_total_conv(), 5)  # for AlexNet
+        assert self.p.get_total_conv() == 5
 
     def test_get_fmap_num(self):
-        self.assertEqual(self.p.get_fmaps_num(0), 64)
-        self.assertEqual(self.p.get_fmaps_num(1), 192)
-        self.assertEqual(self.p.get_fmaps_num(2), 384)
-        self.assertEqual(self.p.get_fmaps_num(3), 256)
-        self.assertEqual(self.p.get_fmaps_num(4), 256)
+        assert self.p.get_fmaps_num(0) == 64
+        assert self.p.get_fmaps_num(1) == 192
+        assert self.p.get_fmaps_num(2) == 384
+        assert self.p.get_fmaps_num(3) == 256
+        assert self.p.get_fmaps_num(4) == 256
 
     def test_get_fmaps_H(self):
-        self.assertEqual(self.p.get_fmaps_H(0), 8)
-        self.assertEqual(self.p.get_fmaps_H(1), 4)
-        self.assertEqual(self.p.get_fmaps_H(2), 2)
-        self.assertEqual(self.p.get_fmaps_H(3), 2)
-        self.assertEqual(self.p.get_fmaps_H(4), 2)
+        assert self.p.get_fmaps_H(0) == 8
+        assert self.p.get_fmaps_H(1) == 4
+        assert self.p.get_fmaps_H(2) == 2
+        assert self.p.get_fmaps_H(3) == 2
+        assert self.p.get_fmaps_H(4) == 2
 
     def test_get_fmaps_W(self):
-        self.assertEqual(self.p.get_fmaps_W(0), 8)
-        self.assertEqual(self.p.get_fmaps_W(1), 4)
-        self.assertEqual(self.p.get_fmaps_W(2), 2)
-        self.assertEqual(self.p.get_fmaps_W(3), 2)
-        self.assertEqual(self.p.get_fmaps_W(4), 2)
+        assert self.p.get_fmaps_W(0) == 8
+        assert self.p.get_fmaps_W(1) == 4
+        assert self.p.get_fmaps_W(2) == 2
+        assert self.p.get_fmaps_W(3) == 2
+        assert self.p.get_fmaps_W(4) == 2
 
     def test_get_fmap_HW(self):
-        self.assertEqual(self.p.get_fmap_HW(0), (8, 8))
-        self.assertEqual(self.p.get_fmap_HW(1), (4, 4))
-        self.assertEqual(self.p.get_fmap_HW(2), (2, 2))
-        self.assertEqual(self.p.get_fmap_HW(3), (2, 2))
-        self.assertEqual(self.p.get_fmap_HW(4), (2, 2))
+        assert self.p.get_fmap_HW(0) == (8, 8)
+        assert self.p.get_fmap_HW(1) == (4, 4)
+        assert self.p.get_fmap_HW(2) == (2, 2)
+        assert self.p.get_fmap_HW(3) == (2, 2)
+        assert self.p.get_fmap_HW(4) == (2, 2)

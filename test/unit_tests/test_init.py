@@ -1,17 +1,15 @@
-import unittest
-
 import torch
 from pytorchfi.core import fault_injection as pfi_core
 
 from .util_test import helper_setUp_CIFAR10
 
 
-class TestNeuronCPUSingle(unittest.TestCase):
+class TestNeuronCPUSingle:
     """
     Testing focuses on neuron perturbations on the CPU with a single batch element.
     """
 
-    def setUp(self):
+    def setup_class(self):
         self.BATCH_SIZE = 1024
         self.WORKERS = 64
         self.img_size = 32
@@ -40,8 +38,7 @@ class TestNeuronCPUSingle(unittest.TestCase):
             self.BATCH_SIZE,
             use_cuda=self.USE_GPU,
         )
-
-        self.assertTrue(True)
+        assert True
 
     def test_orig_model_cpu(self):
         p = pfi_core(
@@ -53,15 +50,15 @@ class TestNeuronCPUSingle(unittest.TestCase):
         )
 
         self.faulty_model = p.get_original_model()
-        self.assertIs(self.faulty_model, self.model)
+        assert self.faulty_model is self.model
 
 
-class TestNeuronGPUSingle(unittest.TestCase):
+class TestNeuronGPUSingle:
     """
     Testing focuses on neuron perturbations on the GPU with a single batch element.
     """
 
-    def setUp(self):
+    def setup_class(self):
         self.BATCH_SIZE = 1024
         self.WORKERS = 64
         self.img_size = 32
@@ -90,8 +87,7 @@ class TestNeuronGPUSingle(unittest.TestCase):
             self.BATCH_SIZE,
             use_cuda=self.USE_GPU,
         )
-
-        self.assertTrue(True)
+        assert True
 
     def test_orig_model_gpu(self):
         p = pfi_core(
@@ -103,15 +99,15 @@ class TestNeuronGPUSingle(unittest.TestCase):
         )
 
         self.faulty_model = p.get_original_model()
-        self.assertIs(self.faulty_model, self.model)
+        assert self.faulty_model is self.model
 
 
-class TestDtypes(unittest.TestCase):
+class TestDtypes:
     """
     Testing focuses on using different model datatypes
     """
 
-    def setUp(self):
+    def setup_class(self):
         self.BATCH_SIZE = 1024
         self.WORKERS = 64
         self.img_size = 32
@@ -143,7 +139,7 @@ class TestDtypes(unittest.TestCase):
             use_cuda=self.USE_GPU,
         )
 
-        self.assertTrue(True)
+        assert True
 
     def test_fp32_cpu(self):
         """
@@ -165,10 +161,8 @@ class TestDtypes(unittest.TestCase):
             self.BATCH_SIZE,
             use_cuda=self.USE_GPU,
         )
+        assert True
 
-        self.assertTrue(True)
-
-    @unittest.skipIf(not torch.cuda.is_available(), "GPU not supported on this machine")
     def test_fp16_gpu(self):
         """
         TODO: More comprehensive test
@@ -191,8 +185,6 @@ class TestDtypes(unittest.TestCase):
             self.BATCH_SIZE,
             use_cuda=self.USE_GPU,
         )
-
-        self.assertTrue(True)
 
     def test_INT8_cpu(self):
         """
@@ -219,5 +211,3 @@ class TestDtypes(unittest.TestCase):
             self.BATCH_SIZE,
             use_cuda=self.USE_GPU,
         )
-
-        self.assertTrue(True)
