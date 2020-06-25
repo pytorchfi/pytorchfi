@@ -3,7 +3,6 @@ pytorchfi.util contains utility functions to help the user generate fault
 injections and determine their impact.
 """
 
-import os.path
 import random
 import time
 
@@ -23,7 +22,8 @@ class util(core.fault_injection):
             rand=True, min_rand_val=min_val, max_rand_val=max_val
         )
 
-    # generates a random neuron injection (default value range [-1, 1]) in every layer of each batch element
+    # generates a random neuron injection (default value range [-1, 1])
+    # in every layer of each batch element
     def random_inj_per_layer(self, min_val=-1, max_val=1):
         conv_num = []
         batch = []
@@ -43,7 +43,8 @@ class util(core.fault_injection):
             conv_num=conv_num, batch=batch, c=c_rand, h=h_rand, w=w_rand, value=value
         )
 
-    # generates a single neuron random injection (default value range [-1, 1]) in each batch element
+    # generates a single neuron random injection (default value range [-1, 1])
+    # in each batch element
     def random_inj(self, min_val=-1, max_val=1):
         conv_num, batch, c_rand, h_rand, w_rand, value = ([] for i in range(6))
 

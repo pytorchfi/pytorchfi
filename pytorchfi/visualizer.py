@@ -77,7 +77,8 @@ def quicksort(arr, low, high):
 def generate_graph(file_name, generator, output_dir):
     try:
         input_file = open(file_name)
-        _name_line = input_file.readline()
+        name = input_file.readline()
+        print(f"Reading {name}")
         csv_line = input_file.readline()
         layer_count = 0
         graph_data = [[]]
