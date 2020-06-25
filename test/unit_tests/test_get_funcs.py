@@ -10,22 +10,18 @@ class TestCoreGetFuncs:
     """
 
     def setup_class(self):
-        self.BATCH_SIZE = 1024
+        self.BATCH_SIZE = 1
         self.WORKERS = 64
         self.img_size = 32
-        self.USE_GPU = torch.cuda.is_available()
+        self.USE_GPU = False
 
         self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS)
-        if self.USE_GPU:
-            self.model.cuda()
 
         self.dataiter = iter(self.dataset)
         self.model.eval()
 
         torch.no_grad()
         self.images, self.labels = self.dataiter.next()
-        if self.USE_GPU is True:
-            self.images = self.images.cuda()
         self.output = self.model(self.images)
 
         self.p = pfi_core(
