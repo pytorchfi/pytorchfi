@@ -14,6 +14,14 @@ jobs:
       - run:
           command: python -m unittest -v
           name: Test
+      - run:
+          command: |
+            $HOME/.local/bin/coverage run -m pytest
+            $HOME/.local/bin/coverage report
+            $HOME/.local/bin/coverage html  # open htmlcov/index.html in a browser
+          name: Code Coverage
+    - store_artifacts:
+        path: htmlcov
 
 workflows:
   main:

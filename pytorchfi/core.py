@@ -12,6 +12,7 @@ import torch.nn as nn
 
 class fault_injection:
     def __init__(self, model, h, w, batch_size, **kwargs):
+        logger.basicConfig(format="%(asctime)-15s %(clientip)s %(user)-8s %(message)s")
         self.ORIG_MODEL = None
         self.CORRUPTED_MODEL = None
         self._BATCH_SIZE = -1
