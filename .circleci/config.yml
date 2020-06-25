@@ -11,7 +11,7 @@ jobs:
       - python/load-cache
       - python/install-deps
       - python/save-cache
-      run:
+      - run:
         name: test
         command: python -m unittest -v -f
 
