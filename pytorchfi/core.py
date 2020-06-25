@@ -3,6 +3,7 @@ pytorchfi.core contains the core functionality for fault injections.
 """
 
 import copy
+import logging
 import random
 
 import torch
@@ -11,9 +12,9 @@ import torch.nn as nn
 
 class fault_injection:
     def __init__(self, model, h, w, batch_size, **kwargs):
+        logging.basicConfig(format="%(asctime)-15s %(clientip)s %(user)-8s %(message)s")
         self.ORIG_MODEL = None
         self.CORRUPTED_MODEL = None
-        self.DEBUG = False
         self._BATCH_SIZE = -1
 
         self.CUSTOM_INJECTION = False
@@ -36,42 +37,35 @@ class fault_injection:
         model_dtype = next(model.parameters()).dtype
 
         self.ORIG_MODEL = model
-
         self._BATCH_SIZE = batch_size
 
-        # perform a dummy inference to profile the model
         handles = []
         for param in self.ORIG_MODEL.modules():
             if isinstance(param, nn.Conv2d):
                 handles.append(param.register_forward_hook(self._save_output_size))
 
-        if use_cuda is False:
-            _dummyTensor = torch.randn(b, c, h, w, dtype=model_dtype)
-        else:
-            _dummyTensor = torch.randn(b, c, h, w, dtype=model_dtype, device="cuda")
+        device = "cuda" if use_cuda else None
+        _dummyTensor = torch.randn(b, c, h, w, dtype=model_dtype, device=device)
 
         self.ORIG_MODEL(_dummyTensor)
 
         for i in range(len(handles)):
             handles[i].remove()
 
-        if self.DEBUG:
-            print("Model output size:")
-            print(
-                "\n".join(
-                    [
-                        "".join(["{:4}".format(item) for item in row])
-                        for row in self.OUTPUT_SIZE
-                    ]
-                )
+        logging.info("Model output size")
+        logging.info(
+            "\n".join(
+                [
+                    "".join(["{:4}".format(item) for item in row])
+                    for row in self.OUTPUT_SIZE
+                ]
             )
+        )
 
     def fi_reset(self):
         self._fi_state_reset()
         self.CORRUPTED_MODEL = None
-
-        if self.DEBUG:
-            print("Fault injector fully reset")
+        logging.info("Reset fault injector")
 
     def _fi_state_reset(self):
         (
@@ -95,9 +89,6 @@ class fault_injection:
         for i in range(len(self.HANDLES)):
             self.HANDLES[i].remove()
 
-        if self.DEBUG:
-            print("Fault injector state reset")
-
     def declare_weight_fi(self, **kwargs):
         self._fi_state_reset()
         custom_function = False
@@ -106,28 +97,23 @@ class fault_injection:
 
         if kwargs:
             if "function" in kwargs:
-                # custom function specified injection
                 custom_function, function = True, kwargs.get("function")
                 corrupt_idx = kwargs.get("index", 0)
             elif kwargs.get("zero", False):
-                # zero layer
                 zero_layer = True
             elif kwargs.get("rand", False):
                 rand_inj = True
                 min_val = kwargs.get("min_rand_val")
                 max_val = kwargs.get("max_rand_val")
             else:
-                # specified injection
                 corrupt_value = kwargs.get("value", -1)
                 corrupt_idx = kwargs.get("index", -1)
             corrupt_layer = kwargs.get("layer", -1)
         else:
             raise ValueError("Please specify an injection or injection function")
 
-        # make deep copy of input model to corrupt
         self.CORRUPTED_MODEL = copy.deepcopy(self.ORIG_MODEL)
 
-        # get number of weight files
         num_layers = 0
         for name, param in self.CORRUPTED_MODEL.named_parameters():
             if name.split(".")[-1] == "weight":
@@ -142,9 +128,8 @@ class fault_injection:
                 if curr_layer == corrupt_layer:
                     if zero_layer:
                         param.data[:] = 0
-                        if self.DEBUG:
-                            print("Zero weight layer")
-                            print("Layer index: %s" % corrupt_layer)
+                        logging.info("Zero weight layer")
+                        logging.info("Layer index: %s" % corrupt_layer)
                     else:
                         if rand_inj:
                             corrupt_value = random.uniform(min_val, max_val)
@@ -157,17 +142,16 @@ class fault_injection:
                             else corrupt_idx
                         )
                         orig_value = param.data[corrupt_idx].item()
-                        # Use function if specified
                         if custom_function:
                             corrupt_value = function(param.data[tuple(corrupt_idx)])
-                        # Inject corrupt value
+
                         param.data[corrupt_idx] = corrupt_value
-                        if self.DEBUG:
-                            print("Weight Injection")
-                            print("Layer index: %s" % corrupt_layer)
-                            print("Module: %s" % name)
-                            print("Original value: %s" % orig_value)
-                            print("Injected value: %s" % corrupt_value)
+                        logging.info("Weight Injection")
+                        logging.info("Layer index: %s" % corrupt_layer)
+                        logging.info("Module: %s" % name)
+                        logging.info("Original value: %s" % orig_value)
+                        logging.info("Injected value: %s" % corrupt_value)
+
                 curr_layer += 1
         return self.CORRUPTED_MODEL
 
@@ -187,37 +171,31 @@ class fault_injection:
                 self.CORRUPT_W = kwargs.get("w", -1)
                 self.CORRUPT_VALUE = kwargs.get("value", None)
 
-                if self.DEBUG:
-                    print("Declaring Specified Fault Injector")
-                    print("Convolution: %s" % self.CORRUPT_CONV)
-                    print("Batch, x, y, z:")
-                    print(
-                        "%s, %s, %s, %s"
-                        % (
-                            self.CORRUPT_BATCH,
-                            self.CORRUPT_C,
-                            self.CORRUPT_H,
-                            self.CORRUPT_W,
-                        )
+                logging.info("Declaring Specified Fault Injector")
+                logging.info("Convolution: %s" % self.CORRUPT_CONV)
+                logging.info("Batch, x, y, z:")
+                logging.info(
+                    "%s, %s, %s, %s"
+                    % (
+                        self.CORRUPT_BATCH,
+                        self.CORRUPT_C,
+                        self.CORRUPT_H,
+                        self.CORRUPT_W,
                     )
+                )
         else:
             raise ValueError("Please specify an injection or injection function")
 
-        # make a deep copy of the input model to corrupt
         self.CORRUPTED_MODEL = copy.deepcopy(self.ORIG_MODEL)
 
-        # attach hook with injection functions to each conv module
         for param in self.CORRUPTED_MODEL.modules():
             if isinstance(param, nn.Conv2d):
-                if CUSTOM_INJECTION:
-                    self.HANDLES.append(param.register_forward_hook(INJECTION_FUNCTION))
-                else:
-                    self.HANDLES.append(param.register_forward_hook(self._set_value))
+                hook = INJECTION_FUNCTION if CUSTOM_INJECTION else self._set_value
+                self.HANDLES.append(param.register_forward_hook(hook))
 
         return self.CORRUPTED_MODEL
 
     def assert_inj_bounds(self, **kwargs):
-        # checks for specfic injection out of a list
         if type(self.CORRUPT_CONV) == list:
             index = kwargs.get("index", -1)
             assert (
@@ -243,7 +221,6 @@ class fault_injection:
                 and self.CORRUPT_W[index]
                 < self.OUTPUT_SIZE[self.CORRUPT_CONV[index]][3]
             ), "Invalid W!"
-        # checks for single injection
         else:
             assert (
                 self.CORRUPT_CONV >= 0 and self.CORRUPT_CONV < self.get_total_conv()
@@ -266,57 +243,48 @@ class fault_injection:
 
     def _set_value(self, model, input, output):
         if type(self.CORRUPT_CONV) == list:
-            # extract injections in this layer
             inj_list = list(
                 filter(
                     lambda x: self.CORRUPT_CONV[x] == self.CURRENT_CONV,
                     range(len(self.CORRUPT_CONV)),
                 )
             )
-            # perform each injection for this layer
             for i in inj_list:
-                # check that the injection indices are valid
                 self.assert_inj_bounds(index=i)
-                if self.DEBUG:
-                    print(
-                        "Original value at [%d][%d][%d][%d]: %d"
-                        % (
-                            self.CORRUPT_BATCH[i],
-                            self.CORRUPT_C[i],
-                            self.CORRUPT_H[i],
-                            self.CORRUPT_W[i],
-                            output[self.CORRUPT_BATCH[i]][self.CORRUPT_C[i]][
-                                self.CORRUPT_H[i]
-                            ][self.CORRUPT_W[i]],
-                        )
+                logging.info(
+                    "Original value at [%d][%d][%d][%d]: %d"
+                    % (
+                        self.CORRUPT_BATCH[i],
+                        self.CORRUPT_C[i],
+                        self.CORRUPT_H[i],
+                        self.CORRUPT_W[i],
+                        output[self.CORRUPT_BATCH[i]][self.CORRUPT_C[i]][
+                            self.CORRUPT_H[i]
+                        ][self.CORRUPT_W[i]],
                     )
-                    print("Changing value to %d" % self.CORRUPT_VALUE[i])
-                # inject value
+                )
+                logging.info("Changing value to %d" % self.CORRUPT_VALUE[i])
                 output[self.CORRUPT_BATCH[i]][self.CORRUPT_C[i]][self.CORRUPT_H[i]][
                     self.CORRUPT_W[i]
                 ] = self.CORRUPT_VALUE[i]
-            # useful for injection hooks
             self.CURRENT_CONV += 1
 
-        else:  # single injection (not a list of injections)
-            # check that the injection indices are valid
+        else:
             self.assert_inj_bounds()
             if self.CURRENT_CONV == self.CORRUPT_CONV:
-                if self.DEBUG:
-                    print(
-                        "Original value at [%d][%d][%d][%d]: %d"
-                        % (
-                            self.CORRUPT_BATCH,
-                            self.CORRUPT_C,
-                            self.CORRUPT_H,
-                            self.CORRUPT_W,
-                            output[self.CORRUPT_BATCH][self.CORRUPT_C][self.CORRUPT_H][
-                                self.CORRUPT_W
-                            ],
-                        )
+                logging.info(
+                    "Original value at [%d][%d][%d][%d]: %d"
+                    % (
+                        self.CORRUPT_BATCH,
+                        self.CORRUPT_C,
+                        self.CORRUPT_H,
+                        self.CORRUPT_W,
+                        output[self.CORRUPT_BATCH][self.CORRUPT_C][self.CORRUPT_H][
+                            self.CORRUPT_W
+                        ],
                     )
-                    print("Changing value to %d" % self.CORRUPT_VALUE)
-                # inject value
+                )
+                logging.info("Changing value to %d" % self.CORRUPT_VALUE)
                 output[self.CORRUPT_BATCH][self.CORRUPT_C][self.CORRUPT_H][
                     self.CORRUPT_W
                 ] = self.CORRUPT_VALUE
@@ -334,29 +302,20 @@ class fault_injection:
     def get_output_size(self):
         return self.OUTPUT_SIZE
 
-    # returns total batches
     def get_total_batches(self):
         return self._BATCH_SIZE
 
-    # returns total number of convs
     def get_total_conv(self):
         return len(self.OUTPUT_SIZE)
 
-    # returns total number of fmaps in a layer
     def get_fmaps_num(self, layer):
         return self.OUTPUT_SIZE[layer][1]
 
-    # returns fmap H size
     def get_fmaps_H(self, layer):
         return self.OUTPUT_SIZE[layer][2]
 
-    # returns fmap W size
     def get_fmaps_W(self, layer):
         return self.OUTPUT_SIZE[layer][3]
 
-    # returns a tuple with (H,W) size of fmaps in a layer
     def get_fmap_HW(self, layer):
         return (self.get_fmaps_H(layer), self.get_fmaps_W(layer))
-
-    def set_debug(self, debug):
-        self.DEBUG = debug

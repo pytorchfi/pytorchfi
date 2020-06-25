@@ -1,6 +1,3 @@
-# ========================================#
-# Commonly used functions during testing
-# ========================================#
 import os
 
 import torch
@@ -11,10 +8,8 @@ import torchvision.models as models
 import torchvision.transforms as transforms
 
 
-#####################################################################################
-#################                CIFAR ALEXNET                              #########
-#####################################################################################
-"""AlexNet for CIFAR10. FC layers are removed. Paddings are adjusted.
+"""
+AlexNet for CIFAR10. FC layers are removed. Paddings are adjusted.
 Without BN, the start learning rate should be 0.01
 (c) YANG, Wei
 """
@@ -48,20 +43,15 @@ class AlexNet(nn.Module):
 
 
 def alexnet(**kwargs):
-    r"""AlexNet model architecture from the
+    """
+    AlexNet model architecture from the
     `"One weird trick..." <https://arxiv.org/abs/1404.5997>`_ paper.
     """
     model = AlexNet(**kwargs)
     return model
 
 
-#####################################################################################
-
-
-# helper function to set up the environment. Returns a model and dataset
 def helper_setUp_IMAGENET(batchsize, workers, dataset_path):
-
-    # Dataset prep
     valdir = os.path.join(dataset_path + "/imagenet/", "val")
     normalize = transforms.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
@@ -83,15 +73,11 @@ def helper_setUp_IMAGENET(batchsize, workers, dataset_path):
         num_workers=workers,
     )
 
-    # Model prep
     model = models.alexnet(pretrained=True)
-
     return model, val_loader
 
 
 def helper_setUp_CIFAR10(batchsize, workers):
-
-    # Dataset prep
     transform = transforms.Compose(
         [
             transforms.ToTensor(),

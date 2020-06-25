@@ -7,6 +7,7 @@
 
 <p align="center">
     <img src="https://img.shields.io/circleci/build/github/pytorchfi/pytorchfi/master"></img>
+    <img src="https://codecov.io/gh/pytorchfi/pytorchfi/branch/master/graph/badge.svg">
     <a href="https://pypi.org/project/pytorchfi/"><img src="https://img.shields.io/pypi/dm/pytorchfi?color=da67f7"></a>
     <a href="https://opensource.org/licenses/NCSA"><img src="https://img.shields.io/badge/license-NCSA-blue"></a>
 </p>
@@ -24,17 +25,15 @@
 
 PyTorchFI is a runtime perturbation tool for deep neural networks (DNNs), implemented for the popular PyTorch deep learning platform. PyTorchFI enables users to perform perturbation on weights or neurons of a DNN during runtime. It is extremely versatile for dependability and reliability research, with applications including resiliency analysis of classification networks, resiliency analysis of object detection networks, analysis of models robust to adversarial attacks, training resilient models, and for DNN interpertability.
 
-For example, this is an object detection network before a fault injection:
+For example, this is an object detection network before a fault injection
 
-<img src="https://user-images.githubusercontent.com/7104017/75512346-c313dc00-59b6-11ea-9563-95f642493e4e.png" width="750">
-
-This is the same object detection network after a fault injection:
-
-<img src="https://user-images.githubusercontent.com/7104017/75512345-c313dc00-59b6-11ea-856c-c8c0918eb7b6.png" width="750">
-
-Download on PyPI [here](https://pypi.org/project/pytorchfi/), or take a look at our documentation at [pytorchfi.github.io](https://pytorchfi.github.io/).
+|                                              Golden Output                                               |                                       Output with Fault Injection                                        |
+| :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: |
+| ![](https://user-images.githubusercontent.com/7104017/85642872-7fb93980-b647-11ea-8717-8d16cb1c35b3.jpg) | ![](https://user-images.githubusercontent.com/7104017/85642867-7def7600-b647-11ea-89b9-570278c22101.jpg) |
 
 ## Usage
+
+Download on PyPI [here](https://pypi.org/project/pytorchfi/), or take a look at our documentation at [pytorchfi.github.io](https://pytorchfi.github.io/).
 
 ### Installing
 
@@ -62,7 +61,9 @@ from pytorchfi import core
 
 ### Testing
 
-`python -m unittest -v`
+```bash
+pytest
+```
 
 ## Code
 
