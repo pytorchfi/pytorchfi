@@ -4,7 +4,7 @@ orbs:
   python: circleci/python@0.2.1
 
 jobs:
-  build-test:
+  build-and-test:
     executor: python/default
     steps:
       - checkout
@@ -12,10 +12,10 @@ jobs:
       - python/install-deps
       - python/save-cache
       - run:
-        name: test
-        command: python -m unittest -v -f
+          command: python -m unittest -v -f
+          name: Test
 
 workflows:
   main:
     jobs:
-      - build-test
+      - build-and-test
