@@ -89,7 +89,7 @@ def helper_setUp_IMAGENET(batchsize, workers, dataset_path):
     return model, val_loader
 
 
-def helper_setUp_CIFAR10(batchsize, workers, dataset_path):
+def helper_setUp_CIFAR10(batchsize, workers):
 
     # Dataset prep
     transform = transforms.Compose(

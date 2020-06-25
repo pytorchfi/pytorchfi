@@ -26,11 +26,8 @@ class TestNeuronFIgpu(unittest.TestCase):
         self.img_size = 32
         self.USE_GPU = torch.cuda.is_available()
 
-
         # get model and dataset
-        self.model, self.dataset = helper_setUp_CIFAR10(
-            self.BATCH_SIZE, self.WORKERS, self.DATASETS
-        )
+        self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS)
         self.dataiter = iter(self.dataset)
 
         if self.USE_GPU:
@@ -124,11 +121,8 @@ class TestNeuronFIcpu(unittest.TestCase):
         self.img_size = 32
         self.USE_GPU = torch.cuda.is_available()
 
-
         # get model and dataset
-        self.model, self.dataset = helper_setUp_CIFAR10(
-            self.BATCH_SIZE, self.WORKERS, self.DATASETS
-        )
+        self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS)
         self.dataiter = iter(self.dataset)
 
         if self.USE_GPU:
@@ -222,11 +216,8 @@ class TestNeuronFIgpuBatch(unittest.TestCase):
         self.img_size = 32
         self.USE_GPU = torch.cuda.is_available()
 
-
         # get model and dataset
-        self.model, self.dataset = helper_setUp_CIFAR10(
-            self.BATCH_SIZE, self.WORKERS, self.DATASETS
-        )
+        self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS)
         self.dataiter = iter(self.dataset)
 
         if self.USE_GPU:
@@ -323,11 +314,8 @@ class TestNeuronFIcpuBatch(unittest.TestCase):
         self.img_size = 32
         self.USE_GPU = torch.cuda.is_available()
 
-
         # get model and dataset
-        self.model, self.dataset = helper_setUp_CIFAR10(
-            self.BATCH_SIZE, self.WORKERS, self.DATASETS
-        )
+        self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS)
         self.dataiter = iter(self.dataset)
 
         if self.USE_GPU:
