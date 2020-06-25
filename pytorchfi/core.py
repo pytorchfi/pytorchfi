@@ -3,9 +3,9 @@ pytorchfi.core contains the core functionality for fault injections.
 """
 
 import copy
+import logging
 import random
 
-import logging
 import torch
 import torch.nn as nn
 

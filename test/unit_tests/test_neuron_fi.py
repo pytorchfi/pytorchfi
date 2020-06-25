@@ -56,7 +56,7 @@ class TestNeuronFIgpu:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        self.assertTrue(not torch.all(corrupted_output_1.eq(self.output)))
+        assert not torch.all(corrupted_output_1.eq(self.output))
 
         self.inj_model = self.p.declare_neuron_fi(
             batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=0,
@@ -66,7 +66,7 @@ class TestNeuronFIgpu:
         with torch.no_grad():
             uncorrupted_output = self.inj_model(self.images)
 
-        self.assertTrue(torch.all(uncorrupted_output.eq(self.output)))
+        assert torch.all(uncorrupted_output.eq(self.output))
 
         self.inj_model = self.p.declare_neuron_fi(
             batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i * 2
@@ -132,7 +132,7 @@ class TestNeuronFIcpu:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        self.assertTrue(not torch.all(corrupted_output_1.eq(self.output)))
+        assert not torch.all(corrupted_output_1.eq(self.output))
 
         self.inj_model = self.p.declare_neuron_fi(
             batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=0,
@@ -142,7 +142,7 @@ class TestNeuronFIcpu:
         with torch.no_grad():
             uncorrupted_output = self.inj_model(self.images)
 
-        self.assertTrue(torch.all(uncorrupted_output.eq(self.output)))
+        assert torch.all(uncorrupted_output.eq(self.output))
 
         self.inj_model = self.p.declare_neuron_fi(
             batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i * 2
