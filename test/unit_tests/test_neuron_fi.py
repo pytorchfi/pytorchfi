@@ -1,3 +1,4 @@
+import pytest
 import torch
 from pytorchfi.core import fault_injection as pfi_core
 
@@ -39,6 +40,9 @@ class TestNeuronFIgpu:
             use_cuda=self.USE_GPU,
         )
 
+    @pytest.mark.skipif(
+        not torch.cuda.is_available(), reason="GPU not supported on this machine"
+    )
     def test_neuronFI_singleElement(self):
         batch_i = 0
         conv_i = 4
@@ -191,6 +195,9 @@ class TestNeuronFIgpuBatch:
             use_cuda=self.USE_GPU,
         )
 
+    @pytest.mark.skipif(
+        not torch.cuda.is_available(), reason="GPU not supported on this machine"
+    )
     def test_neuronFI_batch_1(self):
 
         batch_i = 2
@@ -214,6 +221,9 @@ class TestNeuronFIgpuBatch:
         assert not torch.all(corrupted_output_1[2].eq(self.output[2]))
         assert torch.all(corrupted_output_1[3].eq(self.output[3]))
 
+    @pytest.mark.skipif(
+        not torch.cuda.is_available(), reason="GPU not supported on this machine"
+    )
     def test_neuronFI_batch_2(self):
 
         batch_i = [0, 2, 3]

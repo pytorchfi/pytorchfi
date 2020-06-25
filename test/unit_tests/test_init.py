@@ -1,3 +1,4 @@
+import pytest
 import torch
 from pytorchfi.core import fault_injection as pfi_core
 
@@ -76,6 +77,9 @@ class TestNeuronGPUSingle:
             self.images = self.images.cuda()
         self.output = self.model(self.images)
 
+    @pytest.mark.skipif(
+        not torch.cuda.is_available(), reason="GPU not supported on this machine"
+    )
     def test_init_gpu(self):
         """
         TODO: More comprehensive test
@@ -89,6 +93,9 @@ class TestNeuronGPUSingle:
         )
         assert True
 
+    @pytest.mark.skipif(
+        not torch.cuda.is_available(), reason="GPU not supported on this machine"
+    )
     def test_orig_model_gpu(self):
         p = pfi_core(
             self.model,
@@ -118,6 +125,9 @@ class TestDtypes:
 
         self.images, self.labels = self.dataiter.next()
 
+    @pytest.mark.skipif(
+        not torch.cuda.is_available(), reason="GPU not supported on this machine"
+    )
     def test_fp32_gpu(self):
         """
         TODO: More comprehensive test
@@ -163,6 +173,9 @@ class TestDtypes:
         )
         assert True
 
+    @pytest.mark.skipif(
+        not torch.cuda.is_available(), reason="GPU not supported on this machine"
+    )
     def test_fp16_gpu(self):
         """
         TODO: More comprehensive test
