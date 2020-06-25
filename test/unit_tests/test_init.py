@@ -1,14 +1,10 @@
-# =================================#
-# PyTorchFI Unit Tests
-# =================================#
-
 import os
 import unittest
 
 import torch
 from pytorchfi.core import fault_injection as pfi_core
 
-from .util_test import *
+from .test_util import helper_setUp_CIFAR10
 
 
 class TestNeuronCPUSingle(unittest.TestCase):
