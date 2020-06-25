@@ -124,7 +124,7 @@ class TestDtypes:
         TODO: More comprehensive test
         """
         self.USE_GPU = True
-        self.model.to('cuda')
+        self.model.to("cuda")
         self.model.eval()
 
         torch.no_grad()
@@ -144,7 +144,7 @@ class TestDtypes:
         TODO: More comprehensive test
         """
         self.USE_GPU = False
-        self.model.to('cpu')
+        self.model.to("cpu")
         self.model.eval()
 
         torch.no_grad()
@@ -166,7 +166,7 @@ class TestDtypes:
         TODO: More comprehensive test
         """
         self.USE_GPU = True
-        self.model.to('cuda')
+        self.model.to("cuda")
 
         self.model.half()
         self.model.eval()
@@ -189,7 +189,7 @@ class TestDtypes:
         TODO: More comprehensive test
         """
         self.USE_GPU = False
-        self.model.to('cpu')
+        self.model.to("cpu")
 
         self.model = torch.quantization.quantize_dynamic(
             self.model, {torch.nn.Linear}, dtype=torch.qint8

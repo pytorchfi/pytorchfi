@@ -98,7 +98,6 @@ class TestWeightFIcpu:
         self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS)
         self.dataiter = iter(self.dataset)
 
-
         self.images, self.labels = self.dataiter.next()
 
         self.model.eval()
@@ -255,7 +254,6 @@ class TestWeightFIcpuBatch:
 
         self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS)
         self.dataiter = iter(self.dataset)
-
 
         self.images, self.labels = self.dataiter.next()
 
