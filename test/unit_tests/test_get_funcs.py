@@ -11,7 +11,7 @@ class TestCoreGetFuncs:
 
     def setup_class(self):
         self.BATCH_SIZE = 1
-        self.WORKERS = 64
+        self.WORKERS = 1
         self.img_size = 32
         self.USE_GPU = False
 

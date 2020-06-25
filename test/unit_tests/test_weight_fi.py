@@ -5,7 +5,7 @@ from pytorchfi.core import fault_injection as pfi_core
 from .util_test import helper_setUp_CIFAR10
 
 
-class TestNeuronFIgpu:
+class TestWeightFIgpu:
     """
     Testing focuses on neuron perturbations on GPU with batch = 1.
     """
@@ -82,7 +82,7 @@ class TestNeuronFIgpu:
         assert torch.all(corrupted_output_2.eq(corrupted_output_2))
 
 
-class TestNeuronFIcpu:
+class TestWeightFIcpu:
     """
     Testing focuses on neuron perturbations on CPU with batch = 1.
     """
@@ -154,7 +154,7 @@ class TestNeuronFIcpu:
         assert torch.all(corrupted_output_2.eq(corrupted_output_2))
 
 
-class TestNeuronFIgpuBatch:
+class TestWeightFIgpuBatch:
     """
     Testing focuses on neuron perturbations on GPU with batch = N.
     """
@@ -240,7 +240,7 @@ class TestNeuronFIgpuBatch:
         assert not torch.all(corrupted_output_1[3].eq(self.output[3]))
 
 
-class TestNeuronFIcpuBatch:
+class TestWeightFIcpuBatch:
     """
     Testing focuses on neuron perturbations on cpu with batch = N.
     """
