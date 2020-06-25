@@ -39,7 +39,6 @@ class TestNeuronCPUSingle:
             self.BATCH_SIZE,
             use_cuda=self.USE_GPU,
         )
-        assert True
 
     def test_orig_model_cpu(self):
         p = pfi_core(
@@ -91,7 +90,6 @@ class TestNeuronGPUSingle:
             self.BATCH_SIZE,
             use_cuda=self.USE_GPU,
         )
-        assert True
 
     @pytest.mark.skipif(
         not torch.cuda.is_available(), reason="GPU not supported on this machine"
@@ -149,8 +147,6 @@ class TestDtypes:
             use_cuda=self.USE_GPU,
         )
 
-        assert True
-
     def test_fp32_cpu(self):
         """
         TODO: More comprehensive test
@@ -171,7 +167,6 @@ class TestDtypes:
             self.BATCH_SIZE,
             use_cuda=self.USE_GPU,
         )
-        assert True
 
     @pytest.mark.skipif(
         not torch.cuda.is_available(), reason="GPU not supported on this machine"
