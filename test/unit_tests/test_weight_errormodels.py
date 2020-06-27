@@ -13,15 +13,16 @@ class TestWeightErrorModels:
 
     def setup_class(self):
         torch.manual_seed(0)
-        #random.seed(0)
-
+        # random.seed(0)
 
         self.BATCH_SIZE = 4
         self.WORKERS = 1
         self.img_size = 32
         self.USE_GPU = False
 
-        self.model, self.dataset = helper_setUp_CIFAR10_same(self.BATCH_SIZE, self.WORKERS)
+        self.model, self.dataset = helper_setUp_CIFAR10_same(
+            self.BATCH_SIZE, self.WORKERS
+        )
         self.dataiter = iter(self.dataset)
 
         self.images, self.labels = self.dataiter.next()
@@ -37,4 +38,3 @@ class TestWeightErrorModels:
             self.BATCH_SIZE,
             use_cuda=self.USE_GPU,
         )
-

@@ -33,4 +33,3 @@ class util(core.fault_injection):
             model(input_data)
         end_time = time.time()
         return (end_time - start_time) / iterations
-
