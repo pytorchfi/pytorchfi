@@ -11,21 +11,17 @@ class TestNeuronCPUSingle:
     """
 
     def setup_class(self):
-        self.BATCH_SIZE = 1024
-        self.WORKERS = 64
+        self.BATCH_SIZE = 1
+        self.WORKERS = 1
         self.img_size = 32
-        self.USE_GPU = torch.cuda.is_available()
+        self.USE_GPU = False
 
         self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS)
-        if self.USE_GPU:
-            self.model.cuda()
         self.dataiter = iter(self.dataset)
         self.model.eval()
 
         torch.no_grad()
         self.images, self.labels = self.dataiter.next()
-        if self.USE_GPU is True:
-            self.images = self.images.cuda()
         self.output = self.model(self.images)
 
     def test_init_cpu(self):
@@ -59,21 +55,19 @@ class TestNeuronGPUSingle:
     """
 
     def setup_class(self):
-        self.BATCH_SIZE = 1024
-        self.WORKERS = 64
+        self.BATCH_SIZE = 1
+        self.WORKERS = 1
         self.img_size = 32
-        self.USE_GPU = torch.cuda.is_available()
+        self.USE_GPU = True
 
         self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS)
-        if self.USE_GPU:
-            self.model.cuda()
+        self.model.cuda()
         self.dataiter = iter(self.dataset)
         self.model.eval()
 
         torch.no_grad()
         self.images, self.labels = self.dataiter.next()
-        if self.USE_GPU is True:
-            self.images = self.images.cuda()
+        self.images = self.images.cuda()
         self.output = self.model(self.images)
 
     @pytest.mark.skipif(
@@ -113,10 +107,9 @@ class TestDtypes:
     """
 
     def setup_class(self):
-        self.BATCH_SIZE = 1024
-        self.WORKERS = 64
+        self.BATCH_SIZE = 1
+        self.WORKERS = 1
         self.img_size = 32
-        self.USE_GPU = torch.cuda.is_available()
 
         self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS)
         self.dataiter = iter(self.dataset)
@@ -130,13 +123,12 @@ class TestDtypes:
         """
         TODO: More comprehensive test
         """
-        if self.USE_GPU:
-            self.model.cuda()
+        self.USE_GPU = True
+        self.model.to("cuda")
         self.model.eval()
 
         torch.no_grad()
-        if self.USE_GPU is True:
-            self.images = self.images.cuda()
+        self.images = self.images.cuda()
         self.output = self.model(self.images)
 
         pfi_core(
@@ -151,13 +143,11 @@ class TestDtypes:
         """
         TODO: More comprehensive test
         """
-        if self.USE_GPU:
-            self.model.cuda()
+        self.USE_GPU = False
+        self.model.to("cpu")
         self.model.eval()
 
         torch.no_grad()
-        if self.USE_GPU is True:
-            self.images = self.images.cuda()
         self.output = self.model(self.images)
 
         pfi_core(
@@ -175,15 +165,14 @@ class TestDtypes:
         """
         TODO: More comprehensive test
         """
-        if self.USE_GPU:
-            self.model.cuda()
+        self.USE_GPU = True
+        self.model.to("cuda")
 
         self.model.half()
         self.model.eval()
 
         torch.no_grad()
-        if self.USE_GPU is True:
-            self.images = self.images.cuda()
+        self.images = self.images.cuda()
         self.output = self.model(self.images.half())
 
         pfi_core(
@@ -199,8 +188,8 @@ class TestDtypes:
         """
         TODO: More comprehensive test
         """
-        if self.USE_GPU:
-            self.model.cuda()
+        self.USE_GPU = False
+        self.model.to("cpu")
 
         self.model = torch.quantization.quantize_dynamic(
             self.model, {torch.nn.Linear}, dtype=torch.qint8
@@ -208,10 +197,8 @@ class TestDtypes:
 
         self.model.eval()
 
-        torch.no_grad()
-        if self.USE_GPU is True:
-            self.images = self.images.cuda()
-        self.output = self.model(self.images)
+        with torch.no_grad():
+            self.output = self.model(self.images)
 
         pfi_core(
             self.model,
