@@ -1,9 +1,9 @@
 import torch
+
 from pytorchfi.core import fault_injection as pfi_core
 from pytorchfi.errormodels import random_neuron_inj
-from .util_test import helper_setUp_CIFAR10_same
 
-# from pytorchfi.errormodels import random_weight_inj
+from .util_test import helper_setUp_CIFAR10_same
 
 
 class TestWeightErrorModels:
