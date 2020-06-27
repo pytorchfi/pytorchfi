@@ -1,5 +1,4 @@
 import torch
-
 from pytorchfi.core import fault_injection as pfi_core
 from pytorchfi.errormodels import random_neuron_inj
 

@@ -1,12 +1,9 @@
 import torch
-
 from pytorchfi.core import fault_injection as pfi_core
-from pytorchfi.errormodels import (
-    random_inj_per_layer,
-    random_inj_per_layer_batched,
-    random_neuron_inj,
-    random_neuron_inj_batched,
-)
+from pytorchfi.errormodels import (random_inj_per_layer,
+                                   random_inj_per_layer_batched,
+                                   random_neuron_inj,
+                                   random_neuron_inj_batched)
 
 from .util_test import helper_setUp_CIFAR10_same
 
