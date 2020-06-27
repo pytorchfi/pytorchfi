@@ -1,6 +1,6 @@
 import torch
 from pytorchfi.core import fault_injection as pfi_core
-from pytorchfi.errormodels import error_models as em
+from pytorchfi.errormodels import *
 
 from .util_test import helper_setUp_CIFAR10_same
 
@@ -40,7 +40,7 @@ class TestNeuronErrorModels:
 
     def test_random_neuron_inj(self):
         # TODO make sure only one batch element is different
-        self.inj_model = em.random_neuron_inj(self.p, min_val=10000, max_val=20000)
+        self.inj_model = random_neuron_inj(self.p, min_val=10000, max_val=20000)
 
         self.inj_model.eval()
         with torch.no_grad():
@@ -50,9 +50,7 @@ class TestNeuronErrorModels:
 
     def test_random_neuron_inj_batched_locTrue_valTrue(self):
         # TODO make sure only all batch elements are different
-        self.inj_model = em.random_neuron_inj_batched(
-            self.p, min_val=10000, max_val=20000
-        )
+        self.inj_model = random_neuron_inj_batched(self.p, min_val=10000, max_val=20000)
 
         self.inj_model.eval()
         with torch.no_grad():
@@ -62,7 +60,7 @@ class TestNeuronErrorModels:
 
     def test_random_neuron_inj_batched_locFalse_valTrue(self):
         # TODO make better test
-        self.inj_model = em.random_neuron_inj_batched(
+        self.inj_model = random_neuron_inj_batched(
             self.p, min_val=10000, max_val=20000, randLoc=False
         )
 
@@ -74,7 +72,7 @@ class TestNeuronErrorModels:
 
     def test_random_neuron_inj_batched_locTrue_valFalse(self):
         # TODO make better test
-        self.inj_model = em.random_neuron_inj_batched(
+        self.inj_model = random_neuron_inj_batched(
             self.p, min_val=10000, max_val=20000, randVal=False
         )
 
@@ -86,7 +84,7 @@ class TestNeuronErrorModels:
 
     def test_random_neuron_inj_batched_locFalse_valFalse(self):
         # TODO make better test
-        self.inj_model = em.random_neuron_inj_batched(
+        self.inj_model = random_neuron_inj_batched(
             self.p, min_val=10000, max_val=20000, randLoc=False, randVal=False
         )
 
@@ -98,7 +96,7 @@ class TestNeuronErrorModels:
 
     def test_random_inj_per_layer(self):
         # TODO make better test
-        self.inj_model = em.random_inj_per_layer(self.p, min_val=10000, max_val=20000)
+        self.inj_model = random_inj_per_layer(self.p, min_val=10000, max_val=20000)
 
         self.inj_model.eval()
         with torch.no_grad():
@@ -108,7 +106,7 @@ class TestNeuronErrorModels:
 
     def test_random_inj_per_layer_batched_locTrue_valTrue(self):
         # TODO make better test
-        self.inj_model = em.random_inj_per_layer_batched(
+        self.inj_model = random_inj_per_layer_batched(
             self.p, min_val=10000, max_val=20000, randLoc=True, randVal=True
         )
 
@@ -120,7 +118,7 @@ class TestNeuronErrorModels:
 
     def test_random_inj_per_layer_batched_locFalse_valTrue(self):
         # TODO make better test
-        self.inj_model = em.random_inj_per_layer_batched(
+        self.inj_model = random_inj_per_layer_batched(
             self.p, min_val=10000, max_val=20000, randLoc=False, randVal=True
         )
 
@@ -132,7 +130,7 @@ class TestNeuronErrorModels:
 
     def test_random_inj_per_layer_batched_locTrue_valFalse(self):
         # TODO make better test
-        self.inj_model = em.random_inj_per_layer_batched(
+        self.inj_model = random_inj_per_layer_batched(
             self.p, min_val=10000, max_val=20000, randLoc=True, randVal=False
         )
 
@@ -144,7 +142,7 @@ class TestNeuronErrorModels:
 
     def test_random_inj_per_layer_batched_locFalse_valFalse(self):
         # TODO make better test
-        self.inj_model = em.random_inj_per_layer_batched(
+        self.inj_model = random_inj_per_layer_batched(
             self.p, min_val=10000, max_val=20000, randLoc=False, randVal=False
         )
 
