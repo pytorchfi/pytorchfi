@@ -95,3 +95,61 @@ class TestNeuronErrorModels:
             corrupted_output_1 = self.inj_model(self.images)
 
         assert not torch.all(corrupted_output_1.eq(self.output))
+
+    def test_random_inj_per_layer(self):
+        # TODO make better test
+        self.inj_model = em.random_inj_per_layer(self.p, min_val=10000, max_val=20000)
+
+        self.inj_model.eval()
+        with torch.no_grad():
+            corrupted_output_1 = self.inj_model(self.images)
+
+        assert not torch.all(corrupted_output_1.eq(self.output))
+
+    def test_random_inj_per_layer_batched_locTrue_valTrue(self):
+        # TODO make better test
+        self.inj_model = em.random_inj_per_layer_batched(
+            self.p, min_val=10000, max_val=20000, randLoc=True, randVal=True
+        )
+
+        self.inj_model.eval()
+        with torch.no_grad():
+            corrupted_output_1 = self.inj_model(self.images)
+
+        assert not torch.all(corrupted_output_1.eq(self.output))
+
+    def test_random_inj_per_layer_batched_locFalse_valTrue(self):
+        # TODO make better test
+        self.inj_model = em.random_inj_per_layer_batched(
+            self.p, min_val=10000, max_val=20000, randLoc=False, randVal=True
+        )
+
+        self.inj_model.eval()
+        with torch.no_grad():
+            corrupted_output_1 = self.inj_model(self.images)
+
+        assert not torch.all(corrupted_output_1.eq(self.output))
+
+    def test_random_inj_per_layer_batched_locTrue_valFalse(self):
+        # TODO make better test
+        self.inj_model = em.random_inj_per_layer_batched(
+            self.p, min_val=10000, max_val=20000, randLoc=True, randVal=False
+        )
+
+        self.inj_model.eval()
+        with torch.no_grad():
+            corrupted_output_1 = self.inj_model(self.images)
+
+        assert not torch.all(corrupted_output_1.eq(self.output))
+
+    def test_random_inj_per_layer_batched_locFalse_valFalse(self):
+        # TODO make better test
+        self.inj_model = em.random_inj_per_layer_batched(
+            self.p, min_val=10000, max_val=20000, randLoc=False, randVal=False
+        )
+
+        self.inj_model.eval()
+        with torch.no_grad():
+            corrupted_output_1 = self.inj_model(self.images)
+
+        assert not torch.all(corrupted_output_1.eq(self.output))

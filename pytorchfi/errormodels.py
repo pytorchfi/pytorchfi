@@ -28,7 +28,7 @@ def random_neuron_location_conv(model, conv):
     h = random.randint(0, model.get_fmaps_H(conv) - 1)
     w = random.randint(0, model.get_fmaps_W(conv) - 1)
 
-    return (conv, c, h, w)
+    return (c, h, w)
 
 
 def random_value(min_val=-1, max_val=1):
