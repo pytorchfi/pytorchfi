@@ -4,13 +4,11 @@ pytorchfi.errormodels provides different error models out-of-the-box for use.
 
 import random
 
-import torch
-import torch.nn as nn
 from pytorchfi import core
 
-######################
-## helper functions ##
-######################
+# ###################
+#  helper functions #
+# ###################
 def random_batch_element(model):
     return random.randint(0, model.get_total_batches() - 1)
 
@@ -36,9 +34,9 @@ def random_value(min_val=-1, max_val=1):
     return random.uniform(min_val, max_val)
 
 
-######################
-##   Error Models   ##
-######################
+# ###################
+#    Error Models   #
+# ###################
 class error_models(core.fault_injection):
 
     # single random neuron error in single batch element
@@ -87,7 +85,7 @@ class error_models(core.fault_injection):
         for i in range(self.get_total_conv()):
             (C, H, W) = random_neuron_location_conv(self, i)
             batch.append(b)
-            conv_num.append(j)
+            conv_num.append(i)
             c_rand.append(C)
             h_rand.append(H)
             w_rand.append(W)
@@ -116,7 +114,7 @@ class error_models(core.fault_injection):
                     err_val = random_value(min_val=min_val, max_val=max_val)
 
                 batch.append(b)
-                conv_num.append(j)
+                conv_num.append(i)
                 c_rand.append(C)
                 h_rand.append(H)
                 w_rand.append(W)
