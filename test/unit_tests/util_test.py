@@ -94,3 +94,23 @@ def helper_setUp_CIFAR10(batchsize, workers):
 
     model = alexnet(num_classes=10)
     return model, val_loader
+
+def helper_setUp_CIFAR10_same(batchsize, workers):
+    transform = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ]
+    )
+
+    testset = torchvision.datasets.CIFAR10(
+        root="./data", train=False, download=True, transform=transform
+    )
+
+    #TODO use the same image across the whole batch
+    val_loader = torch.utils.data.DataLoader(
+        testset, batch_size=batchsize, shuffle=False, num_workers=workers
+    )
+
+    model = alexnet(num_classes=10)
+    return model, val_loader
