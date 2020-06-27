@@ -4,8 +4,6 @@ pytorchfi.errormodels provides different error models out-of-the-box for use.
 
 import random
 
-from pytorchfi import core
-
 
 # ###################
 #  helper functions #
