@@ -284,6 +284,18 @@ class fault_injection:
     def get_output_size(self):
         return self.OUTPUT_SIZE
 
+    def updateConv():
+        self.CURRENT_CONV += 1
+
+    def setCorruptConv(value):
+        self.CORRUPT_CONV = value
+
+    def getCurrConv():
+        return self.CURRENT_CONV
+
+    def getCorruptConv():
+        return self.CORRUPT_CONV
+
     def get_total_batches(self):
         return self._BATCH_SIZE
 
@@ -301,3 +313,4 @@ class fault_injection:
 
     def get_fmap_HW(self, layer):
         return (self.get_fmaps_H(layer), self.get_fmaps_W(layer))
+
