@@ -4,7 +4,6 @@ pytorchfi.core contains the core functionality for fault injections.
 
 import copy
 import logging
-import random
 
 import torch
 import torch.nn as nn
@@ -96,7 +95,7 @@ class fault_injection:
 
         if kwargs:
             if "function" in kwargs:
-                CUSTOM_INJECTION, INJECTION_FUNCTION = True, kwargs.get("function")
+                CUSTOM_INJECTION, CUSTOM_FUNCTION = True, kwargs.get("function")
                 corrupt_layer = kwargs.get("conv_num", -1)
                 corrupt_k = kwargs.get("k", -1)
                 corrupt_c = kwargs.get("c", -1)
@@ -126,7 +125,7 @@ class fault_injection:
                     )
                     orig_value = param.data[corrupt_idx].item()
                     if CUSTOM_INJECTION:
-                        corrupt_value = INJECTION_FUNCTION(param.data, corrupt_idx)
+                        corrupt_value = CUSTOM_FUNCTION(param.data, corrupt_idx)
                     param.data[corrupt_idx] = corrupt_value
 
                     logging.info("Weight Injection")

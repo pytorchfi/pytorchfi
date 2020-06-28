@@ -3,7 +3,6 @@ pytorchfi.errormodels provides different error models out-of-the-box for use.
 """
 
 import random
-import torch
 
 
 # ###################
@@ -44,7 +43,7 @@ def random_weight_location(pfi_model):
                     loc.append(random.randint(0, dim - 1))
             curr_layer += 1
 
-    assert(curr_layer == pfi_model.get_total_conv())
+    assert curr_layer == pfi_model.get_total_conv()
     assert len(loc) == 5
 
     return tuple(loc)
@@ -154,17 +153,17 @@ def random_weight_inj(pfi_model, min_val=-1, max_val=1):
     faulty_val = random_value(min_val=min_val, max_val=max_val)
 
     return pfi_model.declare_weight_fi(
-            conv_num=conv, k=k, c=c_in, h=kH, w=kW,value=faulty_val)
+        conv_num=conv, k=k, c=c_in, h=kH, w=kW, value=faulty_val
+    )
 
 
 def zeroFunc_rand_weight(pfi_model):
     (conv, k, c_in, kH, kW) = random_weight_location(pfi_model)
     return pfi_model.declare_weight_fi(
-            function=_zero_rand_weight, conv_num=conv, k=k, c=c_in, h=kH, w=kW)
+        function=_zero_rand_weight, conv_num=conv, k=k, c=c_in, h=kH, w=kW
+    )
 
 
 def _zero_rand_weight(data, location):
-    newData = data[location]*0
+    newData = data[location] * 0
     return newData
-
-

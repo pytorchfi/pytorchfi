@@ -7,7 +7,7 @@ from .util_test import helper_setUp_CIFAR10
 
 class TestWeightFIcpu:
     """
-    Testing focuses on neuron perturbations on CPU with batch = 1.
+    Testing focuses on weight perturbations.
     """
 
     def setup_class(self):
@@ -36,7 +36,6 @@ class TestWeightFIcpu:
         )
 
     def test_neuronFI_singleElement(self):
-        batch_i = 0
         conv_i = 1
         k = 15
         c_i = 20
@@ -77,7 +76,6 @@ class TestWeightFIcpu:
         assert torch.all(corrupted_output_2.eq(corrupted_output_2))
 
     def test_neuronFI_singleElement_noErr(self):
-        batch_i = 0
         conv_i = 4
         k = 153
         c_i = 254
@@ -95,5 +93,3 @@ class TestWeightFIcpu:
             corrupted_output_1 = self.inj_model(self.images)
 
         assert torch.all(corrupted_output_1.eq(self.output))
-
-
