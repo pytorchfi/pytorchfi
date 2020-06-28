@@ -284,16 +284,16 @@ class fault_injection:
     def get_output_size(self):
         return self.OUTPUT_SIZE
 
-    def updateConv():
+    def updateConv(self):
         self.CURRENT_CONV += 1
 
-    def setCorruptConv(value):
+    def setCorruptConv(self, value):
         self.CORRUPT_CONV = value
 
-    def getCurrConv():
+    def getCurrConv(self):
         return self.CURRENT_CONV
 
-    def getCorruptConv():
+    def getCorruptConv(self):
         return self.CORRUPT_CONV
 
     def get_total_batches(self):
