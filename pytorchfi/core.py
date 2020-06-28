@@ -97,7 +97,11 @@ class fault_injection:
         if kwargs:
             if "function" in kwargs:
                 CUSTOM_INJECTION, INJECTION_FUNCTION = True, kwargs.get("function")
-                corrupt_idx = kwargs.get("index", 0)
+                corrupt_layer = kwargs.get("conv_num", -1)
+                corrupt_k = kwargs.get("k", -1)
+                corrupt_c = kwargs.get("c", -1)
+                corrupt_kH = kwargs.get("h", -1)
+                corrupt_kW = kwargs.get("w", -1)
             else:
                 corrupt_layer = kwargs.get("conv_num", -1)
                 corrupt_k = kwargs.get("k", -1)
@@ -115,26 +119,16 @@ class fault_injection:
         for name, param in self.CORRUPTED_MODEL.named_parameters():
             if "weight" in name and "features" in name:
                 if curr_layer == corrupt_layer:
-                    #if zero_layer:
-                    #    param.data[:] = 0
-                    #    logging.info("Zero weight layer")
-                    #    logging.info("Layer index: %s" % corrupt_layer)
-                    #else:
-                    #if rand_inj:
-                    #    corrupt_value = random.uniform(min_val, max_val)
-                    #    corrupt_idx = list()
-                    #    for dim in param.size():
-                    #        corrupt_idx.append(random.randint(0, dim - 1))
                     corrupt_idx = (
                         tuple(corrupt_idx)
                         if isinstance(corrupt_idx, list)
                         else corrupt_idx
                     )
                     orig_value = param.data[corrupt_idx].item()
-                    if CUSTOM_FUNCTION:
-                        corrupt_value = function(param.data[tuple(corrupt_idx)])
-
+                    if CUSTOM_INJECTION:
+                        corrupt_value = INJECTION_FUNCTION(param.data, corrupt_idx)
                     param.data[corrupt_idx] = corrupt_value
+
                     logging.info("Weight Injection")
                     logging.info("Layer index: %s" % corrupt_layer)
                     logging.info("Module: %s" % name)

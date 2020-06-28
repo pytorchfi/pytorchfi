@@ -157,7 +157,14 @@ def random_weight_inj(pfi_model, min_val=-1, max_val=1):
             conv_num=conv, k=k, c=c_in, h=kH, w=kW,value=faulty_val)
 
 
-def zero_layer_weights(pfi_model, zero_layer=0):
-    return pfi_model.declare_weight_fi(layer=zero_layer, zero=True)
+def zeroFunc_rand_weight(pfi_model):
+    (conv, k, c_in, kH, kW) = random_weight_location(pfi_model)
+    return pfi_model.declare_weight_fi(
+            function=_zero_rand_weight, conv_num=conv, k=k, c=c_in, h=kH, w=kW)
+
+
+def _zero_rand_weight(data, location):
+    newData = data[location]*0
+    return newData
 
 

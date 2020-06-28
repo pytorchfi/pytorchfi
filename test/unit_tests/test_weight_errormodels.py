@@ -1,6 +1,10 @@
 import torch
+import random
 from pytorchfi.core import fault_injection as pfi_core
-from pytorchfi.errormodels import random_weight_inj
+from pytorchfi.errormodels import (
+        random_weight_inj,
+        zeroFunc_rand_weight,
+        )
 
 from .util_test import helper_setUp_CIFAR10_same
 
@@ -12,7 +16,7 @@ class TestWeightErrorModels:
 
     def setup_class(self):
         torch.manual_seed(0)
-        # random.seed(0)
+        random.seed(2)
 
         self.BATCH_SIZE = 4
         self.WORKERS = 1
@@ -41,6 +45,17 @@ class TestWeightErrorModels:
     def test_random_weight_inj(self):
         # TODO Update for Weights
         self.inj_model = random_weight_inj(self.p, min_val=10000, max_val=20000)
+
+        self.inj_model.eval()
+        with torch.no_grad():
+            corrupted_output_1 = self.inj_model(self.images)
+
+        assert not torch.all(corrupted_output_1.eq(self.output))
+
+
+    def test_random_weight_zero_inj(self):
+        # TODO Update for Weights
+        self.inj_model = zeroFunc_rand_weight(self.p)
 
         self.inj_model.eval()
         with torch.no_grad():
