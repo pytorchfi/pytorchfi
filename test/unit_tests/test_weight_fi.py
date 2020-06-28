@@ -1,4 +1,3 @@
-import pytest
 import torch
 from pytorchfi.core import fault_injection as pfi_core
 
