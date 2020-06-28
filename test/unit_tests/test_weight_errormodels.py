@@ -1,6 +1,6 @@
 import torch
 from pytorchfi.core import fault_injection as pfi_core
-from pytorchfi.errormodels import random_neuron_inj
+from pytorchfi.errormodels import random_weight_inj
 
 from .util_test import helper_setUp_CIFAR10_same
 
@@ -40,7 +40,7 @@ class TestWeightErrorModels:
 
     def test_random_weight_inj(self):
         # TODO Update for Weights
-        self.inj_model = random_neuron_inj(self.p, min_val=10000, max_val=20000)
+        self.inj_model = random_weight_inj(self.p, min_val=10000, max_val=20000)
 
         self.inj_model.eval()
         with torch.no_grad():

@@ -3,6 +3,7 @@ pytorchfi.errormodels provides different error models out-of-the-box for use.
 """
 
 import random
+import torch
 
 
 # ###################
@@ -29,13 +30,33 @@ def random_neuron_location_conv(pfi_model, conv):
     return (c, h, w)
 
 
+def random_weight_location(pfi_model):
+    loc = list()
+
+    corrupt_layer = random.randint(0, pfi_model.get_total_conv() - 1)
+    loc.append(corrupt_layer)
+
+    curr_layer = 0
+    for name, param in pfi_model.get_original_model().named_parameters():
+        if "features" in name and "weight" in name:
+            if curr_layer == corrupt_layer:
+                for dim in param.size():
+                    loc.append(random.randint(0, dim - 1))
+            curr_layer += 1
+
+    assert(curr_layer == pfi_model.get_total_conv())
+    assert len(loc) == 5
+
+    return tuple(loc)
+
+
 def random_value(min_val=-1, max_val=1):
     return random.uniform(min_val, max_val)
 
 
-# ###################
-#    Error Models   #
-# ###################
+# #################################
+#    Neuron Perturbation Models   #
+# #################################
 # single random neuron error in single batch element
 def random_neuron_inj(pfi_model, min_val=-1, max_val=1):
     b = random_batch_element(pfi_model)
@@ -125,11 +146,18 @@ def random_inj_per_layer_batched(
     )
 
 
+# #################################
+#    Weight Perturbation Models   #
+# #################################
+def random_weight_inj(pfi_model, min_val=-1, max_val=1):
+    (conv, k, c_in, kH, kW) = random_weight_location(pfi_model)
+    faulty_val = random_value(min_val=min_val, max_val=max_val)
+
+    return pfi_model.declare_weight_fi(
+            conv_num=conv, k=k, c=c_in, h=kH, w=kW,value=faulty_val)
+
+
 def zero_layer_weights(pfi_model, zero_layer=0):
     return pfi_model.declare_weight_fi(layer=zero_layer, zero=True)
 
 
-def random_weight_inj(pfi_model, min_val=-1, max_val=1):
-    return pfi_model.declare_weight_fi(
-        rand=True, min_rand_val=min_val, max_rand_val=max_val
-    )

@@ -91,66 +91,55 @@ class fault_injection:
 
     def declare_weight_fi(self, **kwargs):
         self._fi_state_reset()
-        custom_function = False
-        zero_layer = False
-        rand_inj = False
+        CUSTOM_INJECTION = False
+        CUSTOM_FUNCTION = False
 
         if kwargs:
             if "function" in kwargs:
-                custom_function, function = True, kwargs.get("function")
+                CUSTOM_INJECTION, INJECTION_FUNCTION = True, kwargs.get("function")
                 corrupt_idx = kwargs.get("index", 0)
-            elif kwargs.get("zero", False):
-                zero_layer = True
-            elif kwargs.get("rand", False):
-                rand_inj = True
-                min_val = kwargs.get("min_rand_val")
-                max_val = kwargs.get("max_rand_val")
             else:
+                corrupt_layer = kwargs.get("conv_num", -1)
+                corrupt_k = kwargs.get("k", -1)
+                corrupt_c = kwargs.get("c", -1)
+                corrupt_kH = kwargs.get("h", -1)
+                corrupt_kW = kwargs.get("w", -1)
                 corrupt_value = kwargs.get("value", -1)
-                corrupt_idx = kwargs.get("index", -1)
-            corrupt_layer = kwargs.get("layer", -1)
         else:
             raise ValueError("Please specify an injection or injection function")
 
         self.CORRUPTED_MODEL = copy.deepcopy(self.ORIG_MODEL)
+        corrupt_idx = [corrupt_k, corrupt_c, corrupt_kH, corrupt_kW]
 
-        num_layers = 0
-        for name, param in self.CORRUPTED_MODEL.named_parameters():
-            if name.split(".")[-1] == "weight":
-                num_layers += 1
         curr_layer = 0
-        orig_value = 0
-
-        if rand_inj:
-            corrupt_layer = random.randint(0, num_layers - 1)
         for name, param in self.CORRUPTED_MODEL.named_parameters():
-            if name.split(".")[-1] == "weight":
+            if "weight" in name and "features" in name:
                 if curr_layer == corrupt_layer:
-                    if zero_layer:
-                        param.data[:] = 0
-                        logging.info("Zero weight layer")
-                        logging.info("Layer index: %s" % corrupt_layer)
-                    else:
-                        if rand_inj:
-                            corrupt_value = random.uniform(min_val, max_val)
-                            corrupt_idx = list()
-                            for dim in param.size():
-                                corrupt_idx.append(random.randint(0, dim - 1))
-                        corrupt_idx = (
-                            tuple(corrupt_idx)
-                            if isinstance(corrupt_idx, list)
-                            else corrupt_idx
-                        )
-                        orig_value = param.data[corrupt_idx].item()
-                        if custom_function:
-                            corrupt_value = function(param.data[tuple(corrupt_idx)])
+                    #if zero_layer:
+                    #    param.data[:] = 0
+                    #    logging.info("Zero weight layer")
+                    #    logging.info("Layer index: %s" % corrupt_layer)
+                    #else:
+                    #if rand_inj:
+                    #    corrupt_value = random.uniform(min_val, max_val)
+                    #    corrupt_idx = list()
+                    #    for dim in param.size():
+                    #        corrupt_idx.append(random.randint(0, dim - 1))
+                    corrupt_idx = (
+                        tuple(corrupt_idx)
+                        if isinstance(corrupt_idx, list)
+                        else corrupt_idx
+                    )
+                    orig_value = param.data[corrupt_idx].item()
+                    if CUSTOM_FUNCTION:
+                        corrupt_value = function(param.data[tuple(corrupt_idx)])
 
-                        param.data[corrupt_idx] = corrupt_value
-                        logging.info("Weight Injection")
-                        logging.info("Layer index: %s" % corrupt_layer)
-                        logging.info("Module: %s" % name)
-                        logging.info("Original value: %s" % orig_value)
-                        logging.info("Injected value: %s" % corrupt_value)
+                    param.data[corrupt_idx] = corrupt_value
+                    logging.info("Weight Injection")
+                    logging.info("Layer index: %s" % corrupt_layer)
+                    logging.info("Module: %s" % name)
+                    logging.info("Original value: %s" % orig_value)
+                    logging.info("Injected value: %s" % corrupt_value)
 
                 curr_layer += 1
         return self.CORRUPTED_MODEL
