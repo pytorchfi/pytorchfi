@@ -5,6 +5,7 @@ from pytorchfi.errormodels import (
     random_inj_per_layer_batched,
     random_neuron_inj,
     random_neuron_inj_batched,
+    random_neuron_single_bit_inj,
 )
 
 from .util_test import helper_setUp_CIFAR10_same
@@ -156,3 +157,15 @@ class TestNeuronErrorModels:
             corrupted_output_1 = self.inj_model(self.images)
 
         assert not torch.all(corrupted_output_1.eq(self.output))
+
+    def test_random_neuron_single_bit_inj(self):
+        # TODO make sure only one batch element is different
+        self.inj_model = random_neuron_single_bit_inj(self.p, min_val=10000, max_val=20000)
+
+        self.inj_model.eval()
+        with torch.no_grad():
+            corrupted_output_1 = self.inj_model(self.images)
+
+        assert not torch.all(corrupted_output_1.eq(self.output))
+
+

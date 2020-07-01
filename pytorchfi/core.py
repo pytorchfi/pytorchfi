@@ -223,7 +223,7 @@ class fault_injection:
                 and self.CORRUPT_W < self.OUTPUT_SIZE[self.CORRUPT_CONV][3]
             ), "Invalid W!"
 
-    def _set_value(self, model, input, output):
+    def _set_value(self, nnConv2d, input, output):
         if type(self.CORRUPT_CONV) == list:
             inj_list = list(
                 filter(
@@ -313,4 +313,3 @@ class fault_injection:
 
     def get_fmap_HW(self, layer):
         return (self.get_fmaps_H(layer), self.get_fmaps_W(layer))
-

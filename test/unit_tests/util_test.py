@@ -1,4 +1,5 @@
 import os
+import random
 
 import torch
 import torch.nn as nn
@@ -76,27 +77,19 @@ def helper_setUp_IMAGENET(batchsize, workers, dataset_path):
     model = models.alexnet(pretrained=True)
     return model, val_loader
 
+class Custom_Sampler(torch.utils.data.Sampler):
+    def __init__(self, data):
+        self.data = data
+    def __iter__(self):
+        return iter(self.data)
+    def __len__(self):
+        return len(self.data)
+
+def _get_custom_sampler(singleIndex, total):
+    indices = random.choices([singleIndex], k=total)
+    return Custom_Sampler(indices)
 
 def helper_setUp_CIFAR10(batchsize, workers):
-    transform = transforms.Compose(
-        [
-            transforms.ToTensor(),
-            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        ]
-    )
-
-    testset = torchvision.datasets.CIFAR10(
-        root="./data", train=False, download=True, transform=transform
-    )
-    val_loader = torch.utils.data.DataLoader(
-        testset, batch_size=batchsize, shuffle=False, num_workers=workers
-    )
-
-    model = alexnet(num_classes=10)
-    return model, val_loader
-
-
-def helper_setUp_CIFAR10_same(batchsize, workers):
     transform = transforms.Compose(
         [
             transforms.ToTensor(),
@@ -111,6 +104,26 @@ def helper_setUp_CIFAR10_same(batchsize, workers):
     # TODO use the same image across the whole batch
     val_loader = torch.utils.data.DataLoader(
         testset, batch_size=batchsize, shuffle=False, num_workers=workers
+    )
+
+    model = alexnet(num_classes=10)
+    return model, val_loader
+
+def helper_setUp_CIFAR10_same(batchsize, workers, specificIndex=0):
+    custom_sampler = _get_custom_sampler(specificIndex, batchsize)
+
+    transform = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ]
+    )
+
+    testset = torchvision.datasets.CIFAR10(
+        root="./data", train=False, download=True, transform=transform
+    )
+    val_loader = torch.utils.data.DataLoader(
+        testset, batch_size=batchsize, shuffle=False, sampler=custom_sampler, num_workers=workers
     )
 
     model = alexnet(num_classes=10)

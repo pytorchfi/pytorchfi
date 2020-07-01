@@ -1,7 +1,7 @@
 import torch
 from pytorchfi.core import fault_injection as pfi_core
 
-from .util_test import helper_setUp_CIFAR10
+from .util_test import helper_setUp_CIFAR10_same
 
 
 class TestCoreGetFuncs:
@@ -15,7 +15,7 @@ class TestCoreGetFuncs:
         self.img_size = 32
         self.USE_GPU = False
 
-        self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS)
+        self.model, self.dataset = helper_setUp_CIFAR10_same(self.BATCH_SIZE, self.WORKERS)
 
         self.dataiter = iter(self.dataset)
         self.model.eval()

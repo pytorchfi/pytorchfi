@@ -67,6 +67,14 @@ def random_neuron_inj(pfi_model, min_val=-1, max_val=1):
     )
 
 
+def random_neuron_single_bit_inj(pfi_model, min_val=-1, max_val=1):
+    b = random_batch_element(pfi_model)
+    conv = random.randint(0, pfi_model.get_total_conv() - 1)
+    pfi_model.setCorruptConv(conv)
+
+    return pfi_model.declare_neuron_fi(function=_single_bit_flip_signed_across_batch)
+
+
 # single random neuron error in each batch element.
 def random_neuron_inj_batched(
     pfi_model, min_val=-1, max_val=1, randLoc=True, randVal=True
@@ -143,6 +151,12 @@ def random_inj_per_layer_batched(
     return pfi_model.declare_neuron_fi(
         batch=batch, conv_num=conv_num, c=c_rand, h=h_rand, w=w_rand, value=value
     )
+
+def _single_bit_flip_signed_across_batch(self, input, output):
+    curr_layer = pfi_model.getCurrConv()
+    print(curr_layer)
+    #if self.getCorruptConv == curr_layer:
+    #    print("GOT HERE", curr_layer)
 
 
 # #################################
