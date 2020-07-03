@@ -17,7 +17,9 @@ class TestWeightFIcpu:
         self.img_size = 32
         self.USE_GPU = False
 
-        self.model, self.dataset = helper_setUp_CIFAR10_same(self.BATCH_SIZE, self.WORKERS)
+        self.model, self.dataset = helper_setUp_CIFAR10_same(
+            self.BATCH_SIZE, self.WORKERS
+        )
         self.dataiter = iter(self.dataset)
 
         self.images, self.labels = self.dataiter.next()

@@ -192,7 +192,7 @@ class TestNeuronErrorModelsFunc:
             self.img_size,
             self.BATCH_SIZE,
             use_cuda=self.USE_GPU,
-            bits=8
+            bits=8,
         )
         self.ranges = [24.375, 26.375, 13.179688, 3.367188, 3.314453]
 
@@ -209,10 +209,11 @@ class TestNeuronErrorModelsFunc:
         assert not torch.all(corrupted_output_1[2].eq(self.output[2]))
         assert not torch.all(corrupted_output_1[3].eq(self.output[3]))
 
-
     def test_random_neuron_single_bit_inj_sameLoc(self):
         random.seed(2)
-        self.inj_model = random_neuron_single_bit_inj_batched(self.p, self.ranges, randLoc=False)
+        self.inj_model = random_neuron_single_bit_inj_batched(
+            self.p, self.ranges, randLoc=False
+        )
 
         self.inj_model.eval()
         with torch.no_grad():
@@ -222,7 +223,6 @@ class TestNeuronErrorModelsFunc:
         assert not torch.all(corrupted_output_1[1].eq(self.output[1]))
         assert not torch.all(corrupted_output_1[2].eq(self.output[2]))
         assert not torch.all(corrupted_output_1[3].eq(self.output[3]))
-
 
     def test_random_neuron_single_bit_inj_single(self):
         random.seed(0)
@@ -236,4 +236,3 @@ class TestNeuronErrorModelsFunc:
         assert torch.all(corrupted_output_1[1].eq(self.output[1]))
         assert torch.all(corrupted_output_1[2].eq(self.output[2]))
         assert not torch.all(corrupted_output_1[3].eq(self.output[3]))
-

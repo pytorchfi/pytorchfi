@@ -6,6 +6,7 @@ import random
 import torch
 from pytorchfi import core
 
+
 # ###################
 #  helper functions #
 # ###################
@@ -230,7 +231,7 @@ class single_bit_flip_func(core.fault_injection):
         if not bits_str_new.isdigit():
             print("orig value:", orig_value)
             print("max value:", max_value)
-            print("bit_pos:", pit_pos)
+            print("bit_pos:", bit_pos)
             print("total bits:", total_bits)
             print("bit string:", bits_str_new)
 

@@ -18,7 +18,9 @@ class TestNeuronFIgpu:
         self.img_size = 32
         self.USE_GPU = True
 
-        self.model, self.dataset = helper_setUp_CIFAR10_same(self.BATCH_SIZE, self.WORKERS)
+        self.model, self.dataset = helper_setUp_CIFAR10_same(
+            self.BATCH_SIZE, self.WORKERS
+        )
         self.dataiter = iter(self.dataset)
 
         self.model.cuda()
@@ -95,7 +97,9 @@ class TestNeuronFIcpu:
         self.img_size = 32
         self.USE_GPU = False
 
-        self.model, self.dataset = helper_setUp_CIFAR10_same(self.BATCH_SIZE, self.WORKERS)
+        self.model, self.dataset = helper_setUp_CIFAR10_same(
+            self.BATCH_SIZE, self.WORKERS
+        )
         self.dataiter = iter(self.dataset)
 
         self.images, self.labels = self.dataiter.next()
@@ -166,7 +170,9 @@ class TestNeuronFIgpuBatch:
         self.img_size = 32
         self.USE_GPU = True
 
-        self.model, self.dataset = helper_setUp_CIFAR10_same(self.BATCH_SIZE, self.WORKERS)
+        self.model, self.dataset = helper_setUp_CIFAR10_same(
+            self.BATCH_SIZE, self.WORKERS
+        )
         self.dataiter = iter(self.dataset)
 
         self.model.cuda()
@@ -252,7 +258,9 @@ class TestNeuronFIcpuBatch:
         self.img_size = 32
         self.USE_GPU = False
 
-        self.model, self.dataset = helper_setUp_CIFAR10_same(self.BATCH_SIZE, self.WORKERS)
+        self.model, self.dataset = helper_setUp_CIFAR10_same(
+            self.BATCH_SIZE, self.WORKERS
+        )
         self.dataiter = iter(self.dataset)
 
         self.images, self.labels = self.dataiter.next()
