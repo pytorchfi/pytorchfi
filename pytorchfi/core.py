@@ -30,9 +30,11 @@ class fault_injection:
         self.CURRENT_CONV = 0
         self.HANDLES = []
 
-        b = kwargs.get("b", 1)
-        c = kwargs.get("c", 3)
-        use_cuda = kwargs.get("use_cuda", next(model.parameters()).is_cuda)
+        self.imageC = kwargs.get("c", 3)
+        self.imageH = h
+        self.imageW = w
+
+        self.use_cuda = kwargs.get("use_cuda", next(model.parameters()).is_cuda)
         model_dtype = next(model.parameters()).dtype
 
         self.ORIG_MODEL = model
@@ -43,8 +45,9 @@ class fault_injection:
             if isinstance(param, nn.Conv2d):
                 handles.append(param.register_forward_hook(self._save_output_size))
 
-        device = "cuda" if use_cuda else None
-        _dummyTensor = torch.randn(b, c, h, w, dtype=model_dtype, device=device)
+        b = 1 #dummy inference only requires batchsize of 1
+        device = "cuda" if self.use_cuda else None
+        _dummyTensor = torch.randn(b, self.imageC, self.imageH, self.imageW, dtype=model_dtype, device=device)
 
         self.ORIG_MODEL(_dummyTensor)
 
@@ -145,6 +148,11 @@ class fault_injection:
         if kwargs:
             if "function" in kwargs:
                 CUSTOM_INJECTION, INJECTION_FUNCTION = True, kwargs.get("function")
+                self.CORRUPT_CONV = kwargs.get("conv_num", -1)
+                self.CORRUPT_BATCH = kwargs.get("batch", -1)
+                self.CORRUPT_C = kwargs.get("c", -1)
+                self.CORRUPT_H = kwargs.get("h", -1)
+                self.CORRUPT_W = kwargs.get("w", -1)
             else:
                 self.CORRUPT_CONV = kwargs.get("conv_num", -1)
                 self.CORRUPT_BATCH = kwargs.get("batch", -1)
@@ -223,7 +231,7 @@ class fault_injection:
                 and self.CORRUPT_W < self.OUTPUT_SIZE[self.CORRUPT_CONV][3]
             ), "Invalid W!"
 
-    def _set_value(self, nnConv2d, input, output):
+    def _set_value(self, module, input, output):
         if type(self.CORRUPT_CONV) == list:
             inj_list = list(
                 filter(
@@ -278,6 +286,18 @@ class fault_injection:
     def get_original_model(self):
         return self.ORIG_MODEL
 
+    def get_imageC(self):
+        return self.imageC
+
+    def get_imageH(self):
+        return self.imageH
+
+    def get_imageW(self):
+        return self.imageW
+
+    def get_use_cuda(self):
+        return self.use_cuda
+
     def get_corrupted_model(self):
         return self.CORRUPTED_MODEL
 
@@ -287,13 +307,16 @@ class fault_injection:
     def updateConv(self):
         self.CURRENT_CONV += 1
 
-    def setCorruptConv(self, value):
+    def reset_curr_conv(self):
+        self.CURRENT_CONV = 0
+
+    def set_corrupt_conv(self, value):
         self.CORRUPT_CONV = value
 
-    def getCurrConv(self):
+    def get_curr_conv(self):
         return self.CURRENT_CONV
 
-    def getCorruptConv(self):
+    def get_corrupt_conv(self):
         return self.CORRUPT_CONV
 
     def get_total_batches(self):

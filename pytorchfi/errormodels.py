@@ -3,15 +3,12 @@ pytorchfi.errormodels provides different error models out-of-the-box for use.
 """
 
 import random
-
+from functools import wraps
+from pytorchfi import core
 
 # ###################
 #  helper functions #
 # ###################
-def random_batch_element(pfi_model):
-    return random.randint(0, pfi_model.get_total_batches() - 1)
-
-
 def random_neuron_location(pfi_model):
     conv = random.randint(0, pfi_model.get_total_conv() - 1)
     c = random.randint(0, pfi_model.get_fmaps_num(conv) - 1)
@@ -19,6 +16,10 @@ def random_neuron_location(pfi_model):
     w = random.randint(0, pfi_model.get_fmaps_W(conv) - 1)
 
     return (conv, c, h, w)
+
+
+def random_batch_element(pfi_model):
+    return random.randint(0, pfi_model.get_total_batches() - 1)
 
 
 def random_neuron_location_conv(pfi_model, conv):
@@ -49,6 +50,27 @@ def random_weight_location(pfi_model):
     return tuple(loc)
 
 
+def random_weight_location_conv(pfi_model, conv):
+    loc = list()
+
+    corrupt_layer = conv
+    loc.append(corrupt_layer)
+
+    curr_layer = 0
+    for name, param in pfi_model.get_original_model().named_parameters():
+        if "features" in name and "weight" in name:
+            if curr_layer == corrupt_layer:
+                for dim in param.size():
+                    loc.append(random.randint(0, dim - 1))
+            curr_layer += 1
+
+    assert curr_layer == pfi_model.get_total_conv()
+    assert len(loc) == 5
+
+    return tuple(loc)
+
+
+
 def random_value(min_val=-1, max_val=1):
     return random.uniform(min_val, max_val)
 
@@ -66,13 +88,6 @@ def random_neuron_inj(pfi_model, min_val=-1, max_val=1):
         batch=b, conv_num=conv, c=C, h=H, w=W, value=err_val
     )
 
-
-def random_neuron_single_bit_inj(pfi_model, min_val=-1, max_val=1):
-    b = random_batch_element(pfi_model)
-    conv = random.randint(0, pfi_model.get_total_conv() - 1)
-    pfi_model.setCorruptConv(conv)
-
-    return pfi_model.declare_neuron_fi(function=_single_bit_flip_signed_across_batch)
 
 
 # single random neuron error in each batch element.
@@ -152,11 +167,57 @@ def random_inj_per_layer_batched(
         batch=batch, conv_num=conv_num, c=c_rand, h=h_rand, w=w_rand, value=value
     )
 
-def _single_bit_flip_signed_across_batch(self, input, output):
-    curr_layer = pfi_model.getCurrConv()
-    print(curr_layer)
-    #if self.getCorruptConv == curr_layer:
-    #    print("GOT HERE", curr_layer)
+
+class single_bit_flip_func(core.fault_injection):
+    def __init__(self, model, h, w, batch_size, **kwargs):
+        super().__init__(model, h, w, batch_size, **kwargs)
+        self.bits = kwargs.get("bits", 8)
+        self.RandBits = []
+
+    def _reset_RandBits():
+        self.RandBits = []
+
+    def _append_RandBits(value):
+        self.RandBits.append(value)
+
+    def _get_RandBits():
+        return self.RandBits
+
+    def _single_bit_flip_signed_across_batch(self, module, input, output):
+        curr_layer = self.get_curr_conv()
+        if self.get_corrupt_conv() == curr_layer:
+            # layer parameters
+            fmap_num = self.get_fmaps_num(curr_layer)
+            H_size = self.get_fmaps_H(curr_layer)
+            W_size = self.get_fmaps_H(curr_layer)
+            range_max = 5 #self.getConvMax(curr_layer)
+
+            for batch_ele in range(len(output)):
+                fmap_rand = random.randint(0, fmap_num - 1)
+                H_rand = random.randint(0, H_size - 1)
+                W_rand = random.randint(0, W_size - 1)
+
+                prev_value = output[batch_ele][fmap_rand][H_rand][W_rand]
+                print("Before:", prev_value)
+
+                rand_bit = random.randint(0, self.bits - 1)
+
+                new_value = prev_value * 50
+                print("After:", new_value)
+
+                output[batch_ele][fmap_rand][H_rand][W_rand] = new_value
+        self.updateConv()
+        if self.get_curr_conv() >= self.get_total_conv():
+            self.reset_curr_conv()
+
+
+
+def random_neuron_single_bit_inj(pfi_model):
+    corruptConv = random.randint(0, pfi_model.get_total_conv() - 1)
+    return pfi_model.declare_neuron_fi(
+            conv_num=corruptConv,
+            function=pfi_model._single_bit_flip_signed_across_batch
+        )
 
 
 # #################################
