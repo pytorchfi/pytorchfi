@@ -1,4 +1,5 @@
 import torch
+import random
 from pytorchfi.core import fault_injection as pfi_core
 from pytorchfi.errormodels import single_bit_flip_func as pfi_core_func
 from pytorchfi.errormodels import (
@@ -167,7 +168,7 @@ class TestNeuronErrorModelsFunc:
 
     def setup_class(self):
         torch.manual_seed(0)
-        random.seed(0)
+        random.seed(1)
 
         self.BATCH_SIZE = 4
         self.WORKERS = 1
