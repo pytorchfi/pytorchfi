@@ -334,8 +334,11 @@ def random_neuron_single_bit_inj(pfi_model, layer_ranges):
 # #################################
 #    Weight Perturbation Models   #
 # #################################
-def random_weight_inj(pfi_model, min_val=-1, max_val=1):
-    (conv, k, c_in, kH, kW) = random_weight_location(pfi_model)
+def random_weight_inj(pfi_model, corrupt_conv=-1, min_val=-1, max_val=1):
+    if corrupt_conv == -1:
+        (conv, k, c_in, kH, kW) = random_weight_location(pfi_model)
+    else:
+        (conv, k, c_in, kH, kW) = random_weight_location_conv(pfi_model, corrupt_conv)
     faulty_val = random_value(min_val=min_val, max_val=max_val)
 
     return pfi_model.declare_weight_fi(

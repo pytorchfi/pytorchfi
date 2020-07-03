@@ -16,7 +16,6 @@ class TestWeightErrorModels:
 
     def setup_class(self):
         torch.manual_seed(0)
-        random.seed(2)
 
         self.BATCH_SIZE = 4
         self.WORKERS = 1
@@ -44,7 +43,21 @@ class TestWeightErrorModels:
 
     def test_random_weight_inj(self):
         # TODO Update for Weights
+        random.seed(2)
         self.inj_model = random_weight_inj(self.p, min_val=10000, max_val=20000)
+
+        self.inj_model.eval()
+        with torch.no_grad():
+            corrupted_output_1 = self.inj_model(self.images)
+
+        assert not torch.all(corrupted_output_1.eq(self.output))
+
+    def test_random_weight_inj_conv(self):
+        # TODO Update for Weights
+        random.seed(1)
+        self.inj_model = random_weight_inj(
+            self.p, corrupt_conv=3, min_val=10000, max_val=20000
+        )
 
         self.inj_model.eval()
         with torch.no_grad():
@@ -54,6 +67,7 @@ class TestWeightErrorModels:
 
     def test_random_weight_zero_inj(self):
         # TODO Update for Weights
+        random.seed(2)
         self.inj_model = zeroFunc_rand_weight(self.p)
 
         self.inj_model.eval()
