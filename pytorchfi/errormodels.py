@@ -193,11 +193,10 @@ class single_bit_flip_func(core.fault_injection):
         return val
 
     def _twos_comp(self, val, bits):
-        """compute the 2's complement of int value val"""
-        if (val & (1 << (bits - 1))) != 0: # if sign bit is set e.g., 8bit: 128-255
-            val = val - (1 << bits)        # compute negative value
-        return val                         # return positive value as is
-
+        # compute the 2's complement of int value val
+        if (val & (1 << (bits - 1))) != 0:  # if sign bit is set e.g., 8bit: 128-255
+            val = val - (1 << bits)  # compute negative value
+        return val  # return positive value as is
 
     def _flip_bit_signed(self, orig_value, max_value, bit_pos):
         # quantum value
@@ -205,28 +204,29 @@ class single_bit_flip_func(core.fault_injection):
         total_bits = self.bits
 
         quantum = int((orig_value / max_value) * ((2.0 ** (total_bits - 1))))
-        twos_comple = self._twos_complement(quantum, total_bits) #signed
+        twos_comple = self._twos_complement(quantum, total_bits)  # signed
 
         # binary representation
         bits = bin(twos_comple)[2:]
 
-        #sign extend 0's
+        # sign extend 0's
         temp = "0" * (total_bits - len(bits))
         bits = temp + bits
-        assert(len(bits) == total_bits)
+        assert len(bits) == total_bits
 
         # flip a bit
         # use MSB -> LSB indexing
-        assert(bit_pos < total_bits)
+        assert bit_pos < total_bits
 
         bits_new = list(bits)
         bit_loc = total_bits - bit_pos - 1
-        if(bits_new[bit_loc] == "0"):
+        if bits_new[bit_loc] == "0":
             bits_new[bit_loc] = "1"
         else:
             bits_new[bit_loc] = "0"
         bits_str_new = "".join(bits_new)
 
+        # GPU contention causes a weird bug...
         if not bits_str_new.isdigit():
             print("orig value:", orig_value)
             print("max value:", max_value)
@@ -234,18 +234,15 @@ class single_bit_flip_func(core.fault_injection):
             print("total bits:", total_bits)
             print("bit string:", bits_str_new)
 
-
         # convert to quantum
-        assert( bits_str_new.isdigit() )
+        assert bits_str_new.isdigit()
         new_quantum = int(bits_str_new, 2)
         out = self._twos_comp(new_quantum, total_bits)
 
         # get FP equivalent from quantum
         new_value = out * ((2.0 ** (-1 * (total_bits - 1))) * max_value)
 
-        #return new_value #torch.tensor(new_value).cuda().half()
         return torch.tensor(new_value, dtype=save_type)
-
 
     def single_bit_flip_signed_across_batch(self, module, input, output):
         corrupt_conv_set = self.get_corrupt_conv()
@@ -260,9 +257,9 @@ class single_bit_flip_func(core.fault_injection):
             )
             for i in inj_list:
                 self.assert_inj_bounds(index=i)
-                prev_value = output[self.CORRUPT_BATCH[i]][self.CORRUPT_C[i]][self.CORRUPT_H[i]][
-                    self.CORRUPT_W[i]
-                ]
+                prev_value = output[self.CORRUPT_BATCH[i]][self.CORRUPT_C[i]][
+                    self.CORRUPT_H[i]
+                ][self.CORRUPT_W[i]]
 
                 rand_bit = random.randint(0, self.bits - 1)
                 new_value = self._flip_bit_signed(prev_value, range_max, rand_bit)
@@ -290,7 +287,7 @@ class single_bit_flip_func(core.fault_injection):
             self.reset_curr_conv()
 
 
-def random_neuron_single_bit_inj_batched(pfi_model, layer_ranges, randLoc = True):
+def random_neuron_single_bit_inj_batched(pfi_model, layer_ranges, randLoc=True):
     pfi_model.set_conv_max(layer_ranges)
     batch, conv_num, c_rand, h_rand, w_rand = ([] for i in range(5))
 
@@ -308,8 +305,12 @@ def random_neuron_single_bit_inj_batched(pfi_model, layer_ranges, randLoc = True
         w_rand.append(W)
 
     return pfi_model.declare_neuron_fi(
-        batch=batch, conv_num=conv_num, c=c_rand, h=h_rand, w=w_rand,
-        function=pfi_model.single_bit_flip_signed_across_batch
+        batch=batch,
+        conv_num=conv_num,
+        c=c_rand,
+        h=h_rand,
+        w=w_rand,
+        function=pfi_model.single_bit_flip_signed_across_batch,
     )
 
 
@@ -320,10 +321,13 @@ def random_neuron_single_bit_inj(pfi_model, layer_ranges):
     (conv, C, H, W) = random_neuron_location(pfi_model)
 
     return pfi_model.declare_neuron_fi(
-        batch=batch, conv_num=conv, c=C, h=H, w=W,
-        function=pfi_model.single_bit_flip_signed_across_batch
+        batch=batch,
+        conv_num=conv,
+        c=C,
+        h=H,
+        w=W,
+        function=pfi_model.single_bit_flip_signed_across_batch,
     )
-
 
 
 # #################################

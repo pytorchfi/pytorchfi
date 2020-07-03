@@ -45,9 +45,11 @@ class fault_injection:
             if isinstance(param, nn.Conv2d):
                 handles.append(param.register_forward_hook(self._save_output_size))
 
-        b = 1 #dummy inference only requires batchsize of 1
+        b = 1  # dummy inference only requires batchsize of 1
         device = "cuda" if self.use_cuda else None
-        _dummyTensor = torch.randn(b, self.imageC, self.imageH, self.imageW, dtype=model_dtype, device=device)
+        _dummyTensor = torch.randn(
+            b, self.imageC, self.imageH, self.imageW, dtype=model_dtype, device=device
+        )
 
         self.ORIG_MODEL(_dummyTensor)
 
