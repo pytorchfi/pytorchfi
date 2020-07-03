@@ -257,7 +257,6 @@ class fault_injection:
                 output[self.CORRUPT_BATCH[i]][self.CORRUPT_C[i]][self.CORRUPT_H[i]][
                     self.CORRUPT_W[i]
                 ] = self.CORRUPT_VALUE[i]
-            self.CURRENT_CONV += 1
 
         else:
             self.assert_inj_bounds()
@@ -278,7 +277,8 @@ class fault_injection:
                 output[self.CORRUPT_BATCH][self.CORRUPT_C][self.CORRUPT_H][
                     self.CORRUPT_W
                 ] = self.CORRUPT_VALUE
-            self.CURRENT_CONV += 1
+
+        self.CURRENT_CONV += 1
 
     def _save_output_size(self, module, input, output):
         self.OUTPUT_SIZE.append(list(output.size()))
