@@ -11,6 +11,8 @@ from pytorchfi import core
 """
 helper functions
 """
+
+
 def random_batch_element(pfi_model):
     return random.randint(0, pfi_model.get_total_batches() - 1)
 
@@ -56,6 +58,8 @@ def random_value(min_val=-1, max_val=1):
 """
 Neuron Perturbation Models
 """
+
+
 # single random neuron error in single batch element
 def random_neuron_inj(pfi_model, min_val=-1, max_val=1):
     b = random_batch_element(pfi_model)
@@ -69,7 +73,8 @@ def random_neuron_inj(pfi_model, min_val=-1, max_val=1):
 
 # single random neuron error in each batch element.
 def random_neuron_inj_batched(
-    pfi_model, min_val=-1, max_val=1, randLoc=True, randVal=True):
+    pfi_model, min_val=-1, max_val=1, randLoc=True, randVal=True
+):
     batch, conv_num, c_rand, h_rand, w_rand, value = ([] for i in range(6))
 
     if not randLoc:
@@ -321,6 +326,8 @@ def random_neuron_single_bit_inj(pfi_model, layer_ranges):
 """
 Weight Perturbation Models
 """
+
+
 def random_weight_inj(pfi_model, corrupt_conv=-1, min_val=-1, max_val=1):
     (conv, k, c_in, kH, kW) = random_weight_location(pfi_model, corrupt_conv)
     faulty_val = random_value(min_val=min_val, max_val=max_val)
