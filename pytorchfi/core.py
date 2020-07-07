@@ -26,8 +26,8 @@ class fault_injection:
         self.CORRUPT_W = -1
         self.CORRUPT_VALUE = None
 
-        self.OUTPUT_SIZE = []
         self.CURRENT_CONV = 0
+        self.OUTPUT_SIZE = []
         self.HANDLES = []
 
         self.imageC = kwargs.get("c", 3)
@@ -287,15 +287,6 @@ class fault_injection:
 
     def get_original_model(self):
         return self.ORIG_MODEL
-
-    def get_imageC(self):
-        return self.imageC
-
-    def get_imageH(self):
-        return self.imageH
-
-    def get_imageW(self):
-        return self.imageW
 
     def get_use_cuda(self):
         return self.use_cuda
