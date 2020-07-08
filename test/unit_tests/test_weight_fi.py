@@ -1,90 +1,12 @@
-import pytest
 import torch
 from pytorchfi.core import fault_injection as pfi_core
 
-from .util_test import helper_setUp_CIFAR10
-
-
-class TestWeightFIgpu:
-    """
-    Testing focuses on neuron perturbations on GPU with batch = 1.
-    """
-
-    def setup_class(self):
-        torch.manual_seed(0)
-
-        self.BATCH_SIZE = 1
-        self.WORKERS = 1
-        self.img_size = 32
-        self.USE_GPU = True
-
-        self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS)
-        self.dataiter = iter(self.dataset)
-
-        self.model.cuda()
-
-        self.images, self.labels = self.dataiter.next()
-        self.images = self.images.cuda()
-
-        self.model.eval()
-        with torch.no_grad():
-            self.output = self.model(self.images)
-
-        self.p = pfi_core(
-            self.model,
-            self.img_size,
-            self.img_size,
-            self.BATCH_SIZE,
-            use_cuda=self.USE_GPU,
-        )
-
-    @pytest.mark.skipif(
-        not torch.cuda.is_available(), reason="GPU not supported on this machine"
-    )
-    def test_neuronFI_singleElement(self):
-        batch_i = 0
-        conv_i = 4
-        c_i = 0
-        h_i = 1
-        w_i = 1
-
-        inj_value_i = 10000.0
-
-        self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i
-        )
-
-        self.inj_model.eval()
-        with torch.no_grad():
-            corrupted_output_1 = self.inj_model(self.images)
-
-        assert not torch.all(corrupted_output_1.eq(self.output))
-
-        self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=0,
-        )
-
-        self.inj_model.eval()
-        with torch.no_grad():
-            uncorrupted_output = self.inj_model(self.images)
-
-        assert torch.all(uncorrupted_output.eq(self.output))
-
-        self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i * 2
-        )
-
-        self.inj_model.eval()
-        with torch.no_grad():
-            corrupted_output_2 = self.inj_model(self.images)
-
-        assert not torch.all(corrupted_output_2.eq(self.output))
-        assert torch.all(corrupted_output_2.eq(corrupted_output_2))
+from .util_test import helper_setUp_CIFAR10_same
 
 
 class TestWeightFIcpu:
     """
-    Testing focuses on neuron perturbations on CPU with batch = 1.
+    Testing focuses on weight perturbations.
     """
 
     def setup_class(self):
@@ -95,7 +17,9 @@ class TestWeightFIcpu:
         self.img_size = 32
         self.USE_GPU = False
 
-        self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS)
+        self.model, self.dataset = helper_setUp_CIFAR10_same(
+            self.BATCH_SIZE, self.WORKERS
+        )
         self.dataiter = iter(self.dataset)
 
         self.images, self.labels = self.dataiter.next()
@@ -113,16 +37,16 @@ class TestWeightFIcpu:
         )
 
     def test_neuronFI_singleElement(self):
-        batch_i = 0
-        conv_i = 4
-        c_i = 0
-        h_i = 1
-        w_i = 1
+        conv_i = 1
+        k = 15
+        c_i = 20
+        h_i = 2
+        w_i = 3
 
         inj_value_i = 10000.0
 
-        self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i
+        self.inj_model = self.p.declare_weight_fi(
+            conv_num=conv_i, k=k, c=c_i, h=h_i, w=w_i, value=inj_value_i
         )
 
         self.inj_model.eval()
@@ -131,8 +55,8 @@ class TestWeightFIcpu:
 
         assert not torch.all(corrupted_output_1.eq(self.output))
 
-        self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=0,
+        self.inj_model = self.p.declare_weight_fi(
+            conv_num=conv_i, k=k, c=c_i, h=h_i, w=w_i, value=0.01388985849916935,
         )
 
         self.inj_model.eval()
@@ -141,8 +65,8 @@ class TestWeightFIcpu:
 
         assert torch.all(uncorrupted_output.eq(self.output))
 
-        self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i * 2
+        self.inj_model = self.p.declare_weight_fi(
+            conv_num=conv_i, k=k, c=c_i, h=h_i, w=w_i, value=inj_value_i * 2,
         )
 
         self.inj_model.eval()
@@ -152,163 +76,21 @@ class TestWeightFIcpu:
         assert not torch.all(corrupted_output_2.eq(self.output))
         assert torch.all(corrupted_output_2.eq(corrupted_output_2))
 
-
-class TestWeightFIgpuBatch:
-    """
-    Testing focuses on neuron perturbations on GPU with batch = N.
-    """
-
-    def setup_class(self):
-        torch.manual_seed(0)
-
-        self.BATCH_SIZE = 4
-        self.WORKERS = 1
-        self.img_size = 32
-        self.USE_GPU = True
-
-        self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS)
-        self.dataiter = iter(self.dataset)
-
-        self.model.cuda()
-
-        self.images, self.labels = self.dataiter.next()
-        self.images = self.images.cuda()
-
-        self.model.eval()
-        with torch.no_grad():
-            self.output = self.model(self.images)
-
-        self.p = pfi_core(
-            self.model,
-            self.img_size,
-            self.img_size,
-            self.BATCH_SIZE,
-            use_cuda=self.USE_GPU,
-        )
-
-    @pytest.mark.skipif(
-        not torch.cuda.is_available(), reason="GPU not supported on this machine"
-    )
-    def test_neuronFI_batch_1(self):
-
-        batch_i = 2
+    def test_neuronFI_singleElement_noErr(self):
         conv_i = 4
-        c_i = 0
-        h_i = 1
-        w_i = 1
+        k = 153
+        c_i = 254
+        h_i = 0
+        w_i = 0
 
         inj_value_i = 10000.0
 
-        self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i
+        self.inj_model = self.p.declare_weight_fi(
+            conv_num=conv_i, k=k, c=c_i, h=h_i, w=w_i, value=inj_value_i
         )
 
         self.inj_model.eval()
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert torch.all(corrupted_output_1[0].eq(self.output[0]))
-        assert torch.all(corrupted_output_1[1].eq(self.output[1]))
-        assert not torch.all(corrupted_output_1[2].eq(self.output[2]))
-        assert torch.all(corrupted_output_1[3].eq(self.output[3]))
-
-    @pytest.mark.skipif(
-        not torch.cuda.is_available(), reason="GPU not supported on this machine"
-    )
-    def test_neuronFI_batch_2(self):
-
-        batch_i = [0, 2, 3]
-        conv_i = [1, 2, 4]
-        c_i = [3, 1, 1]
-        h_i = [1, 0, 1]
-        w_i = [0, 1, 0]
-
-        inj_value_i = [10000.0, 10000.0, 10000.0]
-
-        self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i
-        )
-
-        self.inj_model.eval()
-        with torch.no_grad():
-            corrupted_output_1 = self.inj_model(self.images)
-
-        assert not torch.all(corrupted_output_1[0].eq(self.output[0]))
-        assert torch.all(corrupted_output_1[1].eq(self.output[1]))
-        assert not torch.all(corrupted_output_1[2].eq(self.output[2]))
-        assert not torch.all(corrupted_output_1[3].eq(self.output[3]))
-
-
-class TestWeightFIcpuBatch:
-    """
-    Testing focuses on neuron perturbations on cpu with batch = N.
-    """
-
-    def setup_class(self):
-        torch.manual_seed(0)
-
-        self.BATCH_SIZE = 4
-        self.WORKERS = 1
-        self.img_size = 32
-        self.USE_GPU = False
-
-        self.model, self.dataset = helper_setUp_CIFAR10(self.BATCH_SIZE, self.WORKERS)
-        self.dataiter = iter(self.dataset)
-
-        self.images, self.labels = self.dataiter.next()
-
-        self.model.eval()
-        with torch.no_grad():
-            self.output = self.model(self.images)
-
-        self.p = pfi_core(
-            self.model,
-            self.img_size,
-            self.img_size,
-            self.BATCH_SIZE,
-            use_cuda=self.USE_GPU,
-        )
-
-    def test_neuronFI_batch_1(self):
-        batch_i = 2
-        conv_i = 4
-        c_i = 0
-        h_i = 1
-        w_i = 1
-
-        inj_value_i = 10000.0
-
-        self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i
-        )
-
-        self.inj_model.eval()
-        with torch.no_grad():
-            corrupted_output_1 = self.inj_model(self.images)
-
-        assert torch.all(corrupted_output_1[0].eq(self.output[0]))
-        assert torch.all(corrupted_output_1[1].eq(self.output[1]))
-        assert not torch.all(corrupted_output_1[2].eq(self.output[2]))
-        assert torch.all(corrupted_output_1[3].eq(self.output[3]))
-
-    def test_neuronFI_batch_2(self):
-        batch_i = [0, 2, 3]
-        conv_i = [1, 2, 4]
-        c_i = [3, 1, 1]
-        h_i = [1, 0, 1]
-        w_i = [0, 1, 0]
-
-        inj_value_i = [10000.0, 10000.0, 10000.0]
-
-        self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=inj_value_i
-        )
-
-        self.inj_model.eval()
-        with torch.no_grad():
-            corrupted_output_1 = self.inj_model(self.images)
-
-        assert not torch.all(corrupted_output_1[0].eq(self.output[0]))
-        assert torch.all(corrupted_output_1[1].eq(self.output[1]))
-        assert not torch.all(corrupted_output_1[2].eq(self.output[2]))
-        assert not torch.all(corrupted_output_1[3].eq(self.output[3]))
+        assert torch.all(corrupted_output_1.eq(self.output))

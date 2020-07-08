@@ -27,5 +27,5 @@ jobs:
           use-flake8: true
           use-black: true
           use-mypy: false
-          use-isort: true
+          use-isort: false
           extra-flake8-options: --max-line-length 88 --ignore E203,W503

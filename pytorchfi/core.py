@@ -4,7 +4,6 @@ pytorchfi.core contains the core functionality for fault injections.
 
 import copy
 import logging
-import random
 
 import torch
 import torch.nn as nn
@@ -27,13 +26,15 @@ class fault_injection:
         self.CORRUPT_W = -1
         self.CORRUPT_VALUE = None
 
-        self.OUTPUT_SIZE = []
         self.CURRENT_CONV = 0
+        self.OUTPUT_SIZE = []
         self.HANDLES = []
 
-        b = kwargs.get("b", 1)
-        c = kwargs.get("c", 3)
-        use_cuda = kwargs.get("use_cuda", next(model.parameters()).is_cuda)
+        self.imageC = kwargs.get("c", 3)
+        self.imageH = h
+        self.imageW = w
+
+        self.use_cuda = kwargs.get("use_cuda", next(model.parameters()).is_cuda)
         model_dtype = next(model.parameters()).dtype
 
         self.ORIG_MODEL = model
@@ -44,8 +45,11 @@ class fault_injection:
             if isinstance(param, nn.Conv2d):
                 handles.append(param.register_forward_hook(self._save_output_size))
 
-        device = "cuda" if use_cuda else None
-        _dummyTensor = torch.randn(b, c, h, w, dtype=model_dtype, device=device)
+        b = 1  # dummy inference only requires batchsize of 1
+        device = "cuda" if self.use_cuda else None
+        _dummyTensor = torch.randn(
+            b, self.imageC, self.imageH, self.imageW, dtype=model_dtype, device=device
+        )
 
         self.ORIG_MODEL(_dummyTensor)
 
@@ -91,66 +95,49 @@ class fault_injection:
 
     def declare_weight_fi(self, **kwargs):
         self._fi_state_reset()
-        custom_function = False
-        zero_layer = False
-        rand_inj = False
+        CUSTOM_INJECTION = False
+        CUSTOM_FUNCTION = False
 
         if kwargs:
             if "function" in kwargs:
-                custom_function, function = True, kwargs.get("function")
-                corrupt_idx = kwargs.get("index", 0)
-            elif kwargs.get("zero", False):
-                zero_layer = True
-            elif kwargs.get("rand", False):
-                rand_inj = True
-                min_val = kwargs.get("min_rand_val")
-                max_val = kwargs.get("max_rand_val")
+                CUSTOM_INJECTION, CUSTOM_FUNCTION = True, kwargs.get("function")
+                corrupt_layer = kwargs.get("conv_num", -1)
+                corrupt_k = kwargs.get("k", -1)
+                corrupt_c = kwargs.get("c", -1)
+                corrupt_kH = kwargs.get("h", -1)
+                corrupt_kW = kwargs.get("w", -1)
             else:
+                corrupt_layer = kwargs.get("conv_num", -1)
+                corrupt_k = kwargs.get("k", -1)
+                corrupt_c = kwargs.get("c", -1)
+                corrupt_kH = kwargs.get("h", -1)
+                corrupt_kW = kwargs.get("w", -1)
                 corrupt_value = kwargs.get("value", -1)
-                corrupt_idx = kwargs.get("index", -1)
-            corrupt_layer = kwargs.get("layer", -1)
         else:
             raise ValueError("Please specify an injection or injection function")
 
         self.CORRUPTED_MODEL = copy.deepcopy(self.ORIG_MODEL)
+        corrupt_idx = [corrupt_k, corrupt_c, corrupt_kH, corrupt_kW]
 
-        num_layers = 0
-        for name, param in self.CORRUPTED_MODEL.named_parameters():
-            if name.split(".")[-1] == "weight":
-                num_layers += 1
         curr_layer = 0
-        orig_value = 0
-
-        if rand_inj:
-            corrupt_layer = random.randint(0, num_layers - 1)
         for name, param in self.CORRUPTED_MODEL.named_parameters():
-            if name.split(".")[-1] == "weight":
+            if "weight" in name and "features" in name:
                 if curr_layer == corrupt_layer:
-                    if zero_layer:
-                        param.data[:] = 0
-                        logging.info("Zero weight layer")
-                        logging.info("Layer index: %s" % corrupt_layer)
-                    else:
-                        if rand_inj:
-                            corrupt_value = random.uniform(min_val, max_val)
-                            corrupt_idx = list()
-                            for dim in param.size():
-                                corrupt_idx.append(random.randint(0, dim - 1))
-                        corrupt_idx = (
-                            tuple(corrupt_idx)
-                            if isinstance(corrupt_idx, list)
-                            else corrupt_idx
-                        )
-                        orig_value = param.data[corrupt_idx].item()
-                        if custom_function:
-                            corrupt_value = function(param.data[tuple(corrupt_idx)])
+                    corrupt_idx = (
+                        tuple(corrupt_idx)
+                        if isinstance(corrupt_idx, list)
+                        else corrupt_idx
+                    )
+                    orig_value = param.data[corrupt_idx].item()
+                    if CUSTOM_INJECTION:
+                        corrupt_value = CUSTOM_FUNCTION(param.data, corrupt_idx)
+                    param.data[corrupt_idx] = corrupt_value
 
-                        param.data[corrupt_idx] = corrupt_value
-                        logging.info("Weight Injection")
-                        logging.info("Layer index: %s" % corrupt_layer)
-                        logging.info("Module: %s" % name)
-                        logging.info("Original value: %s" % orig_value)
-                        logging.info("Injected value: %s" % corrupt_value)
+                    logging.info("Weight Injection")
+                    logging.info("Layer index: %s" % corrupt_layer)
+                    logging.info("Module: %s" % name)
+                    logging.info("Original value: %s" % orig_value)
+                    logging.info("Injected value: %s" % corrupt_value)
 
                 curr_layer += 1
         return self.CORRUPTED_MODEL
@@ -163,6 +150,11 @@ class fault_injection:
         if kwargs:
             if "function" in kwargs:
                 CUSTOM_INJECTION, INJECTION_FUNCTION = True, kwargs.get("function")
+                self.CORRUPT_CONV = kwargs.get("conv_num", -1)
+                self.CORRUPT_BATCH = kwargs.get("batch", -1)
+                self.CORRUPT_C = kwargs.get("c", -1)
+                self.CORRUPT_H = kwargs.get("h", -1)
+                self.CORRUPT_W = kwargs.get("w", -1)
             else:
                 self.CORRUPT_CONV = kwargs.get("conv_num", -1)
                 self.CORRUPT_BATCH = kwargs.get("batch", -1)
@@ -241,11 +233,11 @@ class fault_injection:
                 and self.CORRUPT_W < self.OUTPUT_SIZE[self.CORRUPT_CONV][3]
             ), "Invalid W!"
 
-    def _set_value(self, model, input, output):
+    def _set_value(self, module, input, output):
         if type(self.CORRUPT_CONV) == list:
             inj_list = list(
                 filter(
-                    lambda x: self.CORRUPT_CONV[x] == self.CURRENT_CONV,
+                    lambda x: self.CORRUPT_CONV[x] == self.get_curr_conv(),
                     range(len(self.CORRUPT_CONV)),
                 )
             )
@@ -267,11 +259,10 @@ class fault_injection:
                 output[self.CORRUPT_BATCH[i]][self.CORRUPT_C[i]][self.CORRUPT_H[i]][
                     self.CORRUPT_W[i]
                 ] = self.CORRUPT_VALUE[i]
-            self.CURRENT_CONV += 1
 
         else:
             self.assert_inj_bounds()
-            if self.CURRENT_CONV == self.CORRUPT_CONV:
+            if self.get_curr_conv() == self.CORRUPT_CONV:
                 logging.info(
                     "Original value at [%d][%d][%d][%d]: %d"
                     % (
@@ -288,7 +279,8 @@ class fault_injection:
                 output[self.CORRUPT_BATCH][self.CORRUPT_C][self.CORRUPT_H][
                     self.CORRUPT_W
                 ] = self.CORRUPT_VALUE
-            self.CURRENT_CONV += 1
+
+        self.updateConv()
 
     def _save_output_size(self, module, input, output):
         self.OUTPUT_SIZE.append(list(output.size()))
@@ -301,6 +293,21 @@ class fault_injection:
 
     def get_output_size(self):
         return self.OUTPUT_SIZE
+
+    def updateConv(self, value=1):
+        self.CURRENT_CONV += value
+
+    def reset_curr_conv(self):
+        self.CURRENT_CONV = 0
+
+    def set_corrupt_conv(self, value):
+        self.CORRUPT_CONV = value
+
+    def get_curr_conv(self):
+        return self.CURRENT_CONV
+
+    def get_corrupt_conv(self):
+        return self.CORRUPT_CONV
 
     def get_total_batches(self):
         return self._BATCH_SIZE
