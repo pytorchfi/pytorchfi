@@ -237,7 +237,7 @@ class fault_injection:
         if type(self.CORRUPT_CONV) == list:
             inj_list = list(
                 filter(
-                    lambda x: self.CORRUPT_CONV[x] == self.CURRENT_CONV,
+                    lambda x: self.CORRUPT_CONV[x] == self.get_curr_conv(),
                     range(len(self.CORRUPT_CONV)),
                 )
             )
@@ -262,7 +262,7 @@ class fault_injection:
 
         else:
             self.assert_inj_bounds()
-            if self.CURRENT_CONV == self.CORRUPT_CONV:
+            if self.get_curr_conv() == self.CORRUPT_CONV:
                 logging.info(
                     "Original value at [%d][%d][%d][%d]: %d"
                     % (
@@ -280,7 +280,7 @@ class fault_injection:
                     self.CORRUPT_W
                 ] = self.CORRUPT_VALUE
 
-        self.CURRENT_CONV += 1
+        self.updateConv()
 
     def _save_output_size(self, module, input, output):
         self.OUTPUT_SIZE.append(list(output.size()))
@@ -288,17 +288,14 @@ class fault_injection:
     def get_original_model(self):
         return self.ORIG_MODEL
 
-    def get_use_cuda(self):
-        return self.use_cuda
-
     def get_corrupted_model(self):
         return self.CORRUPTED_MODEL
 
     def get_output_size(self):
         return self.OUTPUT_SIZE
 
-    def updateConv(self):
-        self.CURRENT_CONV += 1
+    def updateConv(self, value=1):
+        self.CURRENT_CONV += value
 
     def reset_curr_conv(self):
         self.CURRENT_CONV = 0

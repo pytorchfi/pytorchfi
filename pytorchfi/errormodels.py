@@ -215,11 +215,7 @@ class single_bit_flip_func(core.fault_injection):
 
         # GPU contention causes a weird bug...
         if not bits_str_new.isdigit():
-            logging.info("orig value:", orig_value)
-            logging.info("max value:", max_value)
-            logging.info("bit_pos:", bit_pos)
-            logging.info("total bits:", total_bits)
-            logging.info("bit string:", bits_str_new)
+            logging.info("Error: Not all the bits are digits (0/1)")
 
         # convert to quantum
         assert bits_str_new.isdigit()
