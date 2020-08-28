@@ -16,7 +16,7 @@
   <a href="#background">Background</a> •
   <a href="#usage">Usage</a> •
   <a href="#code">Code</a> •
-  <a href="#contributing">Contributing</a> •
+  <a href="#contributors">Contributors</a> •
   <a href="#citation">Citation</a> •
   <a href="#license">License</a>
 </p>
@@ -75,7 +75,7 @@ The main source code of PyTorchFI is held in `pytorchfi`, which carries both `co
 
 All python code is formatted with [black](https://black.readthedocs.io/en/stable/).
 
-## Contributing
+## Contributors
 
 Before contributing, please refer to our [contributing guidelines](https://github.com/pytorchfi/pytorchfi/blob/master/CONTRIBUTING.md).
 
