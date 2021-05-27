@@ -85,13 +85,14 @@ Before contributing, please refer to our [contributing guidelines](https://githu
 - [Siva Kumar Sastry Hari](https://research.nvidia.com/person/siva-hari) (NVIDIA)
 - [Abdulrahman Mahmoud](http://amahmou2.web.engr.illinois.edu/) (UIUC)
 - [Alex Nobbe](https://github.com/Alexn99) (UIUC)
+- [Jose Rodrigo Sanchez Vicarte](https://jose-sv.github.io/) (UIUC)
 
 ## Citation
 
 View the [published paper](https://ieeexplore.ieee.org/abstract/document/9151812). If you use or reference PyTorchFI, please cite:
 
 ```
-@INPROCEEDINGS{9151812,
+@INPROCEEDINGS{PytorchFIMahmoudAggarwalDSML20,
 author={A. {Mahmoud} and N. {Aggarwal} and A. {Nobbe} and J. R. S. {Vicarte} and S. V. {Adve} and C. W. {Fletcher} and I. {Frosio} and S. K. S. {Hari}},
 booktitle={2020 50th Annual IEEE/IFIP International Conference on Dependable Systems and Networks Workshops (DSN-W)},
 title={PyTorchFI: A Runtime Perturbation Tool for DNNs},
