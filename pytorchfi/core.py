@@ -40,11 +40,7 @@ class fault_injection:
         self.ORIG_MODEL = model
         self._BATCH_SIZE = batch_size
 
-        handles = []
-        for param in self.ORIG_MODEL.modules():
-            for i in layer_types:
-                if isinstance(param, i):
-                    handles.append(param.register_forward_hook(self._save_output_size))
+        base, handles = self._traverseModelAndSetHooks(self.ORIG_MODEL, layer_types)
 
         b = 1  # dummy inference only requires batchsize of 1
         device = "cuda" if self.use_cuda else None
@@ -66,6 +62,25 @@ class fault_injection:
                 ]
             )
         )
+
+    def _traverseModelAndSetHooks(self, model, layer_types):
+        handles = []
+        base = []
+        for layer in model.children():
+            if list(layer.children()) == []:
+
+                for i in layer_types:
+                    if isinstance(layer, i):
+                        base.append(layer)
+                        handles.append(layer.register_forward_hook(self._save_output_size))
+            else:
+                subBase, subHandles = self._traverseModelAndSetHooks(layer, layer_types)
+                for i in subBase:
+                    base.append(i)
+                for i in subHandles:
+                    handles.append(i)
+
+        return (base, handles)
 
     def fi_reset(self):
         self._fi_state_reset()
