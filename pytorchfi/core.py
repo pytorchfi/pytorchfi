@@ -10,7 +10,7 @@ import torch.nn as nn
 
 
 class fault_injection:
-    def __init__(self, model, h, w, batch_size, **kwargs):
+    def __init__(self, model, h, w, batch_size, layer_types=[torch.nn.Conv2d], **kwargs):
         logging.basicConfig(format="%(asctime)-15s %(clientip)s %(user)-8s %(message)s")
         self.ORIG_MODEL = None
         self.CORRUPTED_MODEL = None
@@ -42,8 +42,9 @@ class fault_injection:
 
         handles = []
         for param in self.ORIG_MODEL.modules():
-            if isinstance(param, nn.Conv2d):
-                handles.append(param.register_forward_hook(self._save_output_size))
+            for i in layer_types:
+                if isinstance(param, i):
+                    handles.append(param.register_forward_hook(self._save_output_size))
 
         b = 1  # dummy inference only requires batchsize of 1
         device = "cuda" if self.use_cuda else None
