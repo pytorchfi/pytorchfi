@@ -10,9 +10,10 @@ class TestCoreGetFuncs:
     """
 
     def setup_class(self):
-        self.BATCH_SIZE = 1
+        self.BATCH_SIZE = 4
         self.WORKERS = 1
         self.img_size = 32
+        self.LAYER_TYPES=[torch.nn.Conv2d]
         self.USE_GPU = False
 
         self.model, self.dataset = helper_setUp_CIFAR10_same(
@@ -31,21 +32,25 @@ class TestCoreGetFuncs:
             self.img_size,
             self.img_size,
             self.BATCH_SIZE,
+            layer_types=self.LAYER_TYPES,
             use_cuda=self.USE_GPU,
         )
 
     def test_get_output_size(self):
         shape = [
-            [1, 64, 8, 8],
-            [1, 192, 4, 4],
-            [1, 384, 2, 2],
-            [1, 256, 2, 2],
-            [1, 256, 2, 2],
+            [4, 64, 8, 8],
+            [4, 192, 4, 4],
+            [4, 384, 2, 2],
+            [4, 256, 2, 2],
+            [4, 256, 2, 2],
         ]
         assert self.p.get_output_size() == shape
 
     def test_get_total_batches(self):
-        assert self.p.get_total_batches() == self.BATCH_SIZE
+        assert self.p.get_total_batches() == 4
+
+    def test_get_layer_types(self):
+        assert self.p.get_layer_types() == [torch.nn.Conv2d]
 
     def test_get_total_conv(self):
         assert self.p.get_total_conv() == 5

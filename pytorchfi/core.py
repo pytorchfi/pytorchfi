@@ -39,10 +39,11 @@ class fault_injection:
 
         self.ORIG_MODEL = model
         self._BATCH_SIZE = batch_size
+        self._LAYER_TYPES = layer_types
 
         shapes, handles = self._traverseModelAndSetHooks(self.ORIG_MODEL, layer_types)
 
-        b = 1  # dummy inference only requires batchsize of 1
+        b = self._BATCH_SIZE  # dummy inference only requires batchsize of 1
         device = "cuda" if self.use_cuda else None
         _dummyTensor = torch.randn(
             b, self.imageC, self.imageH, self.imageW, dtype=model_dtype, device=device
@@ -309,6 +310,9 @@ class fault_injection:
 
     def get_output_size(self):
         return self.OUTPUT_SIZE
+
+    def get_layer_types(self):
+        return self._LAYER_TYPES
 
     def updateConv(self, value=1):
         self.CURRENT_CONV += value
