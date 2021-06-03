@@ -56,7 +56,12 @@ class TestWeightFIcpu:
         assert not torch.all(corrupted_output_1.eq(self.output))
 
         self.inj_model = self.p.declare_weight_fi(
-            conv_num=conv_i, k=k, c=c_i, h=h_i, w=w_i, value=0.01388985849916935,
+            conv_num=conv_i,
+            k=k,
+            c=c_i,
+            h=h_i,
+            w=w_i,
+            value=0.01388985849916935,
         )
 
         self.inj_model.eval()
@@ -66,7 +71,12 @@ class TestWeightFIcpu:
         assert torch.all(uncorrupted_output.eq(self.output))
 
         self.inj_model = self.p.declare_weight_fi(
-            conv_num=conv_i, k=k, c=c_i, h=h_i, w=w_i, value=inj_value_i * 2,
+            conv_num=conv_i,
+            k=k,
+            c=c_i,
+            h=h_i,
+            w=w_i,
+            value=inj_value_i * 2,
         )
 
         self.inj_model.eval()
