@@ -41,7 +41,9 @@ class fault_injection:
         self._BATCH_SIZE = batch_size
         self._LAYER_TYPES = layer_types
 
-        handles, shapes = self._traverseModelAndSetHooks(self.ORIG_MODEL, layer_types)
+        handles, shapes = self._traverseModelAndSetHooks(
+            self.ORIG_MODEL, self._LAYER_TYPES
+        )
 
         b = 1  # profiling only needs one batch element
 
