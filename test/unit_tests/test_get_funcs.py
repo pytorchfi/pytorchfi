@@ -38,11 +38,11 @@ class TestCoreGetFuncs:
 
     def test_get_output_size(self):
         shape = [
-            [4, 64, 8, 8],
-            [4, 192, 4, 4],
-            [4, 384, 2, 2],
-            [4, 256, 2, 2],
-            [4, 256, 2, 2],
+            [1, 64, 8, 8],
+            [1, 192, 4, 4],
+            [1, 384, 2, 2],
+            [1, 256, 2, 2],
+            [1, 256, 2, 2],
         ]
         assert self.p.get_output_size() == shape
 

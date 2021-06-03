@@ -10,7 +10,7 @@ import torch.nn as nn
 
 
 class fault_injection:
-    def __init__(self, model, h, w, batch_size, layer_types=[torch.nn.Conv2d], **kwargs):
+    def __init__(self, model, h, w, batch_size, layer_types=[nn.Conv2d], **kwargs):
         logging.basicConfig(format="%(asctime)-15s %(clientip)s %(user)-8s %(message)s")
         self.ORIG_MODEL = None
         self.CORRUPTED_MODEL = None
@@ -41,9 +41,10 @@ class fault_injection:
         self._BATCH_SIZE = batch_size
         self._LAYER_TYPES = layer_types
 
-        shapes, handles = self._traverseModelAndSetHooks(self.ORIG_MODEL, layer_types)
+        handles, shapes = self._traverseModelAndSetHooks(self.ORIG_MODEL, layer_types)
 
-        b = self._BATCH_SIZE  # dummy inference only requires batchsize of 1
+        b = 1   # profiling only needs one batch element
+
         device = "cuda" if self.use_cuda else None
         _dummyTensor = torch.randn(
             b, self.imageC, self.imageH, self.imageW, dtype=model_dtype, device=device
@@ -68,20 +69,21 @@ class fault_injection:
         handles = []
         shape = []
         for layer in model.children():
+            # leaf node
             if list(layer.children()) == []:
-
                 for i in layer_types:
                     if isinstance(layer, i):
-                        shape.append(layer)
                         handles.append(layer.register_forward_hook(self._save_output_size))
+                        shape.append(layer)
+            # unpack node
             else:
-                subBase, subHandles = self._traverseModelAndSetHooks(layer, layer_types)
-                for i in subBase:
-                    shape.append(i)
+                subHandles, subBase = self._traverseModelAndSetHooks(layer, layer_types)
                 for i in subHandles:
                     handles.append(i)
+                for i in subBase:
+                    shape.append(i)
 
-        return (shape, handles)
+        return (handles, shape)
 
     def fi_reset(self):
         self._fi_state_reset()
@@ -97,6 +99,7 @@ class fault_injection:
             self.CORRUPT_H,
             self.CORRUPT_W,
             self.CORRUPT_VALUE,
+            self._LAYER_TYPES,
         ) = (
             0,
             -1,
@@ -105,6 +108,7 @@ class fault_injection:
             -1,
             -1,
             None,
+            [nn.Conv2d]
         )
 
         for i in range(len(self.HANDLES)):
