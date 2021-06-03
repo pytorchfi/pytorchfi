@@ -1,5 +1,5 @@
 """
-pytorchfi.errormodels provides different error models out-of-the-box for use.
+pytorchfi.error_models provides different error models out-of-the-box for use.
 """
 
 import random
