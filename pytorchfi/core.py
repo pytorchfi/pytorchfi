@@ -104,16 +104,7 @@ class fault_injection:
             self.CORRUPT_W,
             self.CORRUPT_VALUE,
             self._LAYER_TYPES,
-        ) = (
-            0,
-            -1,
-            -1,
-            -1,
-            -1,
-            -1,
-            None,
-            [nn.Conv2d]
-        )
+        ) = (0, -1, -1, -1, -1, -1, None, [nn.Conv2d])
 
         for i in range(len(self.HANDLES)):
             self.HANDLES[i].remove()
