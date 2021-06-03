@@ -13,7 +13,7 @@ class TestCoreGetFuncs:
         self.BATCH_SIZE = 4
         self.WORKERS = 1
         self.img_size = 32
-        self.LAYER_TYPES=[torch.nn.Conv2d]
+        self.LAYER_TYPES = [torch.nn.Conv2d]
         self.USE_GPU = False
 
         self.model, self.dataset = helper_setUp_CIFAR10_same(
