@@ -1,8 +1,8 @@
 import torch
 import random
 from pytorchfi.core import fault_injection as pfi_core
-from pytorchfi.errormodels import single_bit_flip_func as pfi_core_func
-from pytorchfi.errormodels import (
+from pytorchfi.error_models import (
+    single_bit_flip_func,
     random_inj_per_layer,
     random_inj_per_layer_batched,
     random_neuron_inj,
@@ -186,7 +186,7 @@ class TestNeuronErrorModelsFunc:
         with torch.no_grad():
             self.output = self.model(self.images)
 
-        self.p = pfi_core_func(
+        self.p = single_bit_flip_func(
             self.model,
             self.img_size,
             self.img_size,
