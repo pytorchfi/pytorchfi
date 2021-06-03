@@ -43,7 +43,7 @@ class fault_injection:
 
         handles, shapes = self._traverseModelAndSetHooks(self.ORIG_MODEL, layer_types)
 
-        b = 1   # profiling only needs one batch element
+        b = 1  # profiling only needs one batch element
 
         device = "cuda" if self.use_cuda else None
         _dummyTensor = torch.randn(
@@ -73,7 +73,9 @@ class fault_injection:
             if list(layer.children()) == []:
                 for i in layer_types:
                     if isinstance(layer, i):
-                        handles.append(layer.register_forward_hook(self._save_output_size))
+                        handles.append(
+                            layer.register_forward_hook(self._save_output_size)
+                        )
                         shape.append(layer)
             # unpack node
             else:
@@ -100,16 +102,7 @@ class fault_injection:
             self.CORRUPT_W,
             self.CORRUPT_VALUE,
             self._LAYER_TYPES,
-        ) = (
-            0,
-            -1,
-            -1,
-            -1,
-            -1,
-            -1,
-            None,
-            [nn.Conv2d]
-        )
+        ) = (0, -1, -1, -1, -1, -1, None, [nn.Conv2d])
 
         for i in range(len(self.HANDLES)):
             self.HANDLES[i].remove()
