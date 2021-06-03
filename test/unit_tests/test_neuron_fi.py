@@ -63,7 +63,12 @@ class TestNeuronFIgpu:
         assert not torch.all(corrupted_output_1.eq(self.output))
 
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=0,
+            batch=batch_i,
+            conv_num=conv_i,
+            c=c_i,
+            h=h_i,
+            w=w_i,
+            value=0,
         )
 
         self.inj_model.eval()
@@ -136,7 +141,12 @@ class TestNeuronFIcpu:
         assert not torch.all(corrupted_output_1.eq(self.output))
 
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, conv_num=conv_i, c=c_i, h=h_i, w=w_i, value=0,
+            batch=batch_i,
+            conv_num=conv_i,
+            c=c_i,
+            h=h_i,
+            w=w_i,
+            value=0,
         )
 
         self.inj_model.eval()
