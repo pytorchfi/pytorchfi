@@ -49,8 +49,14 @@ class TestCoreGetFuncs:
     def test_get_total_batches(self):
         assert self.p.get_total_batches() == 4
 
-    def test_get_layer_types(self):
-        assert self.p.get_layer_types() == [torch.nn.Conv2d]
+    def test_get_inj_layer_types(self):
+        assert self.p.get_inj_layer_types() == [torch.nn.Conv2d]
+
+    def test_get_layer_type(self):
+        assert self.p.get_layer_type(3) == torch.nn.Conv2d
+
+    def test_get_layer_dim(self):
+        assert self.p.get_layer_dim(3) == 4
 
     def test_get_total_layers(self):
         assert self.p.get_total_layers() == 5

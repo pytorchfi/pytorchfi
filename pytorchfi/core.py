@@ -28,8 +28,8 @@ class fault_injection:
 
         self.CURR_LAYER = 0
         self.OUTPUT_SIZE = []
-        self.LAYER_TYPE = []
-        self.LAYER_DIM = []
+        self.LAYERS_TYPE = []
+        self.LAYERS_DIM = []
         self.HANDLES = []
 
         self.imageC = kwargs.get("c", 3)
@@ -304,8 +304,8 @@ class fault_injection:
         shape = list(output.size())
         dim = len(shape)
 
-        self.LAYER_TYPE.append(module)
-        self.LAYER_DIM.append(dim)
+        self.LAYERS_TYPE.append(type(module))
+        self.LAYERS_DIM.append(dim)
         self.OUTPUT_SIZE.append(shape)
 
     def get_original_model(self):
@@ -317,7 +317,13 @@ class fault_injection:
     def get_output_size(self):
         return self.OUTPUT_SIZE
 
-    def get_layer_types(self):
+    def get_layer_type(self, layer_num):
+        return self.LAYERS_TYPE[layer_num]
+
+    def get_layer_dim(self, layer_num):
+        return self.LAYERS_DIM[layer_num]
+
+    def get_inj_layer_types(self):
         return self._INJ_LAYER_TYPES
 
     def updateConv(self, value=1):
