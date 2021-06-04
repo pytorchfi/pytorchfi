@@ -28,6 +28,8 @@ class fault_injection:
 
         self.CURR_LAYER = 0
         self.OUTPUT_SIZE = []
+        self.LAYER_TYPE = []
+        self.LAYER_DIM = []
         self.HANDLES = []
 
         self.imageC = kwargs.get("c", 3)
@@ -39,10 +41,10 @@ class fault_injection:
 
         self.ORIG_MODEL = model
         self._BATCH_SIZE = batch_size
-        self._LAYER_TYPES = layer_types
+        self._INJ_LAYER_TYPES = layer_types
 
         handles, shapes = self._traverseModelAndSetHooks(
-            self.ORIG_MODEL, self._LAYER_TYPES
+            self.ORIG_MODEL, self._INJ_LAYER_TYPES
         )
 
         b = 1  # profiling only needs one batch element
@@ -103,7 +105,7 @@ class fault_injection:
             self.CORRUPT_H,
             self.CORRUPT_W,
             self.CORRUPT_VALUE,
-            self._LAYER_TYPES,
+            self._INJ_LAYER_TYPES,
         ) = (0, -1, -1, -1, -1, -1, None, [nn.Conv2d])
 
         for i in range(len(self.HANDLES)):
@@ -299,7 +301,12 @@ class fault_injection:
         self.updateConv()
 
     def _save_output_size(self, module, input, output):
-        self.OUTPUT_SIZE.append(list(output.size()))
+        shape = list(output.size())
+        dim = len(shape)
+
+        self.LAYER_TYPE.append(module)
+        self.LAYER_DIM.append(dim)
+        self.OUTPUT_SIZE.append(shape)
 
     def get_original_model(self):
         return self.ORIG_MODEL
@@ -311,7 +318,7 @@ class fault_injection:
         return self.OUTPUT_SIZE
 
     def get_layer_types(self):
-        return self._LAYER_TYPES
+        return self._INJ_LAYER_TYPES
 
     def updateConv(self, value=1):
         self.CURR_LAYER += value

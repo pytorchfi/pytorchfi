@@ -52,7 +52,6 @@ class TestLayers:
         inj_softmax = self.softmax(inj_output)
         inj_label = list(torch.argmax(inj_softmax, dim=1))[0].item()
 
-        print(p.get_total_layers())
         assert inj_label == 578
 
     @pytest.mark.skip(reason="Under development")
