@@ -69,6 +69,26 @@ class fault_injection:
             )
         )
 
+    def fi_reset(self):
+        self._fi_state_reset()
+        self.CORRUPTED_MODEL = None
+        logging.info("Reset fault injector")
+
+    def _fi_state_reset(self):
+        (
+            self.CURR_LAYER,
+            self.CORRUPT_BATCH,
+            self.CORRUPT_LAYER,
+            self.CORRUPT_C,
+            self.CORRUPT_H,
+            self.CORRUPT_W,
+            self.CORRUPT_VALUE,
+            self._INJ_LAYER_TYPES,
+        ) = (0, -1, -1, -1, -1, -1, None, [nn.Conv2d])
+
+        for i in range(len(self.HANDLES)):
+            self.HANDLES[i].remove()
+
     def _traverseModelAndSetHooks(self, model, layer_types):
         handles = []
         shape = []
@@ -90,26 +110,6 @@ class fault_injection:
                     shape.append(i)
 
         return (handles, shape)
-
-    def fi_reset(self):
-        self._fi_state_reset()
-        self.CORRUPTED_MODEL = None
-        logging.info("Reset fault injector")
-
-    def _fi_state_reset(self):
-        (
-            self.CURR_LAYER,
-            self.CORRUPT_BATCH,
-            self.CORRUPT_LAYER,
-            self.CORRUPT_C,
-            self.CORRUPT_H,
-            self.CORRUPT_W,
-            self.CORRUPT_VALUE,
-            self._INJ_LAYER_TYPES,
-        ) = (0, -1, -1, -1, -1, -1, None, [nn.Conv2d])
-
-        for i in range(len(self.HANDLES)):
-            self.HANDLES[i].remove()
 
     def declare_weight_fi(self, **kwargs):
         self._fi_state_reset()
