@@ -208,7 +208,7 @@ class fault_injection:
             index = kwargs.get("index", -1)
             assert (
                 self.CORRUPT_CONV[index] >= 0
-                and self.CORRUPT_CONV[index] < self.get_total_conv()
+                and self.CORRUPT_CONV[index] < self.get_total_layers()
             ), "Invalid convolution!"
             assert (
                 self.CORRUPT_BATCH[index] >= 0
@@ -231,7 +231,7 @@ class fault_injection:
             ), "Invalid W!"
         else:
             assert (
-                self.CORRUPT_CONV >= 0 and self.CORRUPT_CONV < self.get_total_conv()
+                self.CORRUPT_CONV >= 0 and self.CORRUPT_CONV < self.get_total_layers()
             ), "Invalid convolution!"
             assert (
                 self.CORRUPT_BATCH >= 0 and self.CORRUPT_BATCH < self._BATCH_SIZE
@@ -331,7 +331,7 @@ class fault_injection:
     def get_total_batches(self):
         return self._BATCH_SIZE
 
-    def get_total_conv(self):
+    def get_total_layers(self):
         return len(self.OUTPUT_SIZE)
 
     def get_fmaps_num(self, layer):

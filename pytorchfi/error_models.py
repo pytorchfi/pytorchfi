@@ -19,7 +19,7 @@ def random_batch_element(pfi_model):
 
 def random_neuron_location(pfi_model, conv=-1):
     if conv == -1:
-        conv = random.randint(0, pfi_model.get_total_conv() - 1)
+        conv = random.randint(0, pfi_model.get_total_layers() - 1)
 
     c = random.randint(0, pfi_model.get_fmaps_num(conv) - 1)
     h = random.randint(0, pfi_model.get_fmaps_H(conv) - 1)
@@ -32,7 +32,7 @@ def random_weight_location(pfi_model, conv=-1):
     loc = list()
 
     if conv == -1:
-        corrupt_layer = random.randint(0, pfi_model.get_total_conv() - 1)
+        corrupt_layer = random.randint(0, pfi_model.get_total_layers() - 1)
     else:
         corrupt_layer = conv
     loc.append(corrupt_layer)
@@ -45,7 +45,7 @@ def random_weight_location(pfi_model, conv=-1):
                     loc.append(random.randint(0, dim - 1))
             curr_layer += 1
 
-    assert curr_layer == pfi_model.get_total_conv()
+    assert curr_layer == pfi_model.get_total_layers()
     assert len(loc) == 5
 
     return tuple(loc)
@@ -105,7 +105,7 @@ def random_inj_per_layer(pfi_model, min_val=-1, max_val=1):
     batch, conv_num, c_rand, h_rand, w_rand, value = ([] for i in range(6))
 
     b = random_batch_element(pfi_model)
-    for i in range(pfi_model.get_total_conv()):
+    for i in range(pfi_model.get_total_layers()):
         (conv, C, H, W) = random_neuron_location(pfi_model, conv=i)
         batch.append(b)
         conv_num.append(conv)
@@ -125,7 +125,7 @@ def random_inj_per_layer_batched(
 ):
     batch, conv_num, c_rand, h_rand, w_rand, value = ([] for i in range(6))
 
-    for i in range(pfi_model.get_total_conv()):
+    for i in range(pfi_model.get_total_layers()):
         if not randLoc:
             (conv, C, H, W) = random_neuron_location(pfi_model, conv=i)
         if not randVal:
@@ -272,7 +272,7 @@ class single_bit_flip_func(core.fault_injection):
                 ] = new_value
 
         self.updateConv()
-        if self.get_curr_conv() >= self.get_total_conv():
+        if self.get_curr_conv() >= self.get_total_layers():
             self.reset_curr_conv()
 
 

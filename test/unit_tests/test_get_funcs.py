@@ -52,8 +52,8 @@ class TestCoreGetFuncs:
     def test_get_layer_types(self):
         assert self.p.get_layer_types() == [torch.nn.Conv2d]
 
-    def test_get_total_conv(self):
-        assert self.p.get_total_conv() == 5
+    def test_get_total_layers(self):
+        assert self.p.get_total_layers() == 5
 
     def test_get_fmap_num(self):
         assert self.p.get_fmaps_num(0) == 64
