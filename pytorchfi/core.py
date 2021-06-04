@@ -20,13 +20,13 @@ class fault_injection:
         self.INJECTION_FUNCTION = None
 
         self.CORRUPT_BATCH = -1
-        self.CORRUPT_CONV = -1
+        self.CORRUPT_LAYER = -1
         self.CORRUPT_C = -1
         self.CORRUPT_H = -1
         self.CORRUPT_W = -1
         self.CORRUPT_VALUE = None
 
-        self.CURRENT_CONV = 0
+        self.CURR_LAYER = 0
         self.OUTPUT_SIZE = []
         self.HANDLES = []
 
@@ -96,9 +96,9 @@ class fault_injection:
 
     def _fi_state_reset(self):
         (
-            self.CURRENT_CONV,
+            self.CURR_LAYER,
             self.CORRUPT_BATCH,
-            self.CORRUPT_CONV,
+            self.CORRUPT_LAYER,
             self.CORRUPT_C,
             self.CORRUPT_H,
             self.CORRUPT_W,
@@ -166,13 +166,13 @@ class fault_injection:
         if kwargs:
             if "function" in kwargs:
                 CUSTOM_INJECTION, INJECTION_FUNCTION = True, kwargs.get("function")
-                self.CORRUPT_CONV = kwargs.get("layer_num", -1)
+                self.CORRUPT_LAYER = kwargs.get("layer_num", -1)
                 self.CORRUPT_BATCH = kwargs.get("batch", -1)
                 self.CORRUPT_C = kwargs.get("c", -1)
                 self.CORRUPT_H = kwargs.get("h", -1)
                 self.CORRUPT_W = kwargs.get("w", -1)
             else:
-                self.CORRUPT_CONV = kwargs.get("layer_num", -1)
+                self.CORRUPT_LAYER = kwargs.get("layer_num", -1)
                 self.CORRUPT_BATCH = kwargs.get("batch", -1)
                 self.CORRUPT_C = kwargs.get("c", -1)
                 self.CORRUPT_H = kwargs.get("h", -1)
@@ -180,7 +180,7 @@ class fault_injection:
                 self.CORRUPT_VALUE = kwargs.get("value", None)
 
                 logging.info("Declaring Specified Fault Injector")
-                logging.info("Convolution: %s" % self.CORRUPT_CONV)
+                logging.info("Convolution: %s" % self.CORRUPT_LAYER)
                 logging.info("Batch, x, y, z:")
                 logging.info(
                     "%s, %s, %s, %s"
@@ -204,11 +204,11 @@ class fault_injection:
         return self.CORRUPTED_MODEL
 
     def assert_inj_bounds(self, **kwargs):
-        if type(self.CORRUPT_CONV) == list:
+        if type(self.CORRUPT_LAYER) == list:
             index = kwargs.get("index", -1)
             assert (
-                self.CORRUPT_CONV[index] >= 0
-                and self.CORRUPT_CONV[index] < self.get_total_layers()
+                self.CORRUPT_LAYER[index] >= 0
+                and self.CORRUPT_LAYER[index] < self.get_total_layers()
             ), "Invalid convolution!"
             assert (
                 self.CORRUPT_BATCH[index] >= 0
@@ -217,44 +217,44 @@ class fault_injection:
             assert (
                 self.CORRUPT_C[index] >= 0
                 and self.CORRUPT_C[index]
-                < self.OUTPUT_SIZE[self.CORRUPT_CONV[index]][1]
+                < self.OUTPUT_SIZE[self.CORRUPT_LAYER[index]][1]
             ), "Invalid C!"
             assert (
                 self.CORRUPT_H[index] >= 0
                 and self.CORRUPT_H[index]
-                < self.OUTPUT_SIZE[self.CORRUPT_CONV[index]][2]
+                < self.OUTPUT_SIZE[self.CORRUPT_LAYER[index]][2]
             ), "Invalid H!"
             assert (
                 self.CORRUPT_W[index] >= 0
                 and self.CORRUPT_W[index]
-                < self.OUTPUT_SIZE[self.CORRUPT_CONV[index]][3]
+                < self.OUTPUT_SIZE[self.CORRUPT_LAYER[index]][3]
             ), "Invalid W!"
         else:
             assert (
-                self.CORRUPT_CONV >= 0 and self.CORRUPT_CONV < self.get_total_layers()
+                self.CORRUPT_LAYER >= 0 and self.CORRUPT_LAYER < self.get_total_layers()
             ), "Invalid convolution!"
             assert (
                 self.CORRUPT_BATCH >= 0 and self.CORRUPT_BATCH < self._BATCH_SIZE
             ), "Invalid batch!"
             assert (
                 self.CORRUPT_C >= 0
-                and self.CORRUPT_C < self.OUTPUT_SIZE[self.CORRUPT_CONV][1]
+                and self.CORRUPT_C < self.OUTPUT_SIZE[self.CORRUPT_LAYER][1]
             ), "Invalid C!"
             assert (
                 self.CORRUPT_H >= 0
-                and self.CORRUPT_H < self.OUTPUT_SIZE[self.CORRUPT_CONV][2]
+                and self.CORRUPT_H < self.OUTPUT_SIZE[self.CORRUPT_LAYER][2]
             ), "Invalid H!"
             assert (
                 self.CORRUPT_W >= 0
-                and self.CORRUPT_W < self.OUTPUT_SIZE[self.CORRUPT_CONV][3]
+                and self.CORRUPT_W < self.OUTPUT_SIZE[self.CORRUPT_LAYER][3]
             ), "Invalid W!"
 
     def _set_value(self, module, input, output):
-        if type(self.CORRUPT_CONV) == list:
+        if type(self.CORRUPT_LAYER) == list:
             inj_list = list(
                 filter(
-                    lambda x: self.CORRUPT_CONV[x] == self.get_curr_layer(),
-                    range(len(self.CORRUPT_CONV)),
+                    lambda x: self.CORRUPT_LAYER[x] == self.get_curr_layer(),
+                    range(len(self.CORRUPT_LAYER)),
                 )
             )
             for i in inj_list:
@@ -278,7 +278,7 @@ class fault_injection:
 
         else:
             self.assert_inj_bounds()
-            if self.get_curr_layer() == self.CORRUPT_CONV:
+            if self.get_curr_layer() == self.CORRUPT_LAYER:
                 logging.info(
                     "Original value at [%d][%d][%d][%d]: %d"
                     % (
@@ -314,19 +314,19 @@ class fault_injection:
         return self._LAYER_TYPES
 
     def updateConv(self, value=1):
-        self.CURRENT_CONV += value
+        self.CURR_LAYER += value
 
     def reset_curr_layer(self):
-        self.CURRENT_CONV = 0
+        self.CURR_LAYER = 0
 
     def set_corrupt_layer(self, value):
-        self.CORRUPT_CONV = value
+        self.CORRUPT_LAYER = value
 
     def get_curr_layer(self):
-        return self.CURRENT_CONV
+        return self.CURR_LAYER
 
     def get_corrupt_layer(self):
-        return self.CORRUPT_CONV
+        return self.CORRUPT_LAYER
 
     def get_total_batches(self):
         return self._BATCH_SIZE
