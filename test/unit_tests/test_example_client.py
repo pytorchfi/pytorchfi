@@ -43,7 +43,7 @@ class TestCoreExampleClient:
     def test_single_specified_neuron(self):
         (b, layer, C, H, W, err_val) = (0, 3, 4, 2, 4, 10000)
         inj = self.p.declare_neuron_fi(
-            batch=b, conv_num=layer, c=C, h=H, w=W, value=err_val
+            batch=b, layer_num=layer, c=C, h=H, w=W, value=err_val
         )
         inj_output = inj(self.IMAGE)
         inj_softmax = self.softmax(inj_output)
@@ -61,7 +61,7 @@ class TestCoreExampleClient:
             [20000, 10000],
         )
         inj = self.p.declare_neuron_fi(
-            batch=b, conv_num=layer, c=C, h=H, w=W, value=err_val
+            batch=b, layer_num=layer, c=C, h=H, w=W, value=err_val
         )
         inj_output = inj(self.IMAGE)
         inj_softmax = self.softmax(inj_output)

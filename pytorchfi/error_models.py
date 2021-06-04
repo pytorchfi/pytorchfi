@@ -17,24 +17,24 @@ def random_batch_element(pfi_model):
     return random.randint(0, pfi_model.get_total_batches() - 1)
 
 
-def random_neuron_location(pfi_model, conv=-1):
-    if conv == -1:
-        conv = random.randint(0, pfi_model.get_total_layers() - 1)
+def random_neuron_location(pfi_model, layer=-1):
+    if layer == -1:
+        layer = random.randint(0, pfi_model.get_total_layers() - 1)
 
-    c = random.randint(0, pfi_model.get_fmaps_num(conv) - 1)
-    h = random.randint(0, pfi_model.get_fmaps_H(conv) - 1)
-    w = random.randint(0, pfi_model.get_fmaps_W(conv) - 1)
+    c = random.randint(0, pfi_model.get_fmaps_num(layer) - 1)
+    h = random.randint(0, pfi_model.get_fmaps_H(layer) - 1)
+    w = random.randint(0, pfi_model.get_fmaps_W(layer) - 1)
 
-    return (conv, c, h, w)
+    return (layer, c, h, w)
 
 
-def random_weight_location(pfi_model, conv=-1):
+def random_weight_location(pfi_model, layer=-1):
     loc = list()
 
-    if conv == -1:
+    if layer == -1:
         corrupt_layer = random.randint(0, pfi_model.get_total_layers() - 1)
     else:
-        corrupt_layer = conv
+        corrupt_layer = layer
     loc.append(corrupt_layer)
 
     curr_layer = 0
@@ -63,11 +63,11 @@ Neuron Perturbation Models
 # single random neuron error in single batch element
 def random_neuron_inj(pfi_model, min_val=-1, max_val=1):
     b = random_batch_element(pfi_model)
-    (conv, C, H, W) = random_neuron_location(pfi_model)
+    (layer, C, H, W) = random_neuron_location(pfi_model)
     err_val = random_value(min_val=min_val, max_val=max_val)
 
     return pfi_model.declare_neuron_fi(
-        batch=b, conv_num=conv, c=C, h=H, w=W, value=err_val
+        batch=b, layer_num=layer, c=C, h=H, w=W, value=err_val
     )
 
 
@@ -75,47 +75,47 @@ def random_neuron_inj(pfi_model, min_val=-1, max_val=1):
 def random_neuron_inj_batched(
     pfi_model, min_val=-1, max_val=1, randLoc=True, randVal=True
 ):
-    batch, conv_num, c_rand, h_rand, w_rand, value = ([] for i in range(6))
+    batch, layer_num, c_rand, h_rand, w_rand, value = ([] for i in range(6))
 
     if not randLoc:
-        (conv, C, H, W) = random_neuron_location(pfi_model)
+        (layer, C, H, W) = random_neuron_location(pfi_model)
     if not randVal:
         err_val = random_value(min_val=min_val, max_val=max_val)
 
     for i in range(pfi_model.get_total_batches()):
         if randLoc:
-            (conv, C, H, W) = random_neuron_location(pfi_model)
+            (layer, C, H, W) = random_neuron_location(pfi_model)
         if randVal:
             err_val = random_value(min_val=min_val, max_val=max_val)
 
         batch.append(i)
-        conv_num.append(conv)
+        layer_num.append(layer)
         c_rand.append(C)
         h_rand.append(H)
         w_rand.append(W)
         value.append(err_val)
 
     return pfi_model.declare_neuron_fi(
-        batch=batch, conv_num=conv_num, c=c_rand, h=h_rand, w=w_rand, value=value
+        batch=batch, layer_num=layer_num, c=c_rand, h=h_rand, w=w_rand, value=value
     )
 
 
 # one random neuron error per layer in single batch element
 def random_inj_per_layer(pfi_model, min_val=-1, max_val=1):
-    batch, conv_num, c_rand, h_rand, w_rand, value = ([] for i in range(6))
+    batch, layer_num, c_rand, h_rand, w_rand, value = ([] for i in range(6))
 
     b = random_batch_element(pfi_model)
     for i in range(pfi_model.get_total_layers()):
-        (conv, C, H, W) = random_neuron_location(pfi_model, conv=i)
+        (layer, C, H, W) = random_neuron_location(pfi_model, layer=i)
         batch.append(b)
-        conv_num.append(conv)
+        layer_num.append(layer)
         c_rand.append(C)
         h_rand.append(H)
         w_rand.append(W)
         value.append(random_value(min_val=min_val, max_val=max_val))
 
     return pfi_model.declare_neuron_fi(
-        batch=batch, conv_num=conv_num, c=c_rand, h=h_rand, w=w_rand, value=value
+        batch=batch, layer_num=layer_num, c=c_rand, h=h_rand, w=w_rand, value=value
     )
 
 
@@ -123,29 +123,29 @@ def random_inj_per_layer(pfi_model, min_val=-1, max_val=1):
 def random_inj_per_layer_batched(
     pfi_model, min_val=-1, max_val=1, randLoc=True, randVal=True
 ):
-    batch, conv_num, c_rand, h_rand, w_rand, value = ([] for i in range(6))
+    batch, layer_num, c_rand, h_rand, w_rand, value = ([] for i in range(6))
 
     for i in range(pfi_model.get_total_layers()):
         if not randLoc:
-            (conv, C, H, W) = random_neuron_location(pfi_model, conv=i)
+            (layer, C, H, W) = random_neuron_location(pfi_model, layer=i)
         if not randVal:
             err_val = random_value(min_val=min_val, max_val=max_val)
 
         for b in range(pfi_model.get_total_batches()):
             if randLoc:
-                (conv, C, H, W) = random_neuron_location(pfi_model, conv=i)
+                (layer, C, H, W) = random_neuron_location(pfi_model, layer=i)
             if randVal:
                 err_val = random_value(min_val=min_val, max_val=max_val)
 
             batch.append(b)
-            conv_num.append(conv)
+            layer_num.append(layer)
             c_rand.append(C)
             h_rand.append(H)
             w_rand.append(W)
             value.append(err_val)
 
     return pfi_model.declare_neuron_fi(
-        batch=batch, conv_num=conv_num, c=c_rand, h=h_rand, w=w_rand, value=value
+        batch=batch, layer_num=layer_num, c=c_rand, h=h_rand, w=w_rand, value=value
     )
 
 
@@ -230,15 +230,15 @@ class single_bit_flip_func(core.fault_injection):
         return torch.tensor(new_value, dtype=save_type)
 
     def single_bit_flip_signed_across_batch(self, module, input, output):
-        corrupt_conv_set = self.get_corrupt_conv()
-        range_max = self.get_conv_max(self.get_curr_conv())
-        logging.info("curr_conv", self.get_curr_conv())
+        corrupt_conv_set = self.get_corrupt_layer()
+        range_max = self.get_conv_max(self.get_curr_layer())
+        logging.info("curr_conv", self.get_curr_layer())
         logging.info("range_max", range_max)
 
         if type(corrupt_conv_set) == list:
             inj_list = list(
                 filter(
-                    lambda x: corrupt_conv_set[x] == self.get_curr_conv(),
+                    lambda x: corrupt_conv_set[x] == self.get_curr_layer(),
                     range(len(corrupt_conv_set)),
                 )
             )
@@ -258,7 +258,7 @@ class single_bit_flip_func(core.fault_injection):
 
         else:
             self.assert_inj_bounds()
-            if self.get_curr_conv() == corrupt_conv_set:
+            if self.get_curr_layer() == corrupt_conv_set:
                 prev_value = output[self.CORRUPT_BATCH][self.CORRUPT_C][self.CORRUPT_H][
                     self.CORRUPT_W
                 ]
@@ -272,30 +272,30 @@ class single_bit_flip_func(core.fault_injection):
                 ] = new_value
 
         self.updateConv()
-        if self.get_curr_conv() >= self.get_total_layers():
-            self.reset_curr_conv()
+        if self.get_curr_layer() >= self.get_total_layers():
+            self.reset_curr_layer()
 
 
 def random_neuron_single_bit_inj_batched(pfi_model, layer_ranges, randLoc=True):
     pfi_model.set_conv_max(layer_ranges)
-    batch, conv_num, c_rand, h_rand, w_rand = ([] for i in range(5))
+    batch, layer_num, c_rand, h_rand, w_rand = ([] for i in range(5))
 
     if not randLoc:
-        (conv, C, H, W) = random_neuron_location(pfi_model)
+        (layer, C, H, W) = random_neuron_location(pfi_model)
 
     for i in range(pfi_model.get_total_batches()):
         if randLoc:
-            (conv, C, H, W) = random_neuron_location(pfi_model)
+            (layer, C, H, W) = random_neuron_location(pfi_model)
 
         batch.append(i)
-        conv_num.append(conv)
+        layer_num.append(layer)
         c_rand.append(C)
         h_rand.append(H)
         w_rand.append(W)
 
     return pfi_model.declare_neuron_fi(
         batch=batch,
-        conv_num=conv_num,
+        layer_num=layer_num,
         c=c_rand,
         h=h_rand,
         w=w_rand,
@@ -307,11 +307,11 @@ def random_neuron_single_bit_inj(pfi_model, layer_ranges):
     pfi_model.set_conv_max(layer_ranges)
 
     batch = random_batch_element(pfi_model)
-    (conv, C, H, W) = random_neuron_location(pfi_model)
+    (layer, C, H, W) = random_neuron_location(pfi_model)
 
     return pfi_model.declare_neuron_fi(
         batch=batch,
-        conv_num=conv,
+        layer_num=layer,
         c=C,
         h=H,
         w=W,
@@ -325,18 +325,18 @@ Weight Perturbation Models
 
 
 def random_weight_inj(pfi_model, corrupt_conv=-1, min_val=-1, max_val=1):
-    (conv, k, c_in, kH, kW) = random_weight_location(pfi_model, corrupt_conv)
+    (layer, k, c_in, kH, kW) = random_weight_location(pfi_model, corrupt_conv)
     faulty_val = random_value(min_val=min_val, max_val=max_val)
 
     return pfi_model.declare_weight_fi(
-        conv_num=conv, k=k, c=c_in, h=kH, w=kW, value=faulty_val
+        layer_num=layer, k=k, c=c_in, h=kH, w=kW, value=faulty_val
     )
 
 
 def zeroFunc_rand_weight(pfi_model):
-    (conv, k, c_in, kH, kW) = random_weight_location(pfi_model)
+    (layer, k, c_in, kH, kW) = random_weight_location(pfi_model)
     return pfi_model.declare_weight_fi(
-        function=_zero_rand_weight, conv_num=conv, k=k, c=c_in, h=kH, w=kW
+        function=_zero_rand_weight, layer_num=layer, k=k, c=c_in, h=kH, w=kW
     )
 
 

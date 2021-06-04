@@ -117,13 +117,13 @@ class fault_injection:
         if kwargs:
             if "function" in kwargs:
                 CUSTOM_INJECTION, CUSTOM_FUNCTION = True, kwargs.get("function")
-                corrupt_layer = kwargs.get("conv_num", -1)
+                corrupt_layer = kwargs.get("layer_num", -1)
                 corrupt_k = kwargs.get("k", -1)
                 corrupt_c = kwargs.get("c", -1)
                 corrupt_kH = kwargs.get("h", -1)
                 corrupt_kW = kwargs.get("w", -1)
             else:
-                corrupt_layer = kwargs.get("conv_num", -1)
+                corrupt_layer = kwargs.get("layer_num", -1)
                 corrupt_k = kwargs.get("k", -1)
                 corrupt_c = kwargs.get("c", -1)
                 corrupt_kH = kwargs.get("h", -1)
@@ -166,13 +166,13 @@ class fault_injection:
         if kwargs:
             if "function" in kwargs:
                 CUSTOM_INJECTION, INJECTION_FUNCTION = True, kwargs.get("function")
-                self.CORRUPT_CONV = kwargs.get("conv_num", -1)
+                self.CORRUPT_CONV = kwargs.get("layer_num", -1)
                 self.CORRUPT_BATCH = kwargs.get("batch", -1)
                 self.CORRUPT_C = kwargs.get("c", -1)
                 self.CORRUPT_H = kwargs.get("h", -1)
                 self.CORRUPT_W = kwargs.get("w", -1)
             else:
-                self.CORRUPT_CONV = kwargs.get("conv_num", -1)
+                self.CORRUPT_CONV = kwargs.get("layer_num", -1)
                 self.CORRUPT_BATCH = kwargs.get("batch", -1)
                 self.CORRUPT_C = kwargs.get("c", -1)
                 self.CORRUPT_H = kwargs.get("h", -1)
@@ -253,7 +253,7 @@ class fault_injection:
         if type(self.CORRUPT_CONV) == list:
             inj_list = list(
                 filter(
-                    lambda x: self.CORRUPT_CONV[x] == self.get_curr_conv(),
+                    lambda x: self.CORRUPT_CONV[x] == self.get_curr_layer(),
                     range(len(self.CORRUPT_CONV)),
                 )
             )
@@ -278,7 +278,7 @@ class fault_injection:
 
         else:
             self.assert_inj_bounds()
-            if self.get_curr_conv() == self.CORRUPT_CONV:
+            if self.get_curr_layer() == self.CORRUPT_CONV:
                 logging.info(
                     "Original value at [%d][%d][%d][%d]: %d"
                     % (
@@ -316,16 +316,16 @@ class fault_injection:
     def updateConv(self, value=1):
         self.CURRENT_CONV += value
 
-    def reset_curr_conv(self):
+    def reset_curr_layer(self):
         self.CURRENT_CONV = 0
 
-    def set_corrupt_conv(self, value):
+    def set_corrupt_layer(self, value):
         self.CORRUPT_CONV = value
 
-    def get_curr_conv(self):
+    def get_curr_layer(self):
         return self.CURRENT_CONV
 
-    def get_corrupt_conv(self):
+    def get_corrupt_layer(self):
         return self.CORRUPT_CONV
 
     def get_total_batches(self):
