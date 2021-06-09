@@ -213,6 +213,8 @@ class fault_injection:
         else:
             raise ValueError("Please specify an injection or injection function")
 
+        self.checkBounds(self.CORRUPT_BATCH, self.CORRUPT_LAYER, self.CORRUPT_DIM1, self.CORRUPT_DIM2, self.CORRUPT_DIM3)
+
         self.CORRUPTED_MODEL = copy.deepcopy(self.ORIG_MODEL)
         handles_neurons = self._traverseModelAndSetHooksNeurons(
             self.CORRUPTED_MODEL,
@@ -224,6 +226,18 @@ class fault_injection:
             self.HANDLES.append(i)
 
         return self.CORRUPTED_MODEL
+
+    def checkBounds(self, b, l, dim1, dim2, dim3):
+        assert len(b) == len(l), "Injection location missing values."
+        assert len(b) == len(dim1), "Injection location missing values."
+        assert len(b) == len(dim2), "Injection location missing values."
+        assert len(b) == len(dim3), "Injection location missing values."
+
+        logging.info("Checking bounds before runtime")
+        for i in range(len(b)):
+            self.assert_inj_bounds(i)
+
+
 
     def assert_inj_bounds(self, index, **kwargs):
         assert (index >= 0
@@ -249,7 +263,6 @@ class fault_injection:
                 self.CORRUPT_DIM2[index]
                 < layerShape[2]
             ), "%d < %d: Out of bounds error in Dimension 2!" %(self.CORRUPT_DIM2[index], layerShape[2])
-        if layerDim > 3:
             assert (
                 self.CORRUPT_DIM3[index]
                 < layerShape[3]
@@ -259,7 +272,10 @@ class fault_injection:
             if self.CORRUPT_DIM2[index] != None or self.CORRUPT_DIM3[index] != None:
                 warnings.warn("Values in Dim2 and Dim3 ignored, since layer is %s" %(layerType))
 
+        logging.info("Finished checking bounds on inj '%d'"%(index))
+
     def _set_value(self, module, input, output):
+        logging.info("Processing hook of Layer %d: %s" %(self.get_curr_layer(), self.get_layer_type(self.get_curr_layer())))
         inj_list = list(
             filter(
                 lambda x: self.CORRUPT_LAYER[x] == self.get_curr_layer(),
@@ -269,6 +285,7 @@ class fault_injection:
 
         layerDim = self.LAYERS_DIM[self.get_curr_layer()]
 
+        logging.info("Layer %d injection list size: %d" %(self.get_curr_layer(), len(inj_list)))
         if layerDim == 2:
             for i in inj_list:
                 self.assert_inj_bounds(index=i)

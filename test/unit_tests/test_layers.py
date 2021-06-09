@@ -88,7 +88,6 @@ class TestLayers:
 
         assert inj_label == 888
 
-    @pytest.mark.skip(reason="Under development")
     def test_combo_layers(self):
         p = fault_injection(
             self.model,
@@ -96,15 +95,16 @@ class TestLayers:
             self.W,
             self.BATCH_SIZE,
             layer_types=[torch.nn.Conv2d, torch.nn.Linear],
+            # layer_types=[torch.nn.Conv2d],
             use_cuda=self.USE_GPU,
         )
 
         (b, layer, C, H, W, err_val) = (
-            [0, 0],
-            [1, 3],
-            [5, 4],
-            [5, 2],
-            [3, 4],
+            [0, 1],
+            [1, 7],
+            [5, 888],
+            [5, None],
+            [3, None],
             [20000, 10000],
         )
         inj = p.declare_neuron_fi(
@@ -112,62 +112,9 @@ class TestLayers:
         )
         inj_output = inj(self.IMAGE)
         inj_softmax = self.softmax(inj_output)
-        inj_label = list(torch.argmax(inj_softmax, dim=1))[0].item()
+        inj_label_1 = list(torch.argmax(inj_softmax, dim=1))[0].item()
+        inj_label_2 = list(torch.argmax(inj_softmax, dim=1))[1].item()
 
-        assert inj_label == 843
-
-#    def test_multiple_conv_neuron(self):
-#
-#        p = fault_injection(
-#            self.model,
-#            self.H,
-#            self.W,
-#            self.BATCH_SIZE,
-#            layer_types=[torch.nn.Conv2d],
-#            use_cuda=self.USE_GPU,
-#        )
-#
-#        (b, layer, C, H, W, err_val) = (
-#            [0, 0],
-#            [1, 3],
-#            [5, 4],
-#            [5, 2],
-#            [3, 4],
-#            [20000, 10000],
-#        )
-#        inj = p.declare_neuron_fi(
-#            batch=b, layer_num=layer, c=C, h=H, w=W, value=err_val
-#        )
-#        inj_output = inj(self.IMAGE)
-#        inj_softmax = self.softmax(inj_output)
-#        inj_label = list(torch.argmax(inj_softmax, dim=1))[0].item()
-#
-#        assert inj_label == 843
-#
-#    def test_multiple_linear_neuron(self):
-#        p = fault_injection(
-#            self.model,
-#            self.H,
-#            self.W,
-#            self.BATCH_SIZE,
-#            layer_types=[torch.nn.Linear],
-#            use_cuda=self.USE_GPU,
-#        )
-#
-#        (b, layer, C, H, W, err_val) = (
-#            [0, 0],
-#            [1, 3],
-#            [5, 4],
-#            [5, 2],
-#            [3, 4],
-#            [20000, 10000],
-#        )
-#        inj = p.declare_neuron_fi(
-#            batch=b, layer_num=layer, c=C, h=H, w=W, value=err_val
-#        )
-#        inj_output = inj(self.IMAGE)
-#        inj_softmax = self.softmax(inj_output)
-#        inj_label = list(torch.argmax(inj_softmax, dim=1))[0].item()
-#
-#        assert inj_label == 843
-#
+        assert p.get_total_layers() == 8
+        assert inj_label_1 == 695
+        assert inj_label_2 == 888
