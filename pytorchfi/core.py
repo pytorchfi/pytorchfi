@@ -19,12 +19,12 @@ class fault_injection:
         self.CUSTOM_INJECTION = False
         self.INJECTION_FUNCTION = None
 
-        self.CORRUPT_BATCH = -1
-        self.CORRUPT_LAYER = -1
-        self.CORRUPT_C = -1
-        self.CORRUPT_H = -1
-        self.CORRUPT_W = -1
-        self.CORRUPT_VALUE = None
+        self.CORRUPT_BATCH = list()
+        self.CORRUPT_LAYER = list()
+        self.CORRUPT_DIM1 = list()  # C
+        self.CORRUPT_DIM2 = list()  # H
+        self.CORRUPT_DIM3 = list()  # W
+        self.CORRUPT_VALUE = list()
 
         self.CURR_LAYER = 0
         self.OUTPUT_SIZE = []
@@ -84,7 +84,7 @@ class fault_injection:
             self.CORRUPT_W,
             self.CORRUPT_VALUE,
             self._INJ_LAYER_TYPES,
-        ) = (0, -1, -1, -1, -1, -1, None, [nn.Conv2d])
+        ) = (0, list(), list(), list(), list(), list(), list(), [nn.Conv2d])
 
         for i in range(len(self.HANDLES)):
             self.HANDLES[i].remove()
@@ -119,18 +119,18 @@ class fault_injection:
         if kwargs:
             if "function" in kwargs:
                 CUSTOM_INJECTION, CUSTOM_FUNCTION = True, kwargs.get("function")
-                corrupt_layer = kwargs.get("layer_num", -1)
-                corrupt_k = kwargs.get("k", -1)
-                corrupt_c = kwargs.get("c", -1)
-                corrupt_kH = kwargs.get("h", -1)
-                corrupt_kW = kwargs.get("w", -1)
+                corrupt_layer = kwargs.get("layer_num", list())
+                corrupt_k = kwargs.get("k", list())
+                corrupt_c = kwargs.get("c", list())
+                corrupt_kH = kwargs.get("h", list())
+                corrupt_kW = kwargs.get("w", list())
             else:
-                corrupt_layer = kwargs.get("layer_num", -1)
-                corrupt_k = kwargs.get("k", -1)
-                corrupt_c = kwargs.get("c", -1)
-                corrupt_kH = kwargs.get("h", -1)
-                corrupt_kW = kwargs.get("w", -1)
-                corrupt_value = kwargs.get("value", -1)
+                corrupt_layer = kwargs.get("layer_num", )
+                corrupt_k = kwargs.get("k", list())
+                corrupt_c = kwargs.get("c", list())
+                corrupt_kH = kwargs.get("h", list())
+                corrupt_kW = kwargs.get("w", list())
+                corrupt_value = kwargs.get("value", list())
         else:
             raise ValueError("Please specify an injection or injection function")
 
@@ -168,18 +168,18 @@ class fault_injection:
         if kwargs:
             if "function" in kwargs:
                 CUSTOM_INJECTION, INJECTION_FUNCTION = True, kwargs.get("function")
-                self.CORRUPT_LAYER = kwargs.get("layer_num", -1)
-                self.CORRUPT_BATCH = kwargs.get("batch", -1)
-                self.CORRUPT_C = kwargs.get("c", -1)
-                self.CORRUPT_H = kwargs.get("h", -1)
-                self.CORRUPT_W = kwargs.get("w", -1)
+                self.CORRUPT_LAYER = kwargs.get("layer_num", list())
+                self.CORRUPT_BATCH = kwargs.get("batch", list())
+                self.CORRUPT_C = kwargs.get("c", list())
+                self.CORRUPT_H = kwargs.get("h", list())
+                self.CORRUPT_W = kwargs.get("w", list())
             else:
-                self.CORRUPT_LAYER = kwargs.get("layer_num", -1)
-                self.CORRUPT_BATCH = kwargs.get("batch", -1)
-                self.CORRUPT_C = kwargs.get("c", -1)
-                self.CORRUPT_H = kwargs.get("h", -1)
-                self.CORRUPT_W = kwargs.get("w", -1)
-                self.CORRUPT_VALUE = kwargs.get("value", None)
+                self.CORRUPT_LAYER = kwargs.get("layer_num", list())
+                self.CORRUPT_BATCH = kwargs.get("batch", list())
+                self.CORRUPT_C = kwargs.get("c", list())
+                self.CORRUPT_H = kwargs.get("h", list())
+                self.CORRUPT_W = kwargs.get("w", list())
+                self.CORRUPT_VALUE = kwargs.get("value", list())
 
                 logging.info("Declaring Specified Fault Injector")
                 logging.info("Convolution: %s" % self.CORRUPT_LAYER)
