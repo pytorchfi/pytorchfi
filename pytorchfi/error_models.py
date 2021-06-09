@@ -271,7 +271,7 @@ class single_bit_flip_func(core.fault_injection):
                     self.CORRUPT_DIM3
                 ] = new_value
 
-        self.updateConv()
+        self.updateLayer()
         if self.get_curr_layer() >= self.get_total_layers():
             self.reset_curr_layer()
 

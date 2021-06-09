@@ -84,8 +84,7 @@ class fault_injection:
             self.CORRUPT_DIM2,
             self.CORRUPT_DIM3,
             self.CORRUPT_VALUE,
-            self._INJ_LAYER_TYPES,
-        ) = (0, list(), list(), list(), list(), list(), list(), [nn.Conv2d])
+        ) = (0, list(), list(), list(), list(), list(), list())
 
         for i in range(len(self.HANDLES)):
             self.HANDLES[i].remove()
@@ -111,6 +110,23 @@ class fault_injection:
                     shape.append(i)
 
         return (handles, shape)
+
+    def _traverseModelAndSetHooksNeurons(self, model, layer_types, customInj, injFunc):
+        handles = []
+        for layer in model.children():
+            # leaf node
+            if list(layer.children()) == []:
+                for i in layer_types:
+                    if isinstance(layer, i):
+                        hook = injFunc if customInj else self._set_value
+                        handles.append(layer.register_forward_hook(hook))
+            # unpack node
+            else:
+                subHandles = self._traverseModelAndSetHooksNeurons(layer, layer_types, customInj, injFunc)
+                for i in subHandles:
+                    handles.append(i)
+
+        return handles
 
     def declare_weight_fi(self, **kwargs):
         self._fi_state_reset()
@@ -198,11 +214,14 @@ class fault_injection:
             raise ValueError("Please specify an injection or injection function")
 
         self.CORRUPTED_MODEL = copy.deepcopy(self.ORIG_MODEL)
+        handles_neurons = self._traverseModelAndSetHooksNeurons(
+            self.CORRUPTED_MODEL,
+            self._INJ_LAYER_TYPES,
+            CUSTOM_INJECTION,
+            INJECTION_FUNCTION)
 
-        for param in self.CORRUPTED_MODEL.modules():
-            if isinstance(param, nn.Conv2d):
-                hook = INJECTION_FUNCTION if CUSTOM_INJECTION else self._set_value
-                self.HANDLES.append(param.register_forward_hook(hook))
+        for i in handles_neurons:
+            self.HANDLES.append(i)
 
         return self.CORRUPTED_MODEL
 
@@ -225,19 +244,19 @@ class fault_injection:
             self.CORRUPT_DIM1[index]
             < layerShape[1]
         ), "%d < %d: Out of bounds error in Dimension 1!" %(self.CORRUPT_DIM1[index], layerShape[1])
-        if layerDim >= 2:
+        if layerDim > 2:
             assert (
                 self.CORRUPT_DIM2[index]
                 < layerShape[2]
             ), "%d < %d: Out of bounds error in Dimension 2!" %(self.CORRUPT_DIM2[index], layerShape[2])
-        if layerDim >= 3:
+        if layerDim > 3:
             assert (
                 self.CORRUPT_DIM3[index]
                 < layerShape[3]
             ), "%d < %d: Out of bounds error in Dimension 3!" %(self.CORRUPT_DIM3[index], layerShape[3])
 
-        if layerDim < 2:
-            if self.CORRUPT_DIM2 != None or self.CORRUPT_DIM3 != None:
+        if layerDim <= 2:
+            if self.CORRUPT_DIM2[index] != None or self.CORRUPT_DIM3[index] != None:
                 warnings.warn("Values in Dim2 and Dim3 ignored, since layer is %s" %(layerType))
 
     def _set_value(self, module, input, output):
@@ -247,26 +266,45 @@ class fault_injection:
                 range(len(self.CORRUPT_LAYER)),
             )
         )
-        for i in inj_list:
-            self.assert_inj_bounds(index=i)
-            logging.info(
-                "Original value at [%d][%d][%d][%d]: %d"
-                % (
-                    self.CORRUPT_BATCH[i],
-                    self.CORRUPT_DIM1[i],
-                    self.CORRUPT_DIM2[i],
-                    self.CORRUPT_DIM3[i],
-                    output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][
-                        self.CORRUPT_DIM2[i]
-                    ][self.CORRUPT_DIM3[i]],
-                )
-            )
-            logging.info("Changing value to %d" % self.CORRUPT_VALUE[i])
-            output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][self.CORRUPT_DIM2[i]][
-                self.CORRUPT_DIM3[i]
-            ] = self.CORRUPT_VALUE[i]
 
-        self.updateConv()
+        layerDim = self.LAYERS_DIM[self.get_curr_layer()]
+
+        if layerDim == 2:
+            for i in inj_list:
+                self.assert_inj_bounds(index=i)
+                logging.info(
+                    "Original value at [%d][%d]: %d"
+                    % (
+                        self.CORRUPT_BATCH[i],
+                        self.CORRUPT_DIM1[i],
+                        output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]]
+                    )
+                )
+                logging.info("Changing value to %d" % self.CORRUPT_VALUE[i])
+                output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]
+                ] = self.CORRUPT_VALUE[i]
+
+        elif layerDim == 4:
+            for i in inj_list:
+                self.assert_inj_bounds(index=i)
+                logging.info(
+                    "Original value at [%d][%d][%d][%d]: %d"
+                    % (
+                        self.CORRUPT_BATCH[i],
+                        self.CORRUPT_DIM1[i],
+                        self.CORRUPT_DIM2[i],
+                        self.CORRUPT_DIM3[i],
+                        output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][
+                            self.CORRUPT_DIM2[i]
+                        ][self.CORRUPT_DIM3[i]],
+                    )
+                )
+                logging.info("Changing value to %d" % self.CORRUPT_VALUE[i])
+                output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][self.CORRUPT_DIM2[i]][
+                    self.CORRUPT_DIM3[i]
+                ] = self.CORRUPT_VALUE[i]
+
+        self.updateLayer()
 
     def _save_output_size(self, module, input, output):
         shape = list(output.size())
@@ -294,7 +332,7 @@ class fault_injection:
     def get_inj_layer_types(self):
         return self._INJ_LAYER_TYPES
 
-    def updateConv(self, value=1):
+    def updateLayer(self, value=1):
         self.CURR_LAYER += value
 
     def reset_curr_layer(self):

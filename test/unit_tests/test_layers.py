@@ -54,8 +54,7 @@ class TestLayers:
 
         assert inj_label == 578
 
-    @pytest.mark.skip(reason="Under development")
-    def test_single_linear_neuron(self):
+    def test_single_linear_layer(self):
         p = fault_injection(
             self.model,
             self.H,
@@ -65,15 +64,29 @@ class TestLayers:
             use_cuda=self.USE_GPU,
         )
 
-        (b, layer, C, H, W, err_val) = (0, 3, 4, 2, 4, 10000)
+        assert p.get_total_layers() == 3
+        assert p.get_layer_dim(2) == 2
+        assert p.get_layer_type(2) == torch.nn.Linear
+
+    def test_single_linear_neuron_inj(self):
+        p = fault_injection(
+            self.model,
+            self.H,
+            self.W,
+            self.BATCH_SIZE,
+            layer_types=[torch.nn.Linear],
+            use_cuda=self.USE_GPU,
+        )
+
+        (b, layer, C, H, W, err_val) = (0, 2, 888, None, None, 10000)
         inj = p.declare_neuron_fi(
-            batch=b, layer_num=layer, c=C, h=H, w=W, value=err_val
+            batch=[b], layer_num=[layer], c=[C], h=[H], w=[W], value=[err_val]
         )
         inj_output = inj(self.IMAGE)
         inj_softmax = self.softmax(inj_output)
         inj_label = list(torch.argmax(inj_softmax, dim=1))[0].item()
 
-        assert inj_label == 578
+        assert inj_label == 888
 
     @pytest.mark.skip(reason="Under development")
     def test_combo_layers(self):
