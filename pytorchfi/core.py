@@ -4,6 +4,7 @@ pytorchfi.core contains the core functionality for fault injections.
 
 import copy
 import logging
+import warnings
 
 import torch
 import torch.nn as nn
@@ -79,9 +80,9 @@ class fault_injection:
             self.CURR_LAYER,
             self.CORRUPT_BATCH,
             self.CORRUPT_LAYER,
-            self.CORRUPT_C,
-            self.CORRUPT_H,
-            self.CORRUPT_W,
+            self.CORRUPT_DIM1,
+            self.CORRUPT_DIM2,
+            self.CORRUPT_DIM3,
             self.CORRUPT_VALUE,
             self._INJ_LAYER_TYPES,
         ) = (0, list(), list(), list(), list(), list(), list(), [nn.Conv2d])
@@ -170,15 +171,15 @@ class fault_injection:
                 CUSTOM_INJECTION, INJECTION_FUNCTION = True, kwargs.get("function")
                 self.CORRUPT_LAYER = kwargs.get("layer_num", list())
                 self.CORRUPT_BATCH = kwargs.get("batch", list())
-                self.CORRUPT_C = kwargs.get("c", list())
-                self.CORRUPT_H = kwargs.get("h", list())
-                self.CORRUPT_W = kwargs.get("w", list())
+                self.CORRUPT_DIM1 = kwargs.get("c", list())
+                self.CORRUPT_DIM2 = kwargs.get("h", list())
+                self.CORRUPT_DIM3 = kwargs.get("w", list())
             else:
                 self.CORRUPT_LAYER = kwargs.get("layer_num", list())
                 self.CORRUPT_BATCH = kwargs.get("batch", list())
-                self.CORRUPT_C = kwargs.get("c", list())
-                self.CORRUPT_H = kwargs.get("h", list())
-                self.CORRUPT_W = kwargs.get("w", list())
+                self.CORRUPT_DIM1 = kwargs.get("c", list())
+                self.CORRUPT_DIM2 = kwargs.get("h", list())
+                self.CORRUPT_DIM3 = kwargs.get("w", list())
                 self.CORRUPT_VALUE = kwargs.get("value", list())
 
                 logging.info("Declaring Specified Fault Injector")
@@ -188,9 +189,9 @@ class fault_injection:
                     "%s, %s, %s, %s"
                     % (
                         self.CORRUPT_BATCH,
-                        self.CORRUPT_C,
-                        self.CORRUPT_H,
-                        self.CORRUPT_W,
+                        self.CORRUPT_DIM1,
+                        self.CORRUPT_DIM2,
+                        self.CORRUPT_DIM3,
                     )
                 )
         else:
@@ -205,31 +206,39 @@ class fault_injection:
 
         return self.CORRUPTED_MODEL
 
-    def assert_inj_bounds(self, **kwargs):
-        index = kwargs.get("index", -1)
+    def assert_inj_bounds(self, index, **kwargs):
+        assert (index >= 0
+        ), "Invalid injection index: %d" %(index)
         assert (
-            self.CORRUPT_LAYER[index] >= 0
-            and self.CORRUPT_LAYER[index] < self.get_total_layers()
-        ), "Invalid convolution!"
+                self.CORRUPT_BATCH[index] < self.get_total_batches()
+        ), "%d < %d: Invalid batch element!" %(self.CORRUPT_BATCH[index], self.get_total_batches())
         assert (
-            self.CORRUPT_BATCH[index] >= 0
-            and self.CORRUPT_BATCH[index] < self._BATCH_SIZE
-        ), "Invalid batch!"
+            self.CORRUPT_LAYER[index] < self.get_total_layers()
+        ), "%d < %d: Invalid layer!" %(self.CORRUPT_LAYER[index], self.get_total_layers())
+
+        corruptLayerNum = self.CORRUPT_LAYER[index]
+        layerType = self.LAYERS_TYPE[corruptLayerNum]
+        layerDim = self.LAYERS_DIM[corruptLayerNum]
+        layerShape = self.OUTPUT_SIZE[corruptLayerNum]
+
         assert (
-            self.CORRUPT_C[index] >= 0
-            and self.CORRUPT_C[index]
-            < self.OUTPUT_SIZE[self.CORRUPT_LAYER[index]][1]
-        ), "Invalid C!"
-        assert (
-            self.CORRUPT_H[index] >= 0
-            and self.CORRUPT_H[index]
-            < self.OUTPUT_SIZE[self.CORRUPT_LAYER[index]][2]
-        ), "Invalid H!"
-        assert (
-            self.CORRUPT_W[index] >= 0
-            and self.CORRUPT_W[index]
-            < self.OUTPUT_SIZE[self.CORRUPT_LAYER[index]][3]
-        ), "Invalid W!"
+            self.CORRUPT_DIM1[index]
+            < layerShape[1]
+        ), "%d < %d: Out of bounds error in Dimension 1!" %(self.CORRUPT_DIM1[index], layerShape[1])
+        if layerDim >= 2:
+            assert (
+                self.CORRUPT_DIM2[index]
+                < layerShape[2]
+            ), "%d < %d: Out of bounds error in Dimension 2!" %(self.CORRUPT_DIM2[index], layerShape[2])
+        if layerDim >= 3:
+            assert (
+                self.CORRUPT_DIM3[index]
+                < layerShape[3]
+            ), "%d < %d: Out of bounds error in Dimension 3!" %(self.CORRUPT_DIM3[index], layerShape[3])
+
+        if layerDim < 2:
+            if self.CORRUPT_DIM2 != None or self.CORRUPT_DIM3 != None:
+                warnings.warn("Values in Dim2 and Dim3 ignored, since layer is %s" %(layerType))
 
     def _set_value(self, module, input, output):
         inj_list = list(
@@ -244,17 +253,17 @@ class fault_injection:
                 "Original value at [%d][%d][%d][%d]: %d"
                 % (
                     self.CORRUPT_BATCH[i],
-                    self.CORRUPT_C[i],
-                    self.CORRUPT_H[i],
-                    self.CORRUPT_W[i],
-                    output[self.CORRUPT_BATCH[i]][self.CORRUPT_C[i]][
-                        self.CORRUPT_H[i]
-                    ][self.CORRUPT_W[i]],
+                    self.CORRUPT_DIM1[i],
+                    self.CORRUPT_DIM2[i],
+                    self.CORRUPT_DIM3[i],
+                    output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][
+                        self.CORRUPT_DIM2[i]
+                    ][self.CORRUPT_DIM3[i]],
                 )
             )
             logging.info("Changing value to %d" % self.CORRUPT_VALUE[i])
-            output[self.CORRUPT_BATCH[i]][self.CORRUPT_C[i]][self.CORRUPT_H[i]][
-                self.CORRUPT_W[i]
+            output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][self.CORRUPT_DIM2[i]][
+                self.CORRUPT_DIM3[i]
             ] = self.CORRUPT_VALUE[i]
 
         self.updateConv()

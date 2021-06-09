@@ -244,31 +244,31 @@ class single_bit_flip_func(core.fault_injection):
             )
             for i in inj_list:
                 self.assert_inj_bounds(index=i)
-                prev_value = output[self.CORRUPT_BATCH[i]][self.CORRUPT_C[i]][
-                    self.CORRUPT_H[i]
-                ][self.CORRUPT_W[i]]
+                prev_value = output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][
+                    self.CORRUPT_DIM2[i]
+                ][self.CORRUPT_DIM3[i]]
 
                 rand_bit = random.randint(0, self.bits - 1)
                 logging.info("rand_bit", rand_bit)
                 new_value = self._flip_bit_signed(prev_value, range_max, rand_bit)
 
-                output[self.CORRUPT_BATCH[i]][self.CORRUPT_C[i]][self.CORRUPT_H[i]][
-                    self.CORRUPT_W[i]
+                output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][self.CORRUPT_DIM2[i]][
+                    self.CORRUPT_DIM3[i]
                 ] = new_value
 
         else:
             self.assert_inj_bounds()
             if self.get_curr_layer() == corrupt_conv_set:
-                prev_value = output[self.CORRUPT_BATCH][self.CORRUPT_C][self.CORRUPT_H][
-                    self.CORRUPT_W
+                prev_value = output[self.CORRUPT_BATCH][self.CORRUPT_DIM1][self.CORRUPT_DIM2][
+                    self.CORRUPT_DIM3
                 ]
 
                 rand_bit = random.randint(0, self.bits - 1)
                 logging.info("rand_bit", rand_bit)
                 new_value = self._flip_bit_signed(prev_value, range_max, rand_bit)
 
-                output[self.CORRUPT_BATCH][self.CORRUPT_C][self.CORRUPT_H][
-                    self.CORRUPT_W
+                output[self.CORRUPT_BATCH][self.CORRUPT_DIM1][self.CORRUPT_DIM2][
+                    self.CORRUPT_DIM3
                 ] = new_value
 
         self.updateConv()
