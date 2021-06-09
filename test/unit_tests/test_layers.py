@@ -44,7 +44,7 @@ class TestLayers:
         )
 
 
-        (b, layer, C, H, W, err_val) = (0, 3, 4, 2, 4, 10000)
+        (b, layer, C, H, W, err_val) = ([0], [3], [4], [2], [4], [10000])
         inj = p.declare_neuron_fi(
             batch=b, layer_num=layer, c=C, h=H, w=W, value=err_val
         )

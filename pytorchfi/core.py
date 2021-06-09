@@ -252,51 +252,30 @@ class fault_injection:
             ), "Invalid W!"
 
     def _set_value(self, module, input, output):
-        if type(self.CORRUPT_LAYER) == list:
-            inj_list = list(
-                filter(
-                    lambda x: self.CORRUPT_LAYER[x] == self.get_curr_layer(),
-                    range(len(self.CORRUPT_LAYER)),
+        inj_list = list(
+            filter(
+                lambda x: self.CORRUPT_LAYER[x] == self.get_curr_layer(),
+                range(len(self.CORRUPT_LAYER)),
+            )
+        )
+        for i in inj_list:
+            self.assert_inj_bounds(index=i)
+            logging.info(
+                "Original value at [%d][%d][%d][%d]: %d"
+                % (
+                    self.CORRUPT_BATCH[i],
+                    self.CORRUPT_C[i],
+                    self.CORRUPT_H[i],
+                    self.CORRUPT_W[i],
+                    output[self.CORRUPT_BATCH[i]][self.CORRUPT_C[i]][
+                        self.CORRUPT_H[i]
+                    ][self.CORRUPT_W[i]],
                 )
             )
-            for i in inj_list:
-                self.assert_inj_bounds(index=i)
-                logging.info(
-                    "Original value at [%d][%d][%d][%d]: %d"
-                    % (
-                        self.CORRUPT_BATCH[i],
-                        self.CORRUPT_C[i],
-                        self.CORRUPT_H[i],
-                        self.CORRUPT_W[i],
-                        output[self.CORRUPT_BATCH[i]][self.CORRUPT_C[i]][
-                            self.CORRUPT_H[i]
-                        ][self.CORRUPT_W[i]],
-                    )
-                )
-                logging.info("Changing value to %d" % self.CORRUPT_VALUE[i])
-                output[self.CORRUPT_BATCH[i]][self.CORRUPT_C[i]][self.CORRUPT_H[i]][
-                    self.CORRUPT_W[i]
-                ] = self.CORRUPT_VALUE[i]
-
-        else:
-            self.assert_inj_bounds()
-            if self.get_curr_layer() == self.CORRUPT_LAYER:
-                logging.info(
-                    "Original value at [%d][%d][%d][%d]: %d"
-                    % (
-                        self.CORRUPT_BATCH,
-                        self.CORRUPT_C,
-                        self.CORRUPT_H,
-                        self.CORRUPT_W,
-                        output[self.CORRUPT_BATCH][self.CORRUPT_C][self.CORRUPT_H][
-                            self.CORRUPT_W
-                        ],
-                    )
-                )
-                logging.info("Changing value to %d" % self.CORRUPT_VALUE)
-                output[self.CORRUPT_BATCH][self.CORRUPT_C][self.CORRUPT_H][
-                    self.CORRUPT_W
-                ] = self.CORRUPT_VALUE
+            logging.info("Changing value to %d" % self.CORRUPT_VALUE[i])
+            output[self.CORRUPT_BATCH[i]][self.CORRUPT_C[i]][self.CORRUPT_H[i]][
+                self.CORRUPT_W[i]
+            ] = self.CORRUPT_VALUE[i]
 
         self.updateConv()
 

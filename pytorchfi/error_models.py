@@ -67,7 +67,7 @@ def random_neuron_inj(pfi_model, min_val=-1, max_val=1):
     err_val = random_value(min_val=min_val, max_val=max_val)
 
     return pfi_model.declare_neuron_fi(
-        batch=b, layer_num=layer, c=C, h=H, w=W, value=err_val
+        batch=[b], layer_num=[layer], c=[C], h=[H], w=[W], value=[err_val]
     )
 
 

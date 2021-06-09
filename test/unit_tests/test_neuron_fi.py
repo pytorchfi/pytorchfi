@@ -44,13 +44,13 @@ class TestNeuronFIgpu:
         not torch.cuda.is_available(), reason="GPU not supported on this machine"
     )
     def test_neuronFI_singleElement(self):
-        batch_i = 0
-        layer_i = 4
-        c_i = 0
-        h_i = 1
-        w_i = 1
+        batch_i = [0]
+        layer_i = [4]
+        c_i = [0]
+        h_i = [1]
+        w_i = [1]
 
-        inj_value_i = 10000.0
+        inj_value_i = [10000.0]
 
         self.inj_model = self.p.declare_neuron_fi(
             batch=batch_i, layer_num=layer_i, c=c_i, h=h_i, w=w_i, value=inj_value_i
@@ -68,7 +68,7 @@ class TestNeuronFIgpu:
             c=c_i,
             h=h_i,
             w=w_i,
-            value=0,
+            value=[0],
         )
 
         self.inj_model.eval()
@@ -122,13 +122,13 @@ class TestNeuronFIcpu:
         )
 
     def test_neuronFI_singleElement(self):
-        batch_i = 0
-        layer_i = 4
-        c_i = 0
-        h_i = 1
-        w_i = 1
+        batch_i = [0]
+        layer_i = [4]
+        c_i = [0]
+        h_i = [1]
+        w_i = [1]
 
-        inj_value_i = 10000.0
+        inj_value_i = [10000.0]
 
         self.inj_model = self.p.declare_neuron_fi(
             batch=batch_i, layer_num=layer_i, c=c_i, h=h_i, w=w_i, value=inj_value_i
@@ -146,7 +146,7 @@ class TestNeuronFIcpu:
             c=c_i,
             h=h_i,
             w=w_i,
-            value=0,
+            value=[0],
         )
 
         self.inj_model.eval()
@@ -207,13 +207,13 @@ class TestNeuronFIgpuBatch:
     )
     def test_neuronFI_batch_1(self):
 
-        batch_i = 2
-        layer_i = 4
-        c_i = 0
-        h_i = 1
-        w_i = 1
+        batch_i = [2]
+        layer_i = [4]
+        c_i = [0]
+        h_i = [1]
+        w_i = [1]
 
-        inj_value_i = 10000.0
+        inj_value_i = [10000.0]
 
         self.inj_model = self.p.declare_neuron_fi(
             batch=batch_i, layer_num=layer_i, c=c_i, h=h_i, w=w_i, value=inj_value_i
@@ -288,13 +288,13 @@ class TestNeuronFIcpuBatch:
         )
 
     def test_neuronFI_batch_1(self):
-        batch_i = 2
-        layer_i = 4
-        c_i = 0
-        h_i = 1
-        w_i = 1
+        batch_i = [2]
+        layer_i = [4]
+        c_i = [0]
+        h_i = [1]
+        w_i = [1]
 
-        inj_value_i = 10000.0
+        inj_value_i = [10000.0]
 
         self.inj_model = self.p.declare_neuron_fi(
             batch=batch_i, layer_num=layer_i, c=c_i, h=h_i, w=w_i, value=inj_value_i
