@@ -206,50 +206,30 @@ class fault_injection:
         return self.CORRUPTED_MODEL
 
     def assert_inj_bounds(self, **kwargs):
-        if type(self.CORRUPT_LAYER) == list:
-            index = kwargs.get("index", -1)
-            assert (
-                self.CORRUPT_LAYER[index] >= 0
-                and self.CORRUPT_LAYER[index] < self.get_total_layers()
-            ), "Invalid convolution!"
-            assert (
-                self.CORRUPT_BATCH[index] >= 0
-                and self.CORRUPT_BATCH[index] < self._BATCH_SIZE
-            ), "Invalid batch!"
-            assert (
-                self.CORRUPT_C[index] >= 0
-                and self.CORRUPT_C[index]
-                < self.OUTPUT_SIZE[self.CORRUPT_LAYER[index]][1]
-            ), "Invalid C!"
-            assert (
-                self.CORRUPT_H[index] >= 0
-                and self.CORRUPT_H[index]
-                < self.OUTPUT_SIZE[self.CORRUPT_LAYER[index]][2]
-            ), "Invalid H!"
-            assert (
-                self.CORRUPT_W[index] >= 0
-                and self.CORRUPT_W[index]
-                < self.OUTPUT_SIZE[self.CORRUPT_LAYER[index]][3]
-            ), "Invalid W!"
-        else:
-            assert (
-                self.CORRUPT_LAYER >= 0 and self.CORRUPT_LAYER < self.get_total_layers()
-            ), "Invalid convolution!"
-            assert (
-                self.CORRUPT_BATCH >= 0 and self.CORRUPT_BATCH < self._BATCH_SIZE
-            ), "Invalid batch!"
-            assert (
-                self.CORRUPT_C >= 0
-                and self.CORRUPT_C < self.OUTPUT_SIZE[self.CORRUPT_LAYER][1]
-            ), "Invalid C!"
-            assert (
-                self.CORRUPT_H >= 0
-                and self.CORRUPT_H < self.OUTPUT_SIZE[self.CORRUPT_LAYER][2]
-            ), "Invalid H!"
-            assert (
-                self.CORRUPT_W >= 0
-                and self.CORRUPT_W < self.OUTPUT_SIZE[self.CORRUPT_LAYER][3]
-            ), "Invalid W!"
+        index = kwargs.get("index", -1)
+        assert (
+            self.CORRUPT_LAYER[index] >= 0
+            and self.CORRUPT_LAYER[index] < self.get_total_layers()
+        ), "Invalid convolution!"
+        assert (
+            self.CORRUPT_BATCH[index] >= 0
+            and self.CORRUPT_BATCH[index] < self._BATCH_SIZE
+        ), "Invalid batch!"
+        assert (
+            self.CORRUPT_C[index] >= 0
+            and self.CORRUPT_C[index]
+            < self.OUTPUT_SIZE[self.CORRUPT_LAYER[index]][1]
+        ), "Invalid C!"
+        assert (
+            self.CORRUPT_H[index] >= 0
+            and self.CORRUPT_H[index]
+            < self.OUTPUT_SIZE[self.CORRUPT_LAYER[index]][2]
+        ), "Invalid H!"
+        assert (
+            self.CORRUPT_W[index] >= 0
+            and self.CORRUPT_W[index]
+            < self.OUTPUT_SIZE[self.CORRUPT_LAYER[index]][3]
+        ), "Invalid W!"
 
     def _set_value(self, module, input, output):
         inj_list = list(

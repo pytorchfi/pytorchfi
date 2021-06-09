@@ -310,12 +310,12 @@ def random_neuron_single_bit_inj(pfi_model, layer_ranges):
     (layer, C, H, W) = random_neuron_location(pfi_model)
 
     return pfi_model.declare_neuron_fi(
-        batch=batch,
-        layer_num=layer,
-        c=C,
-        h=H,
-        w=W,
-        function=pfi_model.single_bit_flip_signed_across_batch,
+        batch=[batch],
+        layer_num=[layer],
+        c=[C],
+        h=[H],
+        w=[W],
+        function=pfi_model.single_bit_flip_signed_across_batch, #TODO Support multiple error models via list
     )
 
 
