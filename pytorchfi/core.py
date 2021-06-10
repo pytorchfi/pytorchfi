@@ -15,11 +15,14 @@ class fault_injection:
         logging.basicConfig(format="%(asctime)-15s %(clientip)s %(user)-8s %(message)s")
         self.ORIG_MODEL = None
         self.CORRUPTED_MODEL = None
+
+        self.OUTPUT_SIZE = list()
+        self.LAYERS_TYPE = list()
+        self.LAYERS_DIM = list()
         self._BATCH_SIZE = -1
 
-        self.CUSTOM_INJECTION = False
-        self.INJECTION_FUNCTION = None
-
+        self.CURR_LAYER = 0
+        self.HANDLES = list()
         self.CORRUPT_BATCH = list()
         self.CORRUPT_LAYER = list()
         self.CORRUPT_DIM1 = list()  # C
@@ -27,11 +30,8 @@ class fault_injection:
         self.CORRUPT_DIM3 = list()  # W
         self.CORRUPT_VALUE = list()
 
-        self.CURR_LAYER = 0
-        self.OUTPUT_SIZE = []
-        self.LAYERS_TYPE = []
-        self.LAYERS_DIM = []
-        self.HANDLES = []
+        self.CUSTOM_INJECTION = False
+        self.INJECTION_FUNCTION = None
 
         self.imageC = kwargs.get("c", 3)
         self.imageH = h
