@@ -15,6 +15,7 @@ class TestNeuronFIgpu:
 
         self.BATCH_SIZE = 1
         self.WORKERS = 1
+        self.channels = 3
         self.img_size = 32
         self.USE_GPU = True
 
@@ -34,9 +35,8 @@ class TestNeuronFIgpu:
 
         self.p = pfi_core(
             self.model,
-            self.img_size,
-            self.img_size,
             self.BATCH_SIZE,
+            input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=self.USE_GPU,
         )
 
@@ -99,6 +99,7 @@ class TestNeuronFIcpu:
 
         self.BATCH_SIZE = 1
         self.WORKERS = 1
+        self.channels = 3
         self.img_size = 32
         self.USE_GPU = False
 
@@ -115,9 +116,8 @@ class TestNeuronFIcpu:
 
         self.p = pfi_core(
             self.model,
-            self.img_size,
-            self.img_size,
             self.BATCH_SIZE,
+            input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=self.USE_GPU,
         )
 
@@ -177,6 +177,7 @@ class TestNeuronFIgpuBatch:
 
         self.BATCH_SIZE = 4
         self.WORKERS = 1
+        self.channels = 3
         self.img_size = 32
         self.USE_GPU = True
 
@@ -196,9 +197,8 @@ class TestNeuronFIgpuBatch:
 
         self.p = pfi_core(
             self.model,
-            self.img_size,
-            self.img_size,
             self.BATCH_SIZE,
+            input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=self.USE_GPU,
         )
 
@@ -265,6 +265,7 @@ class TestNeuronFIcpuBatch:
 
         self.BATCH_SIZE = 4
         self.WORKERS = 1
+        self.channels = 3
         self.img_size = 32
         self.USE_GPU = False
 
@@ -281,9 +282,8 @@ class TestNeuronFIcpuBatch:
 
         self.p = pfi_core(
             self.model,
-            self.img_size,
-            self.img_size,
             self.BATCH_SIZE,
+            input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=self.USE_GPU,
         )
 

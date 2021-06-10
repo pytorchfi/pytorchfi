@@ -11,11 +11,12 @@ class TestLayers:
     def setup_class(self):
         torch.manual_seed(5)
 
-        self.H = 224
-        self.W = 224
+        self.Cin = 3
+        self.Hin = 224
+        self.Win = 224
         self.BATCH_SIZE = 4
 
-        self.IMAGE = torch.rand((self.BATCH_SIZE, 3, self.H, self.W))
+        self.IMAGE = torch.rand((self.BATCH_SIZE, self.Cin, self.Hin, self.Win))
 
         self.USE_GPU = False
 
@@ -36,8 +37,6 @@ class TestLayers:
 
         p = fault_injection(
             self.model,
-            self.H,
-            self.W,
             self.BATCH_SIZE,
             layer_types=[torch.nn.Conv2d],
             use_cuda=self.USE_GPU,
@@ -57,8 +56,6 @@ class TestLayers:
     def test_single_linear_layer(self):
         p = fault_injection(
             self.model,
-            self.H,
-            self.W,
             self.BATCH_SIZE,
             layer_types=[torch.nn.Linear],
             use_cuda=self.USE_GPU,
@@ -71,8 +68,6 @@ class TestLayers:
     def test_single_linear_neuron_inj(self):
         p = fault_injection(
             self.model,
-            self.H,
-            self.W,
             self.BATCH_SIZE,
             layer_types=[torch.nn.Linear],
             use_cuda=self.USE_GPU,
@@ -91,8 +86,6 @@ class TestLayers:
     def test_combo_layers(self):
         p = fault_injection(
             self.model,
-            self.H,
-            self.W,
             self.BATCH_SIZE,
             layer_types=[torch.nn.Conv2d, torch.nn.Linear],
             # layer_types=[torch.nn.Conv2d],

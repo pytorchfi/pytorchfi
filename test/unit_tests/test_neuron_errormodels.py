@@ -25,6 +25,7 @@ class TestNeuronErrorModels:
 
         self.BATCH_SIZE = 4
         self.WORKERS = 1
+        self.channels = 3
         self.img_size = 32
         self.USE_GPU = False
 
@@ -41,9 +42,8 @@ class TestNeuronErrorModels:
 
         self.p = pfi_core(
             self.model,
-            self.img_size,
-            self.img_size,
             self.BATCH_SIZE,
+            input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=self.USE_GPU,
         )
 
@@ -172,6 +172,7 @@ class TestNeuronErrorModelsFunc:
 
         self.BATCH_SIZE = 4
         self.WORKERS = 1
+        self.channels = 3
         self.img_size = 32
         self.USE_GPU = False
 
@@ -188,9 +189,8 @@ class TestNeuronErrorModelsFunc:
 
         self.p = single_bit_flip_func(
             self.model,
-            self.img_size,
-            self.img_size,
             self.BATCH_SIZE,
+            input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=self.USE_GPU,
             bits=8,
         )
