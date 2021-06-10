@@ -37,7 +37,7 @@ class TestWeightFIcpu:
         )
 
     def test_neuronFI_singleElement(self):
-        conv_i = 1
+        layer_i = 1
         k = 15
         c_i = 20
         h_i = 2
@@ -46,7 +46,7 @@ class TestWeightFIcpu:
         inj_value_i = 10000.0
 
         self.inj_model = self.p.declare_weight_fi(
-            conv_num=conv_i, k=k, c=c_i, h=h_i, w=w_i, value=inj_value_i
+            layer_num=layer_i, k=k, c=c_i, h=h_i, w=w_i, value=inj_value_i
         )
 
         self.inj_model.eval()
@@ -56,7 +56,7 @@ class TestWeightFIcpu:
         assert not torch.all(corrupted_output_1.eq(self.output))
 
         self.inj_model = self.p.declare_weight_fi(
-            conv_num=conv_i,
+            layer_num=layer_i,
             k=k,
             c=c_i,
             h=h_i,
@@ -71,7 +71,7 @@ class TestWeightFIcpu:
         assert torch.all(uncorrupted_output.eq(self.output))
 
         self.inj_model = self.p.declare_weight_fi(
-            conv_num=conv_i,
+            layer_num=layer_i,
             k=k,
             c=c_i,
             h=h_i,
@@ -87,7 +87,7 @@ class TestWeightFIcpu:
         assert torch.all(corrupted_output_2.eq(corrupted_output_2))
 
     def test_neuronFI_singleElement_noErr(self):
-        conv_i = 4
+        layer_i = 4
         k = 153
         c_i = 254
         h_i = 0
@@ -96,7 +96,7 @@ class TestWeightFIcpu:
         inj_value_i = 10000.0
 
         self.inj_model = self.p.declare_weight_fi(
-            conv_num=conv_i, k=k, c=c_i, h=h_i, w=w_i, value=inj_value_i
+            layer_num=layer_i, k=k, c=c_i, h=h_i, w=w_i, value=inj_value_i
         )
 
         self.inj_model.eval()
