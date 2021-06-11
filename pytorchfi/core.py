@@ -381,3 +381,49 @@ class fault_injection:
 
     def get_fmap_HW(self, layer):
         return (self.get_fmaps_H(layer), self.get_fmaps_W(layer))
+
+    def print_pytorchfi_layer_summary(self):
+        summary_str = "==================== PYTORCHFI INIT SUMMARY ====================="+ "\n\n"
+
+        summary_str += "Layer types allowing injections:\n"
+        summary_str += "----------------------------------------------------------------" + "\n"
+        for l_type in self._INJ_LAYER_TYPES:
+            summary_str += "{:>5}".format("- ")
+            substring = str(l_type).split(".")[-1].split("'")[0]
+            summary_str += substring
+            # summary_str += "{:>15}".format(
+            #     str(substring),
+            # )
+            summary_str += "\n"
+        summary_str += "\n"
+
+        summary_str += "Model Info:\n"
+        summary_str += "----------------------------------------------------------------" + "\n"
+
+        summary_str += "   - Shape of input into the model: ("
+        for dim in self._INPUT_SHAPE:
+            summary_str += str(dim) + " "
+        summary_str += ")\n"
+
+        summary_str += "   - Batch Size: " + str(self._BATCH_SIZE) + "\n"
+        summary_str += "   - CUDA Enabled: " + str(self.use_cuda) + "\n\n"
+
+        summary_str += "Layer Info:\n"
+        summary_str += "----------------------------------------------------------------" + "\n"
+        line_new = "{:>5}  {:>15}  {:>15} {:>20}".format(
+            "Layer #", "Layer type", "Dimensions", "Output Shape")
+        summary_str += line_new + "\n"
+        summary_str += "----------------------------------------------------------------" + "\n"
+        for layer in range(len(self.OUTPUT_SIZE)):
+            line_new = "{:>5}  {:>15}  {:>15} {:>20}".format(
+                layer,
+                str(self.LAYERS_TYPE[layer]).split(".")[-1].split("'")[0],
+                str(self.LAYERS_DIM[layer]),
+                str(self.OUTPUT_SIZE[layer]),
+            )
+            summary_str += line_new + "\n"
+
+        summary_str += "================================================================" + "\n"
+
+        return summary_str
+

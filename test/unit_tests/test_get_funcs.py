@@ -88,3 +88,14 @@ class TestCoreGetFuncs:
         assert self.p.get_fmap_HW(2) == (2, 2)
         assert self.p.get_fmap_HW(3) == (2, 2)
         assert self.p.get_fmap_HW(4) == (2, 2)
+
+    def test_print_func(self):
+        outputString = self.p.print_pytorchfi_layer_summary()
+
+        assert "PYTORCHFI INIT SUMMARY" in outputString
+        assert "Shape of input into the model: (3 32 32 )" in outputString
+        assert "Batch Size: 4" in outputString
+        assert "Conv2d" in outputString
+        assert "CUDA Enabled: False" in outputString
+        assert "================================================================" in outputString
+
