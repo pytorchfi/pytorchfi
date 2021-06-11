@@ -11,15 +11,20 @@ import torch.nn as nn
 
 
 class fault_injection:
-    def __init__(self, model, h, w, batch_size, layer_types=[nn.Conv2d], **kwargs):
+    def __init__(self, model, batch_size, input_shape=[3, 224, 224], layer_types=[nn.Conv2d], **kwargs):
         logging.basicConfig(format="%(asctime)-15s %(clientip)s %(user)-8s %(message)s")
-        self.ORIG_MODEL = None
+
+        self.ORIG_MODEL = model
+        self.OUTPUT_SIZE = list()
+        self.LAYERS_TYPE = list()
+        self.LAYERS_DIM = list()
+        self._INPUT_SHAPE = input_shape
+        self._BATCH_SIZE = batch_size
+        self._INJ_LAYER_TYPES = layer_types
+
         self.CORRUPTED_MODEL = None
-        self._BATCH_SIZE = -1
-
-        self.CUSTOM_INJECTION = False
-        self.INJECTION_FUNCTION = None
-
+        self.CURR_LAYER = 0
+        self.HANDLES = list()
         self.CORRUPT_BATCH = list()
         self.CORRUPT_LAYER = list()
         self.CORRUPT_DIM1 = list()  # C
@@ -27,32 +32,24 @@ class fault_injection:
         self.CORRUPT_DIM3 = list()  # W
         self.CORRUPT_VALUE = list()
 
-        self.CURR_LAYER = 0
-        self.OUTPUT_SIZE = []
-        self.LAYERS_TYPE = []
-        self.LAYERS_DIM = []
-        self.HANDLES = []
-
-        self.imageC = kwargs.get("c", 3)
-        self.imageH = h
-        self.imageW = w
+        self.CUSTOM_INJECTION = False
+        self.INJECTION_FUNCTION = None
 
         self.use_cuda = kwargs.get("use_cuda", next(model.parameters()).is_cuda)
-        model_dtype = next(model.parameters()).dtype
 
-        self.ORIG_MODEL = model
-        self._BATCH_SIZE = batch_size
-        self._INJ_LAYER_TYPES = layer_types
+        assert isinstance(input_shape, list), "Error: Input shape must be provided as a list."
+        assert isinstance(batch_size, int) and batch_size >= 1, "Error: Batch size must be an integer greater than 1."
+        assert len(layer_types) >= 0 , "Error: At least one layer type must be selected."
 
         handles, shapes = self._traverseModelAndSetHooks(
             self.ORIG_MODEL, self._INJ_LAYER_TYPES
         )
 
-        b = 1  # profiling only needs one batch element
-
+        dummy_shape = (1, *self._INPUT_SHAPE)  # profiling only needs one batch element
+        model_dtype = next(model.parameters()).dtype
         device = "cuda" if self.use_cuda else None
         _dummyTensor = torch.randn(
-            b, self.imageC, self.imageH, self.imageW, dtype=model_dtype, device=device
+            dummy_shape, dtype=model_dtype, device=device
         )
 
         self.ORIG_MODEL(_dummyTensor)
@@ -60,7 +57,10 @@ class fault_injection:
         for i in range(len(handles)):
             handles[i].remove()
 
-        logging.info("Model output size")
+        logging.info("Input shape:")
+        logging.info(dummy_shape[1:])
+
+        logging.info("Model layer sizes:")
         logging.info(
             "\n".join(
                 [
@@ -381,3 +381,49 @@ class fault_injection:
 
     def get_fmap_HW(self, layer):
         return (self.get_fmaps_H(layer), self.get_fmaps_W(layer))
+
+    def print_pytorchfi_layer_summary(self):
+        summary_str = "==================== PYTORCHFI INIT SUMMARY ====================="+ "\n\n"
+
+        summary_str += "Layer types allowing injections:\n"
+        summary_str += "----------------------------------------------------------------" + "\n"
+        for l_type in self._INJ_LAYER_TYPES:
+            summary_str += "{:>5}".format("- ")
+            substring = str(l_type).split(".")[-1].split("'")[0]
+            summary_str += substring
+            # summary_str += "{:>15}".format(
+            #     str(substring),
+            # )
+            summary_str += "\n"
+        summary_str += "\n"
+
+        summary_str += "Model Info:\n"
+        summary_str += "----------------------------------------------------------------" + "\n"
+
+        summary_str += "   - Shape of input into the model: ("
+        for dim in self._INPUT_SHAPE:
+            summary_str += str(dim) + " "
+        summary_str += ")\n"
+
+        summary_str += "   - Batch Size: " + str(self._BATCH_SIZE) + "\n"
+        summary_str += "   - CUDA Enabled: " + str(self.use_cuda) + "\n\n"
+
+        summary_str += "Layer Info:\n"
+        summary_str += "----------------------------------------------------------------" + "\n"
+        line_new = "{:>5}  {:>15}  {:>15} {:>20}".format(
+            "Layer #", "Layer type", "Dimensions", "Output Shape")
+        summary_str += line_new + "\n"
+        summary_str += "----------------------------------------------------------------" + "\n"
+        for layer in range(len(self.OUTPUT_SIZE)):
+            line_new = "{:>5}  {:>15}  {:>15} {:>20}".format(
+                layer,
+                str(self.LAYERS_TYPE[layer]).split(".")[-1].split("'")[0],
+                str(self.LAYERS_DIM[layer]),
+                str(self.OUTPUT_SIZE[layer]),
+            )
+            summary_str += line_new + "\n"
+
+        summary_str += "================================================================" + "\n"
+
+        return summary_str
+

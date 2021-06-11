@@ -12,6 +12,7 @@ class TestCoreGetFuncs:
     def setup_class(self):
         self.BATCH_SIZE = 4
         self.WORKERS = 1
+        self.channels = 3
         self.img_size = 32
         self.LAYER_TYPES = [torch.nn.Conv2d]
         self.USE_GPU = False
@@ -29,9 +30,8 @@ class TestCoreGetFuncs:
 
         self.p = pfi_core(
             self.model,
-            self.img_size,
-            self.img_size,
             self.BATCH_SIZE,
+            input_shape=[self.channels, self.img_size, self.img_size],
             layer_types=self.LAYER_TYPES,
             use_cuda=self.USE_GPU,
         )
@@ -88,3 +88,14 @@ class TestCoreGetFuncs:
         assert self.p.get_fmap_HW(2) == (2, 2)
         assert self.p.get_fmap_HW(3) == (2, 2)
         assert self.p.get_fmap_HW(4) == (2, 2)
+
+    def test_print_func(self):
+        outputString = self.p.print_pytorchfi_layer_summary()
+
+        assert "PYTORCHFI INIT SUMMARY" in outputString
+        assert "Shape of input into the model: (3 32 32 )" in outputString
+        assert "Batch Size: 4" in outputString
+        assert "Conv2d" in outputString
+        assert "CUDA Enabled: False" in outputString
+        assert "================================================================" in outputString
+

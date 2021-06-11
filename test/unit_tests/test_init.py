@@ -13,6 +13,7 @@ class TestNeuronCPUSingle:
     def setup_class(self):
         self.BATCH_SIZE = 1
         self.WORKERS = 1
+        self.channels = 3
         self.img_size = 32
         self.USE_GPU = False
 
@@ -32,18 +33,16 @@ class TestNeuronCPUSingle:
         """
         pfi_core(
             self.model,
-            self.img_size,
-            self.img_size,
             self.BATCH_SIZE,
+            input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=self.USE_GPU,
         )
 
     def test_orig_model_cpu(self):
         p = pfi_core(
             self.model,
-            self.img_size,
-            self.img_size,
             self.BATCH_SIZE,
+            input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=self.USE_GPU,
         )
 
@@ -59,6 +58,7 @@ class TestNeuronGPUSingle:
     def setup_class(self):
         self.BATCH_SIZE = 1
         self.WORKERS = 1
+        self.channels = 3
         self.img_size = 32
         self.USE_GPU = True
 
@@ -83,9 +83,8 @@ class TestNeuronGPUSingle:
         """
         pfi_core(
             self.model,
-            self.img_size,
-            self.img_size,
             self.BATCH_SIZE,
+            input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=self.USE_GPU,
         )
 
@@ -95,9 +94,8 @@ class TestNeuronGPUSingle:
     def test_orig_model_gpu(self):
         p = pfi_core(
             self.model,
-            self.img_size,
-            self.img_size,
             self.BATCH_SIZE,
+            input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=self.USE_GPU,
         )
 
@@ -113,6 +111,7 @@ class TestDtypes:
     def setup_class(self):
         self.BATCH_SIZE = 1
         self.WORKERS = 1
+        self.channels = 3
         self.img_size = 32
 
         self.model, self.dataset = helper_setUp_CIFAR10_same(
@@ -139,9 +138,8 @@ class TestDtypes:
 
         pfi_core(
             self.model,
-            self.img_size,
-            self.img_size,
             self.BATCH_SIZE,
+            input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=self.USE_GPU,
         )
 
@@ -158,9 +156,8 @@ class TestDtypes:
 
         pfi_core(
             self.model,
-            self.img_size,
-            self.img_size,
             self.BATCH_SIZE,
+            input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=self.USE_GPU,
         )
 
@@ -183,9 +180,8 @@ class TestDtypes:
 
         pfi_core(
             self.model,
-            self.img_size,
-            self.img_size,
             self.BATCH_SIZE,
+            input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=self.USE_GPU,
         )
 
@@ -208,8 +204,7 @@ class TestDtypes:
 
         pfi_core(
             self.model,
-            self.img_size,
-            self.img_size,
             self.BATCH_SIZE,
+            input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=self.USE_GPU,
         )

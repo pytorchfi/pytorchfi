@@ -11,11 +11,12 @@ class TestCoreExampleClient:
     def setup_class(self):
         torch.manual_seed(5)
 
+        self.C = 3
         self.H = 224
         self.W = 224
         self.BATCH_SIZE = 4
 
-        self.IMAGE = torch.rand((self.BATCH_SIZE, 3, self.H, self.W))
+        self.IMAGE = torch.rand((self.BATCH_SIZE, self.C, self.H, self.W))
 
         self.USE_GPU = False
 
@@ -31,9 +32,8 @@ class TestCoreExampleClient:
 
         self.p = fault_injection(
             self.model,
-            self.H,
-            self.W,
             self.BATCH_SIZE,
+            input_shape=[self.C, self.H, self.W],
             use_cuda=self.USE_GPU,
         )
 
