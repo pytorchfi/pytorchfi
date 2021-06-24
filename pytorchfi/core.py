@@ -95,12 +95,17 @@ class fault_injection:
         for layer in model.children():
             # leaf node
             if list(layer.children()) == []:
-                for i in layer_types:
-                    if isinstance(layer, i):
-                        handles.append(
-                            layer.register_forward_hook(self._save_output_size)
-                        )
-                        shape.append(layer)
+                if "all" in layer_types:
+                    handles.append(
+                        layer.register_forward_hook(self._save_output_size)
+                    )
+                else:
+                    for i in layer_types:
+                        if isinstance(layer, i):
+                            handles.append(
+                                layer.register_forward_hook(self._save_output_size)
+                            )
+                            shape.append(layer)
             # unpack node
             else:
                 subHandles, subBase = self._traverseModelAndSetHooks(layer, layer_types)
@@ -417,12 +422,12 @@ class fault_injection:
 
         summary_str += "Layer Info:\n"
         summary_str += "----------------------------------------------------------------" + "\n"
-        line_new = "{:>5}  {:>15}  {:>15} {:>20}".format(
+        line_new = "{:>5}  {:>20}  {:>15} {:>20}".format(
             "Layer #", "Layer type", "Dimensions", "Output Shape")
         summary_str += line_new + "\n"
         summary_str += "----------------------------------------------------------------" + "\n"
         for layer in range(len(self.OUTPUT_SIZE)):
-            line_new = "{:>5}  {:>15}  {:>15} {:>20}".format(
+            line_new = "{:>5}  {:>20}  {:>15} {:>20}".format(
                 layer,
                 str(self.LAYERS_TYPE[layer]).split(".")[-1].split("'")[0],
                 str(self.LAYERS_DIM[layer]),

@@ -65,6 +65,19 @@ class TestLayers:
         assert p.get_layer_dim(2) == 2
         assert p.get_layer_type(2) == torch.nn.Linear
 
+    def test_inj_all_layers(self):
+        p = fault_injection(
+            self.model,
+            self.BATCH_SIZE,
+            layer_types=["all"],
+            use_cuda=self.USE_GPU,
+        )
+
+        assert p.get_total_layers() == 21
+        assert p.get_layer_dim(2) == 4
+        assert p.get_layer_type(2) == torch.nn.MaxPool2d
+        assert p.get_layer_type(20) == torch.nn.Linear
+
     def test_single_linear_neuron_inj(self):
         p = fault_injection(
             self.model,
