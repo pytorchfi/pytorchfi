@@ -45,7 +45,7 @@ class TestLayers:
 
         (b, layer, C, H, W, err_val) = ([0], [3], [4], [2], [4], [10000])
         inj = p.declare_neuron_fi(
-            batch=b, layer_num=layer, c=C, h=H, w=W, value=err_val
+            batch=b, layer_num=layer, dim1=C, dim2=H, dim3=W, value=err_val
         )
         inj_output = inj(self.IMAGE)
         inj_softmax = self.softmax(inj_output)
@@ -88,7 +88,7 @@ class TestLayers:
 
         (b, layer, C, H, W, err_val) = (0, 2, 888, None, None, 10000)
         inj = p.declare_neuron_fi(
-            batch=[b], layer_num=[layer], c=[C], h=[H], w=[W], value=[err_val]
+            batch=[b], layer_num=[layer], dim1=[C], dim2=[H], dim3=[W], value=[err_val]
         )
         inj_output = inj(self.IMAGE)
         inj_softmax = self.softmax(inj_output)
@@ -114,7 +114,7 @@ class TestLayers:
             [20000, 10000],
         )
         inj = p.declare_neuron_fi(
-            batch=b, layer_num=layer, c=C, h=H, w=W, value=err_val
+            batch=b, layer_num=layer, dim1=C, dim2=H, dim3=W, value=err_val
         )
         inj_output = inj(self.IMAGE)
         inj_softmax = self.softmax(inj_output)
