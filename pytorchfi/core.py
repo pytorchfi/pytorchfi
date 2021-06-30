@@ -95,12 +95,17 @@ class fault_injection:
         for layer in model.children():
             # leaf node
             if list(layer.children()) == []:
-                for i in layer_types:
-                    if isinstance(layer, i):
-                        handles.append(
-                            layer.register_forward_hook(self._save_output_size)
-                        )
-                        shape.append(layer)
+                if "all" in layer_types:
+                    handles.append(
+                        layer.register_forward_hook(self._save_output_size)
+                    )
+                else:
+                    for i in layer_types:
+                        if isinstance(layer, i):
+                            handles.append(
+                                layer.register_forward_hook(self._save_output_size)
+                            )
+                            shape.append(layer)
             # unpack node
             else:
                 subHandles, subBase = self._traverseModelAndSetHooks(layer, layer_types)
@@ -138,15 +143,15 @@ class fault_injection:
                 CUSTOM_INJECTION, CUSTOM_FUNCTION = True, kwargs.get("function")
                 corrupt_layer = kwargs.get("layer_num", list())
                 corrupt_k = kwargs.get("k", list())
-                corrupt_c = kwargs.get("c", list())
-                corrupt_kH = kwargs.get("h", list())
-                corrupt_kW = kwargs.get("w", list())
+                corrupt_c = kwargs.get("dim1", list())
+                corrupt_kH = kwargs.get("dim2", list())
+                corrupt_kW = kwargs.get("dim3", list())
             else:
                 corrupt_layer = kwargs.get("layer_num", )
                 corrupt_k = kwargs.get("k", list())
-                corrupt_c = kwargs.get("c", list())
-                corrupt_kH = kwargs.get("h", list())
-                corrupt_kW = kwargs.get("w", list())
+                corrupt_c = kwargs.get("dim1", list())
+                corrupt_kH = kwargs.get("dim2", list())
+                corrupt_kW = kwargs.get("dim3", list())
                 corrupt_value = kwargs.get("value", list())
         else:
             raise ValueError("Please specify an injection or injection function")
@@ -187,15 +192,15 @@ class fault_injection:
                 CUSTOM_INJECTION, INJECTION_FUNCTION = True, kwargs.get("function")
                 self.CORRUPT_LAYER = kwargs.get("layer_num", list())
                 self.CORRUPT_BATCH = kwargs.get("batch", list())
-                self.CORRUPT_DIM1 = kwargs.get("c", list())
-                self.CORRUPT_DIM2 = kwargs.get("h", list())
-                self.CORRUPT_DIM3 = kwargs.get("w", list())
+                self.CORRUPT_DIM1 = kwargs.get("dim1", list())
+                self.CORRUPT_DIM2 = kwargs.get("dim2", list())
+                self.CORRUPT_DIM3 = kwargs.get("dim3", list())
             else:
                 self.CORRUPT_LAYER = kwargs.get("layer_num", list())
                 self.CORRUPT_BATCH = kwargs.get("batch", list())
-                self.CORRUPT_DIM1 = kwargs.get("c", list())
-                self.CORRUPT_DIM2 = kwargs.get("h", list())
-                self.CORRUPT_DIM3 = kwargs.get("w", list())
+                self.CORRUPT_DIM1 = kwargs.get("dim1", list())
+                self.CORRUPT_DIM2 = kwargs.get("dim2", list())
+                self.CORRUPT_DIM3 = kwargs.get("dim3", list())
                 self.CORRUPT_VALUE = kwargs.get("value", list())
 
                 logging.info("Declaring Specified Fault Injector")
@@ -258,11 +263,14 @@ class fault_injection:
             self.CORRUPT_DIM1[index]
             < layerShape[1]
         ), "%d < %d: Out of bounds error in Dimension 1!" %(self.CORRUPT_DIM1[index], layerShape[1])
+
         if layerDim > 2:
             assert (
                 self.CORRUPT_DIM2[index]
                 < layerShape[2]
             ), "%d < %d: Out of bounds error in Dimension 2!" %(self.CORRUPT_DIM2[index], layerShape[2])
+
+        if layerDim > 3:
             assert (
                 self.CORRUPT_DIM3[index]
                 < layerShape[3]
@@ -271,6 +279,10 @@ class fault_injection:
         if layerDim <= 2:
             if self.CORRUPT_DIM2[index] != None or self.CORRUPT_DIM3[index] != None:
                 warnings.warn("Values in Dim2 and Dim3 ignored, since layer is %s" %(layerType))
+
+        if layerDim <= 3:
+            if self.CORRUPT_DIM3[index] != None:
+                warnings.warn("Values Dim3 ignored, since layer is %s" %(layerType))
 
         logging.info("Finished checking bounds on inj '%d'"%(index))
 
@@ -410,12 +422,12 @@ class fault_injection:
 
         summary_str += "Layer Info:\n"
         summary_str += "----------------------------------------------------------------" + "\n"
-        line_new = "{:>5}  {:>15}  {:>15} {:>20}".format(
+        line_new = "{:>5}  {:>20}  {:>15} {:>20}".format(
             "Layer #", "Layer type", "Dimensions", "Output Shape")
         summary_str += line_new + "\n"
         summary_str += "----------------------------------------------------------------" + "\n"
         for layer in range(len(self.OUTPUT_SIZE)):
-            line_new = "{:>5}  {:>15}  {:>15} {:>20}".format(
+            line_new = "{:>5}  {:>20}  {:>15} {:>20}".format(
                 layer,
                 str(self.LAYERS_TYPE[layer]).split(".")[-1].split("'")[0],
                 str(self.LAYERS_DIM[layer]),

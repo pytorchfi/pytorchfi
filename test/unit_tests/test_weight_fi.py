@@ -46,7 +46,7 @@ class TestWeightFIcpu:
         inj_value_i = 10000.0
 
         self.inj_model = self.p.declare_weight_fi(
-            layer_num=layer_i, k=k, c=c_i, h=h_i, w=w_i, value=inj_value_i
+            layer_num=layer_i, k=k, dim1=c_i, dim2=h_i, dim3=w_i, value=inj_value_i
         )
 
         self.inj_model.eval()
@@ -58,9 +58,9 @@ class TestWeightFIcpu:
         self.inj_model = self.p.declare_weight_fi(
             layer_num=layer_i,
             k=k,
-            c=c_i,
-            h=h_i,
-            w=w_i,
+            dim1=c_i,
+            dim2=h_i,
+            dim3=w_i,
             value=0.01388985849916935,
         )
 
@@ -73,9 +73,9 @@ class TestWeightFIcpu:
         self.inj_model = self.p.declare_weight_fi(
             layer_num=layer_i,
             k=k,
-            c=c_i,
-            h=h_i,
-            w=w_i,
+            dim1=c_i,
+            dim2=h_i,
+            dim3=w_i,
             value=inj_value_i * 2,
         )
 
@@ -96,7 +96,7 @@ class TestWeightFIcpu:
         inj_value_i = 10000.0
 
         self.inj_model = self.p.declare_weight_fi(
-            layer_num=layer_i, k=k, c=c_i, h=h_i, w=w_i, value=inj_value_i
+            layer_num=layer_i, k=k, dim1=c_i, dim2=h_i, dim3=w_i, value=inj_value_i
         )
 
         self.inj_model.eval()
