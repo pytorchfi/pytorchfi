@@ -29,7 +29,7 @@ def random_neuron_location(pfi_model, layer=-1):
 
 
 def random_weight_location(pfi_model, layer=-1):
-    loc = list()
+    loc = []
 
     if layer == -1:
         corrupt_layer = random.randint(0, pfi_model.get_total_layers() - 1)
