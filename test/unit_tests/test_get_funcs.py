@@ -97,5 +97,7 @@ class TestCoreGetFuncs:
         assert "Batch Size: 4" in outputString
         assert "Conv2d" in outputString
         assert "CUDA Enabled: False" in outputString
-        assert "================================================================" in outputString
-
+        assert (
+            "================================================================"
+            in outputString
+        )

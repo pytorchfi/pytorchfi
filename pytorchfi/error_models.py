@@ -96,7 +96,12 @@ def random_neuron_inj_batched(
         value.append(err_val)
 
     return pfi_model.declare_neuron_fi(
-        batch=batch, layer_num=layer_num, dim1=c_rand, dim2=h_rand, dim3=w_rand, value=value
+        batch=batch,
+        layer_num=layer_num,
+        dim1=c_rand,
+        dim2=h_rand,
+        dim3=w_rand,
+        value=value,
     )
 
 
@@ -115,7 +120,12 @@ def random_inj_per_layer(pfi_model, min_val=-1, max_val=1):
         value.append(random_value(min_val=min_val, max_val=max_val))
 
     return pfi_model.declare_neuron_fi(
-        batch=batch, layer_num=layer_num, dim1=c_rand, dim2=h_rand, dim3=w_rand, value=value
+        batch=batch,
+        layer_num=layer_num,
+        dim1=c_rand,
+        dim2=h_rand,
+        dim3=w_rand,
+        value=value,
     )
 
 
@@ -145,12 +155,19 @@ def random_inj_per_layer_batched(
             value.append(err_val)
 
     return pfi_model.declare_neuron_fi(
-        batch=batch, layer_num=layer_num, dim1=c_rand, dim2=h_rand, dim3=w_rand, value=value
+        batch=batch,
+        layer_num=layer_num,
+        dim1=c_rand,
+        dim2=h_rand,
+        dim3=w_rand,
+        value=value,
     )
 
 
 class single_bit_flip_func(core.fault_injection):
-    def __init__(self, model, batch_size, input_shape=[3,224,224], **kwargs):
+    def __init__(self, model, batch_size, input_shape=None, **kwargs):
+        if input_shape is None:
+            input_shape = [3, 224, 224]
         super().__init__(model, batch_size, input_shape=input_shape, **kwargs)
         logging.basicConfig(format="%(asctime)-15s %(clientip)s %(user)-8s %(message)s")
 
@@ -235,7 +252,7 @@ class single_bit_flip_func(core.fault_injection):
         logging.info("curr_conv", self.get_curr_layer())
         logging.info("range_max", range_max)
 
-        if type(corrupt_conv_set) == list:
+        if type(corrupt_conv_set) is list:
             inj_list = list(
                 filter(
                     lambda x: corrupt_conv_set[x] == self.get_curr_layer(),
@@ -252,16 +269,16 @@ class single_bit_flip_func(core.fault_injection):
                 logging.info("rand_bit", rand_bit)
                 new_value = self._flip_bit_signed(prev_value, range_max, rand_bit)
 
-                output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][self.CORRUPT_DIM2[i]][
-                    self.CORRUPT_DIM3[i]
-                ] = new_value
+                output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][
+                    self.CORRUPT_DIM2[i]
+                ][self.CORRUPT_DIM3[i]] = new_value
 
         else:
             self.assert_inj_bounds()
             if self.get_curr_layer() == corrupt_conv_set:
-                prev_value = output[self.CORRUPT_BATCH][self.CORRUPT_DIM1][self.CORRUPT_DIM2][
-                    self.CORRUPT_DIM3
-                ]
+                prev_value = output[self.CORRUPT_BATCH][self.CORRUPT_DIM1][
+                    self.CORRUPT_DIM2
+                ][self.CORRUPT_DIM3]
 
                 rand_bit = random.randint(0, self.bits - 1)
                 logging.info("rand_bit", rand_bit)
@@ -304,6 +321,7 @@ def random_neuron_single_bit_inj_batched(pfi_model, layer_ranges, randLoc=True):
 
 
 def random_neuron_single_bit_inj(pfi_model, layer_ranges):
+    # TODO Support multiple error models via list
     pfi_model.set_conv_max(layer_ranges)
 
     batch = random_batch_element(pfi_model)
@@ -315,7 +333,7 @@ def random_neuron_single_bit_inj(pfi_model, layer_ranges):
         dim1=[C],
         dim2=[H],
         dim3=[W],
-        function=pfi_model.single_bit_flip_signed_across_batch, #TODO Support multiple error models via list
+        function=pfi_model.single_bit_flip_signed_across_batch,
     )
 
 

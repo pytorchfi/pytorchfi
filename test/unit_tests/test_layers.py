@@ -3,6 +3,7 @@ import torchvision.models as models
 from pytorchfi.core import fault_injection
 import pytest
 
+
 class TestLayers:
     """
     Testing PyTorchFI.Core example client.
@@ -41,7 +42,6 @@ class TestLayers:
             layer_types=[torch.nn.Conv2d],
             use_cuda=self.USE_GPU,
         )
-
 
         (b, layer, C, H, W, err_val) = ([0], [3], [4], [2], [4], [10000])
         inj = p.declare_neuron_fi(
