@@ -178,10 +178,10 @@ class fault_injection:
                     param.data[corrupt_idx] = corrupt_value
 
                     logging.info("Weight Injection")
-                    logging.info("Layer index: %s" % corrupt_layer)
-                    logging.info("Module: %s" % name)
-                    logging.info("Original value: %s" % orig_value)
-                    logging.info("Injected value: %s" % corrupt_value)
+                    logging.info("Layer index: %s", corrupt_layer)
+                    logging.info("Module: %s", name)
+                    logging.info("Original value: %s", orig_value)
+                    logging.info("Injected value: %s", corrupt_value)
 
                 curr_layer += 1
         return self.CORRUPTED_MODEL
@@ -208,16 +208,14 @@ class fault_injection:
                 self.CORRUPT_VALUE = kwargs.get("value", [])
 
                 logging.info("Declaring Specified Fault Injector")
-                logging.info("Convolution: %s" % self.CORRUPT_LAYER)
+                logging.info("Convolution: %s", self.CORRUPT_LAYER)
                 logging.info("Batch, x, y, z:")
                 logging.info(
-                    "%s, %s, %s, %s"
-                    % (
-                        self.CORRUPT_BATCH,
-                        self.CORRUPT_DIM1,
-                        self.CORRUPT_DIM2,
-                        self.CORRUPT_DIM3,
-                    )
+                    "%s, %s, %s, %s",
+                    self.CORRUPT_BATCH,
+                    self.CORRUPT_DIM1,
+                    self.CORRUPT_DIM2,
+                    self.CORRUPT_DIM3,
                 )
         else:
             raise ValueError("Please specify an injection or injection function")
@@ -288,10 +286,10 @@ class fault_injection:
             if self.CORRUPT_DIM3[index] is not None:
                 warnings.warn("Values Dim3 ignored, since layer is %s" %(layerType))
 
-        logging.info("Finished checking bounds on inj '%d'"%(index))
+        logging.info("Finished checking bounds on inj '%d'", (index))
 
     def _set_value(self, module, input, output):
-        logging.info("Processing hook of Layer %d: %s" %(self.get_curr_layer(), self.get_layer_type(self.get_curr_layer())))
+        logging.info("Processing hook of Layer %d: %s", self.get_curr_layer(), self.get_layer_type(self.get_curr_layer()))
         inj_list = list(
             filter(
                 lambda x: self.CORRUPT_LAYER[x] == self.get_curr_layer(),
@@ -301,19 +299,18 @@ class fault_injection:
 
         layerDim = self.LAYERS_DIM[self.get_curr_layer()]
 
-        logging.info("Layer %d injection list size: %d" %(self.get_curr_layer(), len(inj_list)))
+        logging.info("Layer %d injection list size: %d", self.get_curr_layer(), len(inj_list))
         if layerDim == 2:
             for i in inj_list:
                 self.assert_inj_bounds(index=i)
                 logging.info(
-                    "Original value at [%d][%d]: %d"
-                    % (
-                        self.CORRUPT_BATCH[i],
-                        self.CORRUPT_DIM1[i],
-                        output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]]
-                    )
+                    "Original value at [%d][%d]: %d",
+                    self.CORRUPT_BATCH[i],
+                    self.CORRUPT_DIM1[i],
+                    output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]]
+                    
                 )
-                logging.info("Changing value to %d" % self.CORRUPT_VALUE[i])
+                logging.info("Changing value to %d", self.CORRUPT_VALUE[i])
                 output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]
                 ] = self.CORRUPT_VALUE[i]
 
