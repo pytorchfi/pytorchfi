@@ -237,7 +237,7 @@ class single_bit_flip_func(core.fault_injection):
         logging.info("curr_conv", self.get_curr_layer())
         logging.info("range_max", range_max)
 
-        if type(corrupt_conv_set) == list:
+        if type(corrupt_conv_set) is list:
             inj_list = list(
                 filter(
                     lambda x: corrupt_conv_set[x] == self.get_curr_layer(),
