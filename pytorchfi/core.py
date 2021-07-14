@@ -281,11 +281,11 @@ class fault_injection:
             ), "%d < %d: Out of bounds error in Dimension 3!" %(self.CORRUPT_DIM3[index], layerShape[3])
 
         if layerDim <= 2:
-            if self.CORRUPT_DIM2[index] != None or self.CORRUPT_DIM3[index] != None:
+            if self.CORRUPT_DIM2[index] is not None or self.CORRUPT_DIM3[index] is not None:
                 warnings.warn("Values in Dim2 and Dim3 ignored, since layer is %s" %(layerType))
 
         if layerDim <= 3:
-            if self.CORRUPT_DIM3[index] != None:
+            if self.CORRUPT_DIM3[index] is not None:
                 warnings.warn("Values Dim3 ignored, since layer is %s" %(layerType))
 
         logging.info("Finished checking bounds on inj '%d'"%(index))
