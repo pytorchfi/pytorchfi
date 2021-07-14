@@ -321,6 +321,7 @@ def random_neuron_single_bit_inj_batched(pfi_model, layer_ranges, randLoc=True):
 
 
 def random_neuron_single_bit_inj(pfi_model, layer_ranges):
+    # TODO Support multiple error models via list
     pfi_model.set_conv_max(layer_ranges)
 
     batch = random_batch_element(pfi_model)
@@ -332,7 +333,7 @@ def random_neuron_single_bit_inj(pfi_model, layer_ranges):
         dim1=[C],
         dim2=[H],
         dim3=[W],
-        function=pfi_model.single_bit_flip_signed_across_batch,  # TODO Support multiple error models via list
+        function=pfi_model.single_bit_flip_signed_across_batch,
     )
 
 
