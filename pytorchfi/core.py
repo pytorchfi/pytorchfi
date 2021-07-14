@@ -11,7 +11,11 @@ import torch.nn as nn
 
 
 class fault_injection:
-    def __init__(self, model, batch_size, input_shape=[3, 224, 224], layer_types=[nn.Conv2d], **kwargs):
+    def __init__(self, model, batch_size, input_shape=None, layer_types=None, **kwargs):
+        if input_shape is None:
+            input_shape = [3, 224, 224]
+        if layer_types is None:
+            layer_types = [nn.Conv2d]
         logging.basicConfig(format="%(asctime)-15s %(clientip)s %(user)-8s %(message)s")
 
         self.ORIG_MODEL = model

@@ -150,7 +150,9 @@ def random_inj_per_layer_batched(
 
 
 class single_bit_flip_func(core.fault_injection):
-    def __init__(self, model, batch_size, input_shape=[3,224,224], **kwargs):
+    def __init__(self, model, batch_size, input_shape=None, **kwargs):
+        if input_shape is None:
+            input_shape = [3, 224, 224]
         super().__init__(model, batch_size, input_shape=input_shape, **kwargs)
         logging.basicConfig(format="%(asctime)-15s %(clientip)s %(user)-8s %(message)s")
 
