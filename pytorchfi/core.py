@@ -15,22 +15,22 @@ class fault_injection:
         logging.basicConfig(format="%(asctime)-15s %(clientip)s %(user)-8s %(message)s")
 
         self.ORIG_MODEL = model
-        self.OUTPUT_SIZE = list()
-        self.LAYERS_TYPE = list()
-        self.LAYERS_DIM = list()
+        self.OUTPUT_SIZE = []
+        self.LAYERS_TYPE = []
+        self.LAYERS_DIM = []
         self._INPUT_SHAPE = input_shape
         self._BATCH_SIZE = batch_size
         self._INJ_LAYER_TYPES = layer_types
 
         self.CORRUPTED_MODEL = None
         self.CURR_LAYER = 0
-        self.HANDLES = list()
-        self.CORRUPT_BATCH = list()
-        self.CORRUPT_LAYER = list()
-        self.CORRUPT_DIM1 = list()  # C
-        self.CORRUPT_DIM2 = list()  # H
-        self.CORRUPT_DIM3 = list()  # W
-        self.CORRUPT_VALUE = list()
+        self.HANDLES = []
+        self.CORRUPT_BATCH = []
+        self.CORRUPT_LAYER = []
+        self.CORRUPT_DIM1 = []  # C
+        self.CORRUPT_DIM2 = []  # H
+        self.CORRUPT_DIM3 = []  # W
+        self.CORRUPT_VALUE = []
 
         self.CUSTOM_INJECTION = False
         self.INJECTION_FUNCTION = None
@@ -84,7 +84,7 @@ class fault_injection:
             self.CORRUPT_DIM2,
             self.CORRUPT_DIM3,
             self.CORRUPT_VALUE,
-        ) = (0, list(), list(), list(), list(), list(), list())
+        ) = (0, [], [], [], [], [], [])
 
         for i in range(len(self.HANDLES)):
             self.HANDLES[i].remove()
@@ -141,18 +141,18 @@ class fault_injection:
         if kwargs:
             if "function" in kwargs:
                 CUSTOM_INJECTION, CUSTOM_FUNCTION = True, kwargs.get("function")
-                corrupt_layer = kwargs.get("layer_num", list())
-                corrupt_k = kwargs.get("k", list())
-                corrupt_c = kwargs.get("dim1", list())
-                corrupt_kH = kwargs.get("dim2", list())
-                corrupt_kW = kwargs.get("dim3", list())
+                corrupt_layer = kwargs.get("layer_num", [])
+                corrupt_k = kwargs.get("k", [])
+                corrupt_c = kwargs.get("dim1", [])
+                corrupt_kH = kwargs.get("dim2", [])
+                corrupt_kW = kwargs.get("dim3", [])
             else:
                 corrupt_layer = kwargs.get("layer_num", )
-                corrupt_k = kwargs.get("k", list())
-                corrupt_c = kwargs.get("dim1", list())
-                corrupt_kH = kwargs.get("dim2", list())
-                corrupt_kW = kwargs.get("dim3", list())
-                corrupt_value = kwargs.get("value", list())
+                corrupt_k = kwargs.get("k", [])
+                corrupt_c = kwargs.get("dim1", [])
+                corrupt_kH = kwargs.get("dim2", [])
+                corrupt_kW = kwargs.get("dim3", [])
+                corrupt_value = kwargs.get("value", [])
         else:
             raise ValueError("Please specify an injection or injection function")
 
@@ -190,18 +190,18 @@ class fault_injection:
         if kwargs:
             if "function" in kwargs:
                 CUSTOM_INJECTION, INJECTION_FUNCTION = True, kwargs.get("function")
-                self.CORRUPT_LAYER = kwargs.get("layer_num", list())
-                self.CORRUPT_BATCH = kwargs.get("batch", list())
-                self.CORRUPT_DIM1 = kwargs.get("dim1", list())
-                self.CORRUPT_DIM2 = kwargs.get("dim2", list())
-                self.CORRUPT_DIM3 = kwargs.get("dim3", list())
+                self.CORRUPT_LAYER = kwargs.get("layer_num", [])
+                self.CORRUPT_BATCH = kwargs.get("batch", [])
+                self.CORRUPT_DIM1 = kwargs.get("dim1", [])
+                self.CORRUPT_DIM2 = kwargs.get("dim2", [])
+                self.CORRUPT_DIM3 = kwargs.get("dim3", [])
             else:
-                self.CORRUPT_LAYER = kwargs.get("layer_num", list())
-                self.CORRUPT_BATCH = kwargs.get("batch", list())
-                self.CORRUPT_DIM1 = kwargs.get("dim1", list())
-                self.CORRUPT_DIM2 = kwargs.get("dim2", list())
-                self.CORRUPT_DIM3 = kwargs.get("dim3", list())
-                self.CORRUPT_VALUE = kwargs.get("value", list())
+                self.CORRUPT_LAYER = kwargs.get("layer_num", [])
+                self.CORRUPT_BATCH = kwargs.get("batch", [])
+                self.CORRUPT_DIM1 = kwargs.get("dim1", [])
+                self.CORRUPT_DIM2 = kwargs.get("dim2", [])
+                self.CORRUPT_DIM3 = kwargs.get("dim3", [])
+                self.CORRUPT_VALUE = kwargs.get("value", [])
 
                 logging.info("Declaring Specified Fault Injector")
                 logging.info("Convolution: %s" % self.CORRUPT_LAYER)
