@@ -53,7 +53,12 @@ class TestNeuronFIgpu:
         inj_value_i = [10000.0]
 
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, layer_num=layer_i, dim1=c_i, dim2=h_i, dim3=w_i, value=inj_value_i
+            batch=batch_i,
+            layer_num=layer_i,
+            dim1=c_i,
+            dim2=h_i,
+            dim3=w_i,
+            value=inj_value_i,
         )
 
         self.inj_model.eval()
@@ -78,7 +83,12 @@ class TestNeuronFIgpu:
         assert torch.all(uncorrupted_output.eq(self.output))
 
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, layer_num=layer_i, dim1=c_i, dim2=h_i, dim3=w_i, value=inj_value_i * 2
+            batch=batch_i,
+            layer_num=layer_i,
+            dim1=c_i,
+            dim2=h_i,
+            dim3=w_i,
+            value=inj_value_i * 2,
         )
 
         self.inj_model.eval()
@@ -131,7 +141,12 @@ class TestNeuronFIcpu:
         inj_value_i = [10000.0]
 
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, layer_num=layer_i, dim1=c_i, dim2=h_i, dim3=w_i, value=inj_value_i
+            batch=batch_i,
+            layer_num=layer_i,
+            dim1=c_i,
+            dim2=h_i,
+            dim3=w_i,
+            value=inj_value_i,
         )
 
         self.inj_model.eval()
@@ -156,7 +171,12 @@ class TestNeuronFIcpu:
         assert torch.all(uncorrupted_output.eq(self.output))
 
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, layer_num=layer_i, dim1=c_i, dim2=h_i, dim3=w_i, value=inj_value_i * 2
+            batch=batch_i,
+            layer_num=layer_i,
+            dim1=c_i,
+            dim2=h_i,
+            dim3=w_i,
+            value=inj_value_i * 2,
         )
 
         self.inj_model.eval()
@@ -216,7 +236,12 @@ class TestNeuronFIgpuBatch:
         inj_value_i = [10000.0]
 
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, layer_num=layer_i, dim1=c_i, dim2=h_i, dim3=w_i, value=inj_value_i
+            batch=batch_i,
+            layer_num=layer_i,
+            dim1=c_i,
+            dim2=h_i,
+            dim3=w_i,
+            value=inj_value_i,
         )
 
         self.inj_model.eval()
@@ -242,7 +267,12 @@ class TestNeuronFIgpuBatch:
         inj_value_i = [10000.0, 10000.0, 10000.0]
 
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, layer_num=layer_i, dim1=c_i, dim2=h_i, dim3=w_i, value=inj_value_i
+            batch=batch_i,
+            layer_num=layer_i,
+            dim1=c_i,
+            dim2=h_i,
+            dim3=w_i,
+            value=inj_value_i,
         )
 
         self.inj_model.eval()
@@ -297,7 +327,12 @@ class TestNeuronFIcpuBatch:
         inj_value_i = [10000.0]
 
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, layer_num=layer_i, dim1=c_i, dim2=h_i, dim3=w_i, value=inj_value_i
+            batch=batch_i,
+            layer_num=layer_i,
+            dim1=c_i,
+            dim2=h_i,
+            dim3=w_i,
+            value=inj_value_i,
         )
 
         self.inj_model.eval()
@@ -319,7 +354,12 @@ class TestNeuronFIcpuBatch:
         inj_value_i = [10000.0, 10000.0, 10000.0]
 
         self.inj_model = self.p.declare_neuron_fi(
-            batch=batch_i, layer_num=layer_i, dim1=c_i, dim2=h_i, dim3=w_i, value=inj_value_i
+            batch=batch_i,
+            layer_num=layer_i,
+            dim1=c_i,
+            dim2=h_i,
+            dim3=w_i,
+            value=inj_value_i,
         )
 
         self.inj_model.eval()
