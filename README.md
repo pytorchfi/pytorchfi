@@ -35,6 +35,9 @@ For example, this is an object detection network before a fault injection
 
 Download on PyPI [here](https://pypi.org/project/pytorchfi/), or take a look at our documentation at [pytorchfi.github.io](https://pytorchfi.github.io/).
 
+You can also learn more with our [interactive demo](https://colab.research.google.com/drive/1BMB4LbsTU_K_YXUFzRyfIynpGu5Yhr1Y).
+
+
 ### Installing
 
 **From Pip**
@@ -107,4 +110,4 @@ This project was funded in part by the [Applications Driving Architectures (ADA)
 
 ## License
 
-[NCSA](https://opensource.org/licenses/NCSA) License. Copyright © 2020 [RSim Research Group](http://rsim.cs.uiuc.edu/).
+[NCSA](https://opensource.org/licenses/NCSA) License. Copyright © 2021 [RSim Research Group](http://rsim.cs.uiuc.edu/).
