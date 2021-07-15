@@ -25,15 +25,14 @@
 
 PyTorchFI is a runtime perturbation tool for deep neural networks (DNNs), implemented for the popular PyTorch deep learning platform. PyTorchFI enables users to perform perturbation on weights or neurons of a DNN during runtime. It is extremely versatile for dependability and reliability research, with applications including resiliency analysis of classification networks, resiliency analysis of object detection networks, analysis of models robust to adversarial attacks, training resilient models, and for DNN interpertability.
 
-For example, this the output of an object detection network before and after an error injection
-
+An example of a use case for PyTorchFI is to simulate and error by performaing a fault-injection on an object recognition model.
 |                                              Golden Output                                               |                                       Output with Fault Injection                                        |
 | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: |
 | ![](https://user-images.githubusercontent.com/7104017/85642872-7fb93980-b647-11ea-8717-8d16cb1c35b3.jpg) | ![](https://user-images.githubusercontent.com/7104017/85642867-7def7600-b647-11ea-89b9-570278c22101.jpg) |
 
 ## Usage
 
-Download on PyPI [here](https://pypi.org/project/pytorchfi/), or take a look at our documentation at [pytorchfi.github.io](https://pytorchfi.github.io/).
+Download on PyPI [here](https://pypi.org/project/pytorchfi/), or take a look at our documentation at [pytorchfi.dev](https://pytorchfi.dev/).
 
 You can also learn more with our [interactive demo](https://colab.research.google.com/drive/1BMB4LbsTU_K_YXUFzRyfIynpGu5Yhr1Y).
 
@@ -72,7 +71,7 @@ pytest
 
 ### Structure
 
-The main source code of PyTorchFI is held in `pytorchfi`, which carries both `core` and `util` implementations.
+The main source code of PyTorchFI is held in `pytorchfi`, which carries both `core` and `error_models.py` implementations.
 
 ### Formatting
 
@@ -92,7 +91,7 @@ Before contributing, please refer to our [contributing guidelines](https://githu
 
 ## Citation
 
-View the [published paper](https://ieeexplore.ieee.org/abstract/document/9151812). If you use or reference PyTorchFI, please cite:
+View the [published paper](http://rsim.cs.illinois.edu/Pubs/20-DSML-PyTorchFI.pdf). If you use or reference PyTorchFI, please cite:
 
 ```
 @INPROCEEDINGS{PytorchFIMahmoudAggarwalDSML20,
