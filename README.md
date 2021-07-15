@@ -25,7 +25,7 @@
 
 PyTorchFI is a runtime perturbation tool for deep neural networks (DNNs), implemented for the popular PyTorch deep learning platform. PyTorchFI enables users to perform perturbation on weights or neurons of a DNN during runtime. It is extremely versatile for dependability and reliability research, with applications including resiliency analysis of classification networks, resiliency analysis of object detection networks, analysis of models robust to adversarial attacks, training resilient models, and for DNN interpertability.
 
-For example, this is an object detection network before a fault injection
+For example, this the output of an object detection network before and after an error injection
 
 |                                              Golden Output                                               |                                       Output with Fault Injection                                        |
 | :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: |
