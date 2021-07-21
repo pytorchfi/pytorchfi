@@ -44,60 +44,91 @@ class TestCoreGetFuncs:
             [1, 256, 2, 2],
             [1, 256, 2, 2],
         ]
-        assert self.p.get_output_size() == shape
+        if self.p.get_output_size() != shape:
+            raise AssertionError
 
     def test_get_total_batches(self):
-        assert self.p.get_total_batches() == 4
+        if self.p.get_total_batches() != 4:
+            raise AssertionError
 
     def test_get_inj_layer_types(self):
-        assert self.p.get_inj_layer_types() == [torch.nn.Conv2d]
+        if self.p.get_inj_layer_types() != [torch.nn.Conv2d]:
+            raise AssertionError
 
     def test_get_layer_type(self):
-        assert self.p.get_layer_type(3) == torch.nn.Conv2d
+        if self.p.get_layer_type(3) != torch.nn.Conv2d:
+            raise AssertionError
 
     def test_get_layer_dim(self):
-        assert self.p.get_layer_dim(3) == 4
+        if self.p.get_layer_dim(3) != 4:
+            raise AssertionError
 
     def test_get_total_layers(self):
-        assert self.p.get_total_layers() == 5
+        if self.p.get_total_layers() != 5:
+            raise AssertionError
 
     def test_get_fmap_num(self):
-        assert self.p.get_fmaps_num(0) == 64
-        assert self.p.get_fmaps_num(1) == 192
-        assert self.p.get_fmaps_num(2) == 384
-        assert self.p.get_fmaps_num(3) == 256
-        assert self.p.get_fmaps_num(4) == 256
+        if self.p.get_fmaps_num(0) != 64:
+            raise AssertionError
+        if self.p.get_fmaps_num(1) != 192:
+            raise AssertionError
+        if self.p.get_fmaps_num(2) != 384:
+            raise AssertionError
+        if self.p.get_fmaps_num(3) != 256:
+            raise AssertionError
+        if self.p.get_fmaps_num(4) != 256:
+            raise AssertionError
 
     def test_get_fmaps_H(self):
-        assert self.p.get_fmaps_H(0) == 8
-        assert self.p.get_fmaps_H(1) == 4
-        assert self.p.get_fmaps_H(2) == 2
-        assert self.p.get_fmaps_H(3) == 2
-        assert self.p.get_fmaps_H(4) == 2
+        if self.p.get_fmaps_H(0) != 8:
+            raise AssertionError
+        if self.p.get_fmaps_H(1) != 4:
+            raise AssertionError
+        if self.p.get_fmaps_H(2) != 2:
+            raise AssertionError
+        if self.p.get_fmaps_H(3) != 2:
+            raise AssertionError
+        if self.p.get_fmaps_H(4) != 2:
+            raise AssertionError
 
     def test_get_fmaps_W(self):
-        assert self.p.get_fmaps_W(0) == 8
-        assert self.p.get_fmaps_W(1) == 4
-        assert self.p.get_fmaps_W(2) == 2
-        assert self.p.get_fmaps_W(3) == 2
-        assert self.p.get_fmaps_W(4) == 2
+        if self.p.get_fmaps_W(0) != 8:
+            raise AssertionError
+        if self.p.get_fmaps_W(1) != 4:
+            raise AssertionError
+        if self.p.get_fmaps_W(2) != 2:
+            raise AssertionError
+        if self.p.get_fmaps_W(3) != 2:
+            raise AssertionError
+        if self.p.get_fmaps_W(4) != 2:
+            raise AssertionError
 
     def test_get_fmap_HW(self):
-        assert self.p.get_fmap_HW(0) == (8, 8)
-        assert self.p.get_fmap_HW(1) == (4, 4)
-        assert self.p.get_fmap_HW(2) == (2, 2)
-        assert self.p.get_fmap_HW(3) == (2, 2)
-        assert self.p.get_fmap_HW(4) == (2, 2)
+        if self.p.get_fmap_HW(0) != (8, 8):
+            raise AssertionError
+        if self.p.get_fmap_HW(1) != (4, 4):
+            raise AssertionError
+        if self.p.get_fmap_HW(2) != (2, 2):
+            raise AssertionError
+        if self.p.get_fmap_HW(3) != (2, 2):
+            raise AssertionError
+        if self.p.get_fmap_HW(4) != (2, 2):
+            raise AssertionError
 
     def test_print_func(self):
         outputString = self.p.print_pytorchfi_layer_summary()
 
-        assert "PYTORCHFI INIT SUMMARY" in outputString
-        assert "Shape of input into the model: (3 32 32 )" in outputString
-        assert "Batch Size: 4" in outputString
-        assert "Conv2d" in outputString
-        assert "CUDA Enabled: False" in outputString
-        assert (
-            "================================================================"
-            in outputString
-        )
+        if "PYTORCHFI INIT SUMMARY" not in outputString:
+            raise AssertionError
+        if "Shape of input into the model: (3 32 32 )" not in outputString:
+            raise AssertionError
+        if "Batch Size: 4" not in outputString:
+            raise AssertionError
+        if "Conv2d" not in outputString:
+            raise AssertionError
+        if "CUDA Enabled: False" not in outputString:
+            raise AssertionError
+        if (
+            "================================================================" not in outputString
+        ):
+            raise AssertionError
