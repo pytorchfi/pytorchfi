@@ -464,7 +464,7 @@ class fault_injection:
         summary_str += (
             "----------------------------------------------------------------" + "\n"
         )
-        for index, layer in enumerate(self.OUTPUT_SIZE):
+        for layer, dim in enumerate(self.OUTPUT_SIZE):
             line_new = "{:>5}  {:>20}  {:>15} {:>20}".format(
                 layer,
                 str(self.LAYERS_TYPE[layer]).split(".")[-1].split("'")[0],
