@@ -50,7 +50,8 @@ class TestWeightErrorModels:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert not torch.all(corrupted_output_1.eq(self.output))
+        if torch.all(corrupted_output_1.eq(self.output)):
+            raise AssertionError
 
     def test_random_weight_inj_conv(self):
         # TODO Update for Weights
@@ -63,7 +64,8 @@ class TestWeightErrorModels:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert not torch.all(corrupted_output_1.eq(self.output))
+        if torch.all(corrupted_output_1.eq(self.output)):
+            raise AssertionError
 
     def test_random_weight_zero_inj(self):
         # TODO Update for Weights
@@ -74,4 +76,5 @@ class TestWeightErrorModels:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert not torch.all(corrupted_output_1.eq(self.output))
+        if torch.all(corrupted_output_1.eq(self.output)):
+            raise AssertionError

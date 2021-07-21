@@ -45,8 +45,10 @@ def random_weight_location(pfi_model, layer=-1):
                     loc.append(random.randint(0, dim - 1))
             curr_layer += 1
 
-    assert curr_layer == pfi_model.get_total_layers()
-    assert len(loc) == 5
+    if curr_layer != pfi_model.get_total_layers():
+        raise AssertionError
+    if len(loc) != 5:
+        raise AssertionError
 
     return tuple(loc)
 
@@ -214,12 +216,14 @@ class single_bit_flip_func(core.fault_injection):
         # sign extend 0's
         temp = "0" * (total_bits - len(bits))
         bits = temp + bits
-        assert len(bits) == total_bits
+        if len(bits) != total_bits:
+            raise AssertionError
         logging.info("sign extend bits", bits)
 
         # flip a bit
         # use MSB -> LSB indexing
-        assert bit_pos < total_bits
+        if bit_pos >= total_bits:
+            raise AssertionError
 
         bits_new = list(bits)
         bit_loc = total_bits - bit_pos - 1
@@ -235,7 +239,8 @@ class single_bit_flip_func(core.fault_injection):
             logging.info("Error: Not all the bits are digits (0/1)")
 
         # convert to quantum
-        assert bits_str_new.isdigit()
+        if not bits_str_new.isdigit():
+            raise AssertionError
         new_quantum = int(bits_str_new, 2)
         out = self._twos_comp(new_quantum, total_bits)
         logging.info("out", out)
