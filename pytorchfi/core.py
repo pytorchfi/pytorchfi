@@ -49,7 +49,7 @@ class fault_injection:
         ), "Error: Batch size must be an integer greater than 1."
         assert len(layer_types) >= 0, "Error: At least one layer type must be selected."
 
-        handles, shapes = self._traverseModelAndSetHooks(
+        handles, _shapes = self._traverseModelAndSetHooks(
             self.ORIG_MODEL, self._INJ_LAYER_TYPES
         )
 
@@ -60,8 +60,8 @@ class fault_injection:
 
         self.ORIG_MODEL(_dummyTensor)
 
-        for i in range(len(handles)):
-            handles[i].remove()
+        for index, handle in enumerate(handles):
+            handles[index].remove()
 
         logging.info("Input shape:")
         logging.info(dummy_shape[1:])
@@ -92,8 +92,8 @@ class fault_injection:
             self.CORRUPT_VALUE,
         ) = (0, [], [], [], [], [], [])
 
-        for i in range(len(self.HANDLES)):
-            self.HANDLES[i].remove()
+        for index, handle in enumerate(self.HANDLES):
+            self.HANDLES[index].remove()
 
     def _traverseModelAndSetHooks(self, model, layer_types):
         handles = []
@@ -298,18 +298,15 @@ class fault_injection:
                 layerShape[3],
             )
 
-        if layerDim <= 2:
-            if (
-                self.CORRUPT_DIM2[index] is not None
-                or self.CORRUPT_DIM3[index] is not None
-            ):
-                warnings.warn(
-                    "Values in Dim2 and Dim3 ignored, since layer is %s" % (layerType)
-                )
+        if layerDim <= 2 and (
+            self.CORRUPT_DIM2[index] is not None or self.CORRUPT_DIM3[index] is not None
+        ):
+            warnings.warn(
+                "Values in Dim2 and Dim3 ignored, since layer is %s" % (layerType)
+            )
 
-        if layerDim <= 3:
-            if self.CORRUPT_DIM3[index] is not None:
-                warnings.warn("Values Dim3 ignored, since layer is %s" % (layerType))
+        if layerDim <= 3 and self.CORRUPT_DIM3[index] is not None:
+            warnings.warn("Values Dim3 ignored, since layer is %s" % (layerType))
 
         logging.info("Finished checking bounds on inj '%d'", (index))
 
@@ -467,7 +464,7 @@ class fault_injection:
         summary_str += (
             "----------------------------------------------------------------" + "\n"
         )
-        for layer in range(len(self.OUTPUT_SIZE)):
+        for index, layer in enumerate(self.OUTPUT_SIZE):
             line_new = "{:>5}  {:>20}  {:>15} {:>20}".format(
                 layer,
                 str(self.LAYERS_TYPE[layer]).split(".")[-1].split("'")[0],
