@@ -41,13 +41,16 @@ class fault_injection:
 
         self.use_cuda = kwargs.get("use_cuda", next(model.parameters()).is_cuda)
 
-        assert isinstance(
+        if not isinstance(
             input_shape, list
-        ), "Error: Input shape must be provided as a list."
-        assert (
+        ):
+            raise AssertionError("Error: Input shape must be provided as a list.")
+        if not (
             isinstance(batch_size, int) and batch_size >= 1
-        ), "Error: Batch size must be an integer greater than 1."
-        assert len(layer_types) >= 0, "Error: At least one layer type must be selected."
+        ):
+            raise AssertionError("Error: Batch size must be an integer greater than 1.")
+        if len(layer_types) < 0:
+            raise AssertionError("Error: At least one layer type must be selected.")
 
         handles, _shapes = self._traverseModelAndSetHooks(
             self.ORIG_MODEL, self._INJ_LAYER_TYPES
@@ -246,57 +249,67 @@ class fault_injection:
         return self.CORRUPTED_MODEL
 
     def checkBounds(self, b, l, dim1, dim2, dim3):
-        assert len(b) == len(l), "Injection location missing values."
-        assert len(b) == len(dim1), "Injection location missing values."
-        assert len(b) == len(dim2), "Injection location missing values."
-        assert len(b) == len(dim3), "Injection location missing values."
+        if len(b) != len(l):
+            raise AssertionError("Injection location missing values.")
+        if len(b) != len(dim1):
+            raise AssertionError("Injection location missing values.")
+        if len(b) != len(dim2):
+            raise AssertionError("Injection location missing values.")
+        if len(b) != len(dim3):
+            raise AssertionError("Injection location missing values.")
 
         logging.info("Checking bounds before runtime")
         for i in range(len(b)):
             self.assert_inj_bounds(i)
 
     def assert_inj_bounds(self, index, **kwargs):
-        assert index >= 0, "Invalid injection index: %d" % (index)
-        assert (
-            self.CORRUPT_BATCH[index] < self.get_total_batches()
-        ), "%d < %d: Invalid batch element!" % (
-            self.CORRUPT_BATCH[index],
-            self.get_total_batches(),
-        )
-        assert (
-            self.CORRUPT_LAYER[index] < self.get_total_layers()
-        ), "%d < %d: Invalid layer!" % (
-            self.CORRUPT_LAYER[index],
-            self.get_total_layers(),
-        )
+        if index < 0:
+            raise AssertionError("Invalid injection index: %d" % (index))
+        if (
+            self.CORRUPT_BATCH[index] >= self.get_total_batches()
+        ):
+            raise AssertionError("%d < %d: Invalid batch element!" % (
+                self.CORRUPT_BATCH[index],
+                self.get_total_batches(),
+            ))
+        if (
+            self.CORRUPT_LAYER[index] >= self.get_total_layers()
+        ):
+            raise AssertionError("%d < %d: Invalid layer!" % (
+                self.CORRUPT_LAYER[index],
+                self.get_total_layers(),
+            ))
 
         corruptLayerNum = self.CORRUPT_LAYER[index]
         layerType = self.LAYERS_TYPE[corruptLayerNum]
         layerDim = self.LAYERS_DIM[corruptLayerNum]
         layerShape = self.OUTPUT_SIZE[corruptLayerNum]
 
-        assert (
-            self.CORRUPT_DIM1[index] < layerShape[1]
-        ), "%d < %d: Out of bounds error in Dimension 1!" % (
-            self.CORRUPT_DIM1[index],
-            layerShape[1],
-        )
+        if (
+            self.CORRUPT_DIM1[index] >= layerShape[1]
+        ):
+            raise AssertionError("%d < %d: Out of bounds error in Dimension 1!" % (
+                self.CORRUPT_DIM1[index],
+                layerShape[1],
+            ))
 
         if layerDim > 2:
-            assert (
-                self.CORRUPT_DIM2[index] < layerShape[2]
-            ), "%d < %d: Out of bounds error in Dimension 2!" % (
-                self.CORRUPT_DIM2[index],
-                layerShape[2],
-            )
+            if (
+                self.CORRUPT_DIM2[index] >= layerShape[2]
+            ):
+                raise AssertionError("%d < %d: Out of bounds error in Dimension 2!" % (
+                    self.CORRUPT_DIM2[index],
+                    layerShape[2],
+                ))
 
         if layerDim > 3:
-            assert (
-                self.CORRUPT_DIM3[index] < layerShape[3]
-            ), "%d < %d: Out of bounds error in Dimension 3!" % (
-                self.CORRUPT_DIM3[index],
-                layerShape[3],
-            )
+            if (
+                self.CORRUPT_DIM3[index] >= layerShape[3]
+            ):
+                raise AssertionError("%d < %d: Out of bounds error in Dimension 3!" % (
+                    self.CORRUPT_DIM3[index],
+                    layerShape[3],
+                ))
 
         if layerDim <= 2 and (
             self.CORRUPT_DIM2[index] is not None or self.CORRUPT_DIM3[index] is not None

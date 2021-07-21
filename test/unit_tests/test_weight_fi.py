@@ -53,7 +53,8 @@ class TestWeightFIcpu:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert not torch.all(corrupted_output_1.eq(self.output))
+        if torch.all(corrupted_output_1.eq(self.output)):
+            raise AssertionError
 
         self.inj_model = self.p.declare_weight_fi(
             layer_num=layer_i,
@@ -68,7 +69,8 @@ class TestWeightFIcpu:
         with torch.no_grad():
             uncorrupted_output = self.inj_model(self.images)
 
-        assert torch.all(uncorrupted_output.eq(self.output))
+        if not torch.all(uncorrupted_output.eq(self.output)):
+            raise AssertionError
 
         self.inj_model = self.p.declare_weight_fi(
             layer_num=layer_i,
@@ -83,8 +85,10 @@ class TestWeightFIcpu:
         with torch.no_grad():
             corrupted_output_2 = self.inj_model(self.images)
 
-        assert not torch.all(corrupted_output_2.eq(self.output))
-        assert torch.all(corrupted_output_2.eq(corrupted_output_2))
+        if torch.all(corrupted_output_2.eq(self.output)):
+            raise AssertionError
+        if not torch.all(corrupted_output_2.eq(corrupted_output_2)):
+            raise AssertionError
 
     def test_neuronFI_singleElement_noErr(self):
         layer_i = 4
@@ -103,4 +107,5 @@ class TestWeightFIcpu:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert torch.all(corrupted_output_1.eq(self.output))
+        if not torch.all(corrupted_output_1.eq(self.output)):
+            raise AssertionError

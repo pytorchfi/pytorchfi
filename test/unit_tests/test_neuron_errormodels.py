@@ -55,7 +55,8 @@ class TestNeuronErrorModels:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert not torch.all(corrupted_output_1.eq(self.output))
+        if torch.all(corrupted_output_1.eq(self.output)):
+            raise AssertionError
 
     def test_random_neuron_inj_batched_locTrue_valTrue(self):
         # TODO make sure only all batch elements are different
@@ -65,7 +66,8 @@ class TestNeuronErrorModels:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert not torch.all(corrupted_output_1.eq(self.output))
+        if torch.all(corrupted_output_1.eq(self.output)):
+            raise AssertionError
 
     def test_random_neuron_inj_batched_locFalse_valTrue(self):
         # TODO make better test
@@ -77,7 +79,8 @@ class TestNeuronErrorModels:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert not torch.all(corrupted_output_1.eq(self.output))
+        if torch.all(corrupted_output_1.eq(self.output)):
+            raise AssertionError
 
     def test_random_neuron_inj_batched_locTrue_valFalse(self):
         # TODO make better test
@@ -89,7 +92,8 @@ class TestNeuronErrorModels:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert not torch.all(corrupted_output_1.eq(self.output))
+        if torch.all(corrupted_output_1.eq(self.output)):
+            raise AssertionError
 
     def test_random_neuron_inj_batched_locFalse_valFalse(self):
         # TODO make better test
@@ -101,7 +105,8 @@ class TestNeuronErrorModels:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert not torch.all(corrupted_output_1.eq(self.output))
+        if torch.all(corrupted_output_1.eq(self.output)):
+            raise AssertionError
 
     def test_random_inj_per_layer(self):
         # TODO make better test
@@ -111,7 +116,8 @@ class TestNeuronErrorModels:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert not torch.all(corrupted_output_1.eq(self.output))
+        if torch.all(corrupted_output_1.eq(self.output)):
+            raise AssertionError
 
     def test_random_inj_per_layer_batched_locTrue_valTrue(self):
         # TODO make better test
@@ -123,7 +129,8 @@ class TestNeuronErrorModels:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert not torch.all(corrupted_output_1.eq(self.output))
+        if torch.all(corrupted_output_1.eq(self.output)):
+            raise AssertionError
 
     def test_random_inj_per_layer_batched_locFalse_valTrue(self):
         # TODO make better test
@@ -135,7 +142,8 @@ class TestNeuronErrorModels:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert not torch.all(corrupted_output_1.eq(self.output))
+        if torch.all(corrupted_output_1.eq(self.output)):
+            raise AssertionError
 
     def test_random_inj_per_layer_batched_locTrue_valFalse(self):
         # TODO make better test
@@ -147,7 +155,8 @@ class TestNeuronErrorModels:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert not torch.all(corrupted_output_1.eq(self.output))
+        if torch.all(corrupted_output_1.eq(self.output)):
+            raise AssertionError
 
     def test_random_inj_per_layer_batched_locFalse_valFalse(self):
         # TODO make better test
@@ -159,7 +168,8 @@ class TestNeuronErrorModels:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert not torch.all(corrupted_output_1.eq(self.output))
+        if torch.all(corrupted_output_1.eq(self.output)):
+            raise AssertionError
 
 
 class TestNeuronErrorModelsFunc:
@@ -204,10 +214,14 @@ class TestNeuronErrorModelsFunc:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert not torch.all(corrupted_output_1[0].eq(self.output[0]))
-        assert not torch.all(corrupted_output_1[1].eq(self.output[1]))
-        assert not torch.all(corrupted_output_1[2].eq(self.output[2]))
-        assert not torch.all(corrupted_output_1[3].eq(self.output[3]))
+        if torch.all(corrupted_output_1[0].eq(self.output[0])):
+            raise AssertionError
+        if torch.all(corrupted_output_1[1].eq(self.output[1])):
+            raise AssertionError
+        if torch.all(corrupted_output_1[2].eq(self.output[2])):
+            raise AssertionError
+        if torch.all(corrupted_output_1[3].eq(self.output[3])):
+            raise AssertionError
 
     def test_random_neuron_single_bit_inj_sameLoc(self):
         random.seed(2)
@@ -219,10 +233,14 @@ class TestNeuronErrorModelsFunc:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert not torch.all(corrupted_output_1[0].eq(self.output[0]))
-        assert not torch.all(corrupted_output_1[1].eq(self.output[1]))
-        assert not torch.all(corrupted_output_1[2].eq(self.output[2]))
-        assert not torch.all(corrupted_output_1[3].eq(self.output[3]))
+        if torch.all(corrupted_output_1[0].eq(self.output[0])):
+            raise AssertionError
+        if torch.all(corrupted_output_1[1].eq(self.output[1])):
+            raise AssertionError
+        if torch.all(corrupted_output_1[2].eq(self.output[2])):
+            raise AssertionError
+        if torch.all(corrupted_output_1[3].eq(self.output[3])):
+            raise AssertionError
 
     def test_random_neuron_single_bit_inj_single(self):
         random.seed(0)
@@ -232,7 +250,11 @@ class TestNeuronErrorModelsFunc:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        assert torch.all(corrupted_output_1[0].eq(self.output[0]))
-        assert torch.all(corrupted_output_1[1].eq(self.output[1]))
-        assert torch.all(corrupted_output_1[2].eq(self.output[2]))
-        assert not torch.all(corrupted_output_1[3].eq(self.output[3]))
+        if not torch.all(corrupted_output_1[0].eq(self.output[0])):
+            raise AssertionError
+        if not torch.all(corrupted_output_1[1].eq(self.output[1])):
+            raise AssertionError
+        if not torch.all(corrupted_output_1[2].eq(self.output[2])):
+            raise AssertionError
+        if torch.all(corrupted_output_1[3].eq(self.output[3])):
+            raise AssertionError

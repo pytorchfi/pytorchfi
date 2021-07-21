@@ -47,7 +47,8 @@ class TestNeuronCPUSingle:
         )
 
         self.faulty_model = p.get_original_model()
-        assert self.faulty_model is self.model
+        if self.faulty_model is not self.model:
+            raise AssertionError
 
 
 class TestNeuronGPUSingle:
@@ -100,7 +101,8 @@ class TestNeuronGPUSingle:
         )
 
         self.faulty_model = p.get_original_model()
-        assert self.faulty_model is self.model
+        if self.faulty_model is not self.model:
+            raise AssertionError
 
 
 class TestDtypes:
