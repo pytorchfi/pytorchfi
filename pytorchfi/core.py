@@ -63,7 +63,7 @@ class fault_injection:
 
         self.ORIG_MODEL(_dummyTensor)
 
-        for index, handle in enumerate(handles):
+        for index, _handle in enumerate(handles):
             handles[index].remove()
 
         logging.info("Input shape:")
@@ -95,7 +95,7 @@ class fault_injection:
             self.CORRUPT_VALUE,
         ) = (0, [], [], [], [], [], [])
 
-        for index, handle in enumerate(self.HANDLES):
+        for index, _handle in enumerate(self.HANDLES):
             self.HANDLES[index].remove()
 
     def _traverseModelAndSetHooks(self, model, layer_types):
@@ -477,7 +477,7 @@ class fault_injection:
         summary_str += (
             "----------------------------------------------------------------" + "\n"
         )
-        for layer, dim in enumerate(self.OUTPUT_SIZE):
+        for layer, _dim in enumerate(self.OUTPUT_SIZE):
             line_new = "{:>5}  {:>20}  {:>15} {:>20}".format(
                 layer,
                 str(self.LAYERS_TYPE[layer]).split(".")[-1].split("'")[0],
