@@ -323,7 +323,7 @@ class fault_injection:
 
         logging.info("Finished checking bounds on inj '%d'", (index))
 
-    def _set_value(self, module, input, output):
+    def _set_value(self, module, input_val, output):
         logging.info(
             "Processing hook of Layer %d: %s",
             self.get_curr_layer(),
@@ -375,7 +375,7 @@ class fault_injection:
 
         self.updateLayer()
 
-    def _save_output_size(self, module, input, output):
+    def _save_output_size(self, module, input_val, output):
         shape = list(output.size())
         dim = len(shape)
 

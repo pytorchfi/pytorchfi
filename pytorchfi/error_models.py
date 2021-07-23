@@ -247,7 +247,7 @@ class single_bit_flip_func(core.fault_injection):
 
         return torch.tensor(new_value, dtype=save_type)
 
-    def single_bit_flip_signed_across_batch(self, module, input, output):
+    def single_bit_flip_signed_across_batch(self, module, input_val, output):
         corrupt_conv_set = self.get_corrupt_layer()
         range_max = self.get_conv_max(self.get_curr_layer())
         logging.info("Current layer: %s", self.get_curr_layer())
