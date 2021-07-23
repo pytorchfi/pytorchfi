@@ -8,9 +8,7 @@ import torch
 from pytorchfi import core
 
 
-"""
-helper functions
-"""
+# Helper Functions
 
 
 def random_batch_element(pfi_model):
@@ -57,9 +55,7 @@ def random_value(min_val=-1, max_val=1):
     return random.uniform(min_val, max_val)
 
 
-"""
-Neuron Perturbation Models
-"""
+# Neuron Perturbation Models
 
 
 # single random neuron error in single batch element
@@ -341,9 +337,7 @@ def random_neuron_single_bit_inj(pfi_model, layer_ranges):
     )
 
 
-"""
-Weight Perturbation Models
-"""
+# Weight Perturbation Models
 
 
 def random_weight_inj(pfi_model, corrupt_conv=-1, min_val=-1, max_val=1):
