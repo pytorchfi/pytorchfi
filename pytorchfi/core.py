@@ -52,7 +52,7 @@ class fault_injection:
         if len(layer_types) < 0:
             raise AssertionError("Error: At least one layer type must be selected.")
 
-        handles, shapes = self._traverseModelAndSetHooks(
+        handles, _shapes = self._traverseModelAndSetHooks(
             self.ORIG_MODEL, self._INJ_LAYER_TYPES
         )
 
@@ -63,8 +63,8 @@ class fault_injection:
 
         self.ORIG_MODEL(_dummyTensor)
 
-        for i in range(len(handles)):
-            handles[i].remove()
+        for index, _handle in enumerate(handles):
+            handles[index].remove()
 
         logging.info("Input shape:")
         logging.info(dummy_shape[1:])
@@ -95,8 +95,8 @@ class fault_injection:
             self.CORRUPT_VALUE,
         ) = (0, [], [], [], [], [], [])
 
-        for i in range(len(self.HANDLES)):
-            self.HANDLES[i].remove()
+        for index, _handle in enumerate(self.HANDLES):
+            self.HANDLES[index].remove()
 
     def _traverseModelAndSetHooks(self, model, layer_types):
         handles = []
@@ -311,22 +311,19 @@ class fault_injection:
                     layerShape[3],
                 ))
 
-        if layerDim <= 2:
-            if (
-                self.CORRUPT_DIM2[index] is not None
-                or self.CORRUPT_DIM3[index] is not None
-            ):
-                warnings.warn(
-                    "Values in Dim2 and Dim3 ignored, since layer is %s" % (layerType)
-                )
+        if layerDim <= 2 and (
+            self.CORRUPT_DIM2[index] is not None or self.CORRUPT_DIM3[index] is not None
+        ):
+            warnings.warn(
+                "Values in Dim2 and Dim3 ignored, since layer is %s" % (layerType)
+            )
 
-        if layerDim <= 3:
-            if self.CORRUPT_DIM3[index] is not None:
-                warnings.warn("Values Dim3 ignored, since layer is %s" % (layerType))
+        if layerDim <= 3 and self.CORRUPT_DIM3[index] is not None:
+            warnings.warn("Values Dim3 ignored, since layer is %s" % (layerType))
 
         logging.info("Finished checking bounds on inj '%d'", (index))
 
-    def _set_value(self, module, input, output):
+    def _set_value(self, module, input_val, output):
         logging.info(
             "Processing hook of Layer %d: %s",
             self.get_curr_layer(),
@@ -348,12 +345,12 @@ class fault_injection:
             for i in inj_list:
                 self.assert_inj_bounds(index=i)
                 logging.info(
-                    "Original value at [%d][%d]: %d",
+                    "Original value at [%d][%d]: %f",
                     self.CORRUPT_BATCH[i],
                     self.CORRUPT_DIM1[i],
                     output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]],
                 )
-                logging.info("Changing value to %d", self.CORRUPT_VALUE[i])
+                logging.info("Changing value to %f", self.CORRUPT_VALUE[i])
                 output[self.CORRUPT_BATCH[i]][
                     self.CORRUPT_DIM1[i]
                 ] = self.CORRUPT_VALUE[i]
@@ -362,25 +359,23 @@ class fault_injection:
             for i in inj_list:
                 self.assert_inj_bounds(index=i)
                 logging.info(
-                    "Original value at [%d][%d][%d][%d]: %d"
-                    % (
-                        self.CORRUPT_BATCH[i],
-                        self.CORRUPT_DIM1[i],
-                        self.CORRUPT_DIM2[i],
-                        self.CORRUPT_DIM3[i],
-                        output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][
-                            self.CORRUPT_DIM2[i]
-                        ][self.CORRUPT_DIM3[i]],
-                    )
+                    "Original value at [%d][%d][%d][%d]: %f",
+                    self.CORRUPT_BATCH[i],
+                    self.CORRUPT_DIM1[i],
+                    self.CORRUPT_DIM2[i],
+                    self.CORRUPT_DIM3[i],
+                    output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][
+                        self.CORRUPT_DIM2[i]
+                    ][self.CORRUPT_DIM3[i]],
                 )
-                logging.info("Changing value to %d" % self.CORRUPT_VALUE[i])
+                logging.info("Changing value to %f", self.CORRUPT_VALUE[i])
                 output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][
                     self.CORRUPT_DIM2[i]
                 ][self.CORRUPT_DIM3[i]] = self.CORRUPT_VALUE[i]
 
         self.updateLayer()
 
-    def _save_output_size(self, module, input, output):
+    def _save_output_size(self, module, input_val, output):
         shape = list(output.size())
         dim = len(shape)
 
@@ -482,7 +477,7 @@ class fault_injection:
         summary_str += (
             "----------------------------------------------------------------" + "\n"
         )
-        for layer in range(len(self.OUTPUT_SIZE)):
+        for layer, _dim in enumerate(self.OUTPUT_SIZE):
             line_new = "{:>5}  {:>20}  {:>15} {:>20}".format(
                 layer,
                 str(self.LAYERS_TYPE[layer]).split(".")[-1].split("'")[0],
