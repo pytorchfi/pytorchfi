@@ -345,12 +345,12 @@ class fault_injection:
             for i in inj_list:
                 self.assert_inj_bounds(index=i)
                 logging.info(
-                    "Original value at [%d][%d]: %d",
+                    "Original value at [%d][%d]: %f",
                     self.CORRUPT_BATCH[i],
                     self.CORRUPT_DIM1[i],
                     output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]],
                 )
-                logging.info("Changing value to %d", self.CORRUPT_VALUE[i])
+                logging.info("Changing value to %f", self.CORRUPT_VALUE[i])
                 output[self.CORRUPT_BATCH[i]][
                     self.CORRUPT_DIM1[i]
                 ] = self.CORRUPT_VALUE[i]
@@ -359,7 +359,7 @@ class fault_injection:
             for i in inj_list:
                 self.assert_inj_bounds(index=i)
                 logging.info(
-                    "Original value at [%d][%d][%d][%d]: %d",
+                    "Original value at [%d][%d][%d][%d]: %f",
                     self.CORRUPT_BATCH[i],
                     self.CORRUPT_DIM1[i],
                     self.CORRUPT_DIM2[i],
@@ -368,7 +368,7 @@ class fault_injection:
                         self.CORRUPT_DIM2[i]
                     ][self.CORRUPT_DIM3[i]],
                 )
-                logging.info("Changing value to %d", self.CORRUPT_VALUE[i])
+                logging.info("Changing value to %f", self.CORRUPT_VALUE[i])
                 output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][
                     self.CORRUPT_DIM2[i]
                 ][self.CORRUPT_DIM3[i]] = self.CORRUPT_VALUE[i]

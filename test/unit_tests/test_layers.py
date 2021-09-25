@@ -9,7 +9,7 @@ class TestLayers:
     Testing PyTorchFI.Core example client.
     """
 
-    def __init__(self):
+    def setup_class(self):
         torch.manual_seed(5)
 
         self.Cin = 3
