@@ -128,10 +128,13 @@ class fault_injection:
         for layer in model.children():
             # leaf node
             if list(layer.children()) == []:
-                for i in layer_types:
-                    if isinstance(layer, i):
-                        hook = injFunc if customInj else self._set_value
-                        handles.append(layer.register_forward_hook(hook))
+                if "all" in layer_types:
+                    handles.append(layer.register_forward_hook(self._save_output_size))
+                else:
+                    for i in layer_types:
+                        if isinstance(layer, i):
+                            hook = injFunc if customInj else self._set_value
+                            handles.append(layer.register_forward_hook(hook))
             # unpack node
             else:
                 subHandles = self._traverseModelAndSetHooksNeurons(
@@ -354,7 +357,21 @@ class fault_injection:
                 output[self.CORRUPT_BATCH[i]][
                     self.CORRUPT_DIM1[i]
                 ] = self.CORRUPT_VALUE[i]
-
+        elif layerDim == 3:
+            for i in inj_list:
+                self.assert_inj_bounds(index=i)
+                logging.info(
+                    "Original value at [%d][%d][%d]: %f",
+                    self.CORRUPT_BATCH[i],
+                    self.CORRUPT_DIM1[i],
+                    self.CORRUPT_DIM2[i],
+                    output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][self.CORRUPT_DIM2[i]],
+                )
+                logging.info("Changing value to %f", self.CORRUPT_VALUE[i])
+                output[self.CORRUPT_BATCH[i]][
+                    self.CORRUPT_DIM1[i],
+                    self.CORRUPT_DIM2[i]
+                ] = self.CORRUPT_VALUE[i]
         elif layerDim == 4:
             for i in inj_list:
                 self.assert_inj_bounds(index=i)
