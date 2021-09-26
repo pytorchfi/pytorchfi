@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://pytorchfi.github.io/"><img src="https://user-images.githubusercontent.com/7104017/75485879-22e79400-5971-11ea-9376-2d898034c23a.png" width="150"></a>
+  <a href="https://pytorchfi.dev/"><img src="https://user-images.githubusercontent.com/7104017/75485879-22e79400-5971-11ea-9376-2d898034c23a.png" width="150"></a>
   <br/>
     PyTorchFI
   </br>
