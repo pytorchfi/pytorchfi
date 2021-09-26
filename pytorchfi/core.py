@@ -128,10 +128,13 @@ class fault_injection:
         for layer in model.children():
             # leaf node
             if list(layer.children()) == []:
-                for i in layer_types:
-                    if isinstance(layer, i):
-                        hook = injFunc if customInj else self._set_value
-                        handles.append(layer.register_forward_hook(hook))
+                if "all" in layer_types:
+                    handles.append(layer.register_forward_hook(self._save_output_size))
+                else:
+                    for i in layer_types:
+                        if isinstance(layer, i):
+                            hook = injFunc if customInj else self._set_value
+                            handles.append(layer.register_forward_hook(hook))
             # unpack node
             else:
                 subHandles = self._traverseModelAndSetHooksNeurons(
