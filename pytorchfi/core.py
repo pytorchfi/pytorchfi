@@ -129,7 +129,8 @@ class fault_injection:
             # leaf node
             if list(layer.children()) == []:
                 if "all" in layer_types:
-                    handles.append(layer.register_forward_hook(self._save_output_size))
+                    hook = injFunc if customInj else self._set_value
+                    handles.append(layer.register_forward_hook(hook))
                 else:
                     for i in layer_types:
                         if isinstance(layer, i):
