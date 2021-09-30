@@ -14,9 +14,7 @@ class TestSingleNeuron:
         self.channels = 3
         self.img_size = 32
 
-        self.model, self.dataset = CIFAR10_set_up_custom(
-            self.batch_size, workers
-        )
+        self.model, self.dataset = CIFAR10_set_up_custom(self.batch_size, workers)
         self.dataiter = iter(self.dataset)
         self.model.eval()
 
@@ -80,9 +78,7 @@ class TestDtypes:
         self.channels = 3
         self.img_size = 32
 
-        self.model, dataset = CIFAR10_set_up_custom(
-            self.batch_size, workers
-        )
+        self.model, dataset = CIFAR10_set_up_custom(self.batch_size, workers)
         dataiter = iter(dataset)
         self.images, self.labels = dataiter.next()
 

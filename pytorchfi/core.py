@@ -16,26 +16,24 @@ class fault_injection:
             layer_types = [nn.Conv2d]
         logging.basicConfig(format="%(asctime)-15s %(clientip)s %(user)-8s %(message)s")
 
-        self.ORIG_MODEL = model
-        self.OUTPUT_SIZE = []
-        self.LAYERS_TYPE = []
-        self.LAYERS_DIM = []
-        self._INPUT_SHAPE = input_shape
-        self._BATCH_SIZE = batch_size
-        self._INJ_LAYER_TYPES = layer_types
+        self.original_model = model
+        self.output_size = []
+        self.layers_type = []
+        self.layers_dim = []
 
-        self.CORRUPTED_MODEL = None
-        self.CURR_LAYER = 0
-        self.HANDLES = []
-        self.CORRUPT_BATCH = []
-        self.CORRUPT_LAYER = []
-        self.CORRUPT_DIM1 = []  # C
-        self.CORRUPT_DIM2 = []  # H
-        self.CORRUPT_DIM3 = []  # W
-        self.CORRUPT_VALUE = []
+        self._input_shape = input_shape
+        self._batch_size = batch_size
+        self._inj_layer_types = layer_types
 
-        self.CUSTOM_INJECTION = False
-        self.INJECTION_FUNCTION = None
+        self.corrupted_model = None
+        self.current_layer = 0
+        self.handles = []
+        self.corrupt_batch = []
+        self.corrupt_layer = []
+        self.corrupt_dim1 = []  # C
+        self.corrupt_dim2 = []  # H
+        self.corrupt_dim3 = []  # W
+        self.corrupt_value = []
 
         self.use_cuda = kwargs.get("use_cuda", next(model.parameters()).is_cuda)
 
@@ -47,15 +45,15 @@ class fault_injection:
             raise AssertionError("Error: At least one layer type must be selected.")
 
         handles, _shapes = self._traverseModelAndSetHooks(
-            self.ORIG_MODEL, self._INJ_LAYER_TYPES
+            self.original_model, self._inj_layer_types
         )
 
-        dummy_shape = (1, *self._INPUT_SHAPE)  # profiling only needs one batch element
+        dummy_shape = (1, *self._input_shape)  # profiling only needs one batch element
         model_dtype = next(model.parameters()).dtype
         device = "cuda" if self.use_cuda else None
         _dummyTensor = torch.randn(dummy_shape, dtype=model_dtype, device=device)
 
-        self.ORIG_MODEL(_dummyTensor)
+        self.original_model(_dummyTensor)
 
         for index, _handle in enumerate(handles):
             handles[index].remove()
@@ -68,29 +66,29 @@ class fault_injection:
             "\n".join(
                 [
                     "".join(["{:4}".format(item) for item in row])
-                    for row in self.OUTPUT_SIZE
+                    for row in self.output_size
                 ]
             )
         )
 
     def fi_reset(self):
         self._fi_state_reset()
-        self.CORRUPTED_MODEL = None
+        self.corrupted_model = None
         logging.info("Reset fault injector")
 
     def _fi_state_reset(self):
         (
-            self.CURR_LAYER,
-            self.CORRUPT_BATCH,
-            self.CORRUPT_LAYER,
-            self.CORRUPT_DIM1,
-            self.CORRUPT_DIM2,
-            self.CORRUPT_DIM3,
-            self.CORRUPT_VALUE,
+            self.current_layer,
+            self.corrupt_batch,
+            self.corrupt_layer,
+            self.corrupt_dim1,
+            self.corrupt_dim2,
+            self.corrupt_dim3,
+            self.corrupt_value,
         ) = (0, [], [], [], [], [], [])
 
-        for index, _handle in enumerate(self.HANDLES):
-            self.HANDLES[index].remove()
+        for index, _handle in enumerate(self.handles):
+            self.handles[index].remove()
 
     def _traverseModelAndSetHooks(self, model, layer_types):
         handles = []
@@ -142,12 +140,12 @@ class fault_injection:
 
     def declare_weight_fi(self, **kwargs):
         self._fi_state_reset()
-        CUSTOM_INJECTION = False
+        custom_injection = False
         CUSTOM_FUNCTION = False
 
         if kwargs:
             if "function" in kwargs:
-                CUSTOM_INJECTION, CUSTOM_FUNCTION = True, kwargs.get("function")
+                custom_injection, CUSTOM_FUNCTION = True, kwargs.get("function")
                 corrupt_layer = kwargs.get("layer_num", [])
                 corrupt_k = kwargs.get("k", [])
                 corrupt_c = kwargs.get("dim1", [])
@@ -165,20 +163,20 @@ class fault_injection:
         else:
             raise ValueError("Please specify an injection or injection function")
 
-        self.CORRUPTED_MODEL = copy.deepcopy(self.ORIG_MODEL)
+        self.corrupted_model = copy.deepcopy(self.original_model)
         corrupt_idx = [corrupt_k, corrupt_c, corrupt_kH, corrupt_kW]
 
-        curr_layer = 0
-        for name, param in self.CORRUPTED_MODEL.named_parameters():
+        current_layer = 0
+        for name, param in self.corrupted_model.named_parameters():
             if "weight" in name and "features" in name:
-                if curr_layer == corrupt_layer:
+                if current_layer == corrupt_layer:
                     corrupt_idx = (
                         tuple(corrupt_idx)
                         if isinstance(corrupt_idx, list)
                         else corrupt_idx
                     )
                     orig_value = param.data[corrupt_idx].item()
-                    if CUSTOM_INJECTION:
+                    if custom_injection:
                         corrupt_value = CUSTOM_FUNCTION(param.data, corrupt_idx)
                     param.data[corrupt_idx] = corrupt_value
 
@@ -188,65 +186,62 @@ class fault_injection:
                     logging.info("Original value: %s", orig_value)
                     logging.info("Injected value: %s", corrupt_value)
 
-                curr_layer += 1
-        return self.CORRUPTED_MODEL
+                current_layer += 1
+        return self.corrupted_model
 
     def declare_neuron_fi(self, **kwargs):
         self._fi_state_reset()
-        CUSTOM_INJECTION = False
-        INJECTION_FUNCTION = False
+        custom_injection = False
+        injection_function = False
 
         if kwargs:
             if "function" in kwargs:
-                CUSTOM_INJECTION, INJECTION_FUNCTION = True, kwargs.get("function")
-                self.CORRUPT_LAYER = kwargs.get("layer_num", [])
-                self.CORRUPT_BATCH = kwargs.get("batch", [])
-                self.CORRUPT_DIM1 = kwargs.get("dim1", [])
-                self.CORRUPT_DIM2 = kwargs.get("dim2", [])
-                self.CORRUPT_DIM3 = kwargs.get("dim3", [])
+                logging.info("Declaring Custom Function")
+                custom_injection, injection_function = True, kwargs.get("function")
             else:
-                self.CORRUPT_LAYER = kwargs.get("layer_num", [])
-                self.CORRUPT_BATCH = kwargs.get("batch", [])
-                self.CORRUPT_DIM1 = kwargs.get("dim1", [])
-                self.CORRUPT_DIM2 = kwargs.get("dim2", [])
-                self.CORRUPT_DIM3 = kwargs.get("dim3", [])
-                self.CORRUPT_VALUE = kwargs.get("value", [])
-
                 logging.info("Declaring Specified Fault Injector")
-                logging.info("Convolution: %s", self.CORRUPT_LAYER)
-                logging.info("Batch, x, y, z:")
-                logging.info(
-                    "%s, %s, %s, %s",
-                    self.CORRUPT_BATCH,
-                    self.CORRUPT_DIM1,
-                    self.CORRUPT_DIM2,
-                    self.CORRUPT_DIM3,
-                )
+                self.corrupt_value = kwargs.get("value", [])
+
+            self.corrupt_layer = kwargs.get("layer_num", [])
+            self.corrupt_batch = kwargs.get("batch", [])
+            self.corrupt_dim1 = kwargs.get("dim1", [])
+            self.corrupt_dim2 = kwargs.get("dim2", [])
+            self.corrupt_dim3 = kwargs.get("dim3", [])
+
+            logging.info("Convolution: %s", self.corrupt_layer)
+            logging.info("Batch, x, y, z:")
+            logging.info(
+                "%s, %s, %s, %s",
+                self.corrupt_batch,
+                self.corrupt_dim1,
+                self.corrupt_dim2,
+                self.corrupt_dim3,
+            )
         else:
             raise ValueError("Please specify an injection or injection function")
 
-        self.checkBounds(
-            self.CORRUPT_BATCH,
-            self.CORRUPT_LAYER,
-            self.CORRUPT_DIM1,
-            self.CORRUPT_DIM2,
-            self.CORRUPT_DIM3,
+        self.check_bounds(
+            self.corrupt_batch,
+            self.corrupt_layer,
+            self.corrupt_dim1,
+            self.corrupt_dim2,
+            self.corrupt_dim3,
         )
 
-        self.CORRUPTED_MODEL = copy.deepcopy(self.ORIG_MODEL)
+        self.corrupted_model = copy.deepcopy(self.original_model)
         handles_neurons = self._traverseModelAndSetHooksNeurons(
-            self.CORRUPTED_MODEL,
-            self._INJ_LAYER_TYPES,
-            CUSTOM_INJECTION,
-            INJECTION_FUNCTION,
+            self.corrupted_model,
+            self._inj_layer_types,
+            custom_injection,
+            injection_function,
         )
 
         for i in handles_neurons:
-            self.HANDLES.append(i)
+            self.handles.append(i)
 
-        return self.CORRUPTED_MODEL
+        return self.corrupted_model
 
-    def checkBounds(self, b, l, dim1, dim2, dim3):
+    def check_bounds(self, b, l, dim1, dim2, dim3):
         if len(b) != len(l):
             raise AssertionError("Injection location missing values.")
         if len(b) != len(dim1):
@@ -263,131 +258,131 @@ class fault_injection:
     def assert_inj_bounds(self, index, **kwargs):
         if index < 0:
             raise AssertionError("Invalid injection index: %d" % (index))
-        if self.CORRUPT_BATCH[index] >= self.get_total_batches():
+        if self.corrupt_batch[index] >= self.get_total_batches():
             raise AssertionError(
                 "%d < %d: Invalid batch element!"
                 % (
-                    self.CORRUPT_BATCH[index],
+                    self.corrupt_batch[index],
                     self.get_total_batches(),
                 )
             )
-        if self.CORRUPT_LAYER[index] >= self.get_total_layers():
+        if self.corrupt_layer[index] >= self.get_total_layers():
             raise AssertionError(
                 "%d < %d: Invalid layer!"
                 % (
-                    self.CORRUPT_LAYER[index],
+                    self.corrupt_layer[index],
                     self.get_total_layers(),
                 )
             )
 
-        corruptLayerNum = self.CORRUPT_LAYER[index]
-        layerType = self.LAYERS_TYPE[corruptLayerNum]
-        layerDim = self.LAYERS_DIM[corruptLayerNum]
-        layerShape = self.OUTPUT_SIZE[corruptLayerNum]
+        corrupt_layer_num = self.corrupt_layer[index]
+        layer_type = self.layers_type[corrupt_layer_num]
+        layer_dim = self.layers_dim[corrupt_layer_num]
+        layer_shape = self.output_size[corrupt_layer_num]
 
-        if self.CORRUPT_DIM1[index] >= layerShape[1]:
+        if self.corrupt_dim1[index] >= layer_shape[1]:
             raise AssertionError(
                 "%d < %d: Out of bounds error in Dimension 1!"
                 % (
-                    self.CORRUPT_DIM1[index],
-                    layerShape[1],
+                    self.corrupt_dim1[index],
+                    layer_shape[1],
                 )
             )
 
-        if layerDim > 2 and self.CORRUPT_DIM2[index] >= layerShape[2]:
+        if layer_dim > 2 and self.corrupt_dim2[index] >= layer_shape[2]:
             raise AssertionError(
                 "%d < %d: Out of bounds error in Dimension 2!"
                 % (
-                    self.CORRUPT_DIM2[index],
-                    layerShape[2],
+                    self.corrupt_dim2[index],
+                    layer_shape[2],
                 )
             )
 
-        if layerDim > 3 and self.CORRUPT_DIM3[index] >= layerShape[3]:
+        if layer_dim > 3 and self.corrupt_dim3[index] >= layer_shape[3]:
             raise AssertionError(
                 "%d < %d: Out of bounds error in Dimension 3!"
                 % (
-                    self.CORRUPT_DIM3[index],
-                    layerShape[3],
+                    self.corrupt_dim3[index],
+                    layer_shape[3],
                 )
             )
 
-        if layerDim <= 2 and (
-            self.CORRUPT_DIM2[index] is not None or self.CORRUPT_DIM3[index] is not None
+        if layer_dim <= 2 and (
+            self.corrupt_dim2[index] is not None or self.corrupt_dim3[index] is not None
         ):
             warnings.warn(
-                "Values in Dim2 and Dim3 ignored, since layer is %s" % (layerType)
+                "Values in Dim2 and Dim3 ignored, since layer is %s" % (layer_type)
             )
 
-        if layerDim <= 3 and self.CORRUPT_DIM3[index] is not None:
-            warnings.warn("Values Dim3 ignored, since layer is %s" % (layerType))
+        if layer_dim <= 3 and self.corrupt_dim3[index] is not None:
+            warnings.warn("Values Dim3 ignored, since layer is %s" % (layer_type))
 
         logging.info("Finished checking bounds on inj '%d'", (index))
 
     def _set_value(self, module, input_val, output):
         logging.info(
             "Processing hook of Layer %d: %s",
-            self.get_curr_layer(),
-            self.get_layer_type(self.get_curr_layer()),
+            self.get_current_layer(),
+            self.get_layer_type(self.get_current_layer()),
         )
         inj_list = list(
             filter(
-                lambda x: self.CORRUPT_LAYER[x] == self.get_curr_layer(),
-                range(len(self.CORRUPT_LAYER)),
+                lambda x: self.corrupt_layer[x] == self.get_current_layer(),
+                range(len(self.corrupt_layer)),
             )
         )
 
-        layerDim = self.LAYERS_DIM[self.get_curr_layer()]
+        layer_dim = self.layers_dim[self.get_current_layer()]
 
         logging.info(
-            "Layer %d injection list size: %d", self.get_curr_layer(), len(inj_list)
+            "Layer %d injection list size: %d", self.get_current_layer(), len(inj_list)
         )
-        if layerDim == 2:
+        if layer_dim == 2:
             for i in inj_list:
                 self.assert_inj_bounds(index=i)
                 logging.info(
                     "Original value at [%d][%d]: %f",
-                    self.CORRUPT_BATCH[i],
-                    self.CORRUPT_DIM1[i],
-                    output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]],
+                    self.corrupt_batch[i],
+                    self.corrupt_dim1[i],
+                    output[self.corrupt_batch[i]][self.corrupt_dim1[i]],
                 )
-                logging.info("Changing value to %f", self.CORRUPT_VALUE[i])
-                output[self.CORRUPT_BATCH[i]][
-                    self.CORRUPT_DIM1[i]
-                ] = self.CORRUPT_VALUE[i]
-        elif layerDim == 3:
+                logging.info("Changing value to %f", self.corrupt_value[i])
+                output[self.corrupt_batch[i]][
+                    self.corrupt_dim1[i]
+                ] = self.corrupt_value[i]
+        elif layer_dim == 3:
             for i in inj_list:
                 self.assert_inj_bounds(index=i)
                 logging.info(
                     "Original value at [%d][%d][%d]: %f",
-                    self.CORRUPT_BATCH[i],
-                    self.CORRUPT_DIM1[i],
-                    self.CORRUPT_DIM2[i],
-                    output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][
-                        self.CORRUPT_DIM2[i]
+                    self.corrupt_batch[i],
+                    self.corrupt_dim1[i],
+                    self.corrupt_dim2[i],
+                    output[self.corrupt_batch[i]][self.corrupt_dim1[i]][
+                        self.corrupt_dim2[i]
                     ],
                 )
-                logging.info("Changing value to %f", self.CORRUPT_VALUE[i])
-                output[self.CORRUPT_BATCH[i]][
-                    self.CORRUPT_DIM1[i], self.CORRUPT_DIM2[i]
-                ] = self.CORRUPT_VALUE[i]
-        elif layerDim == 4:
+                logging.info("Changing value to %f", self.corrupt_value[i])
+                output[self.corrupt_batch[i]][
+                    self.corrupt_dim1[i], self.corrupt_dim2[i]
+                ] = self.corrupt_value[i]
+        elif layer_dim == 4:
             for i in inj_list:
                 self.assert_inj_bounds(index=i)
                 logging.info(
                     "Original value at [%d][%d][%d][%d]: %f",
-                    self.CORRUPT_BATCH[i],
-                    self.CORRUPT_DIM1[i],
-                    self.CORRUPT_DIM2[i],
-                    self.CORRUPT_DIM3[i],
-                    output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][
-                        self.CORRUPT_DIM2[i]
-                    ][self.CORRUPT_DIM3[i]],
+                    self.corrupt_batch[i],
+                    self.corrupt_dim1[i],
+                    self.corrupt_dim2[i],
+                    self.corrupt_dim3[i],
+                    output[self.corrupt_batch[i]][self.corrupt_dim1[i]][
+                        self.corrupt_dim2[i]
+                    ][self.corrupt_dim3[i]],
                 )
-                logging.info("Changing value to %f", self.CORRUPT_VALUE[i])
-                output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][
-                    self.CORRUPT_DIM2[i]
-                ][self.CORRUPT_DIM3[i]] = self.CORRUPT_VALUE[i]
+                logging.info("Changing value to %f", self.corrupt_value[i])
+                output[self.corrupt_batch[i]][self.corrupt_dim1[i]][
+                    self.corrupt_dim2[i]
+                ][self.corrupt_dim3[i]] = self.corrupt_value[i]
 
         self.updateLayer()
 
@@ -395,57 +390,57 @@ class fault_injection:
         shape = list(output.size())
         dim = len(shape)
 
-        self.LAYERS_TYPE.append(type(module))
-        self.LAYERS_DIM.append(dim)
-        self.OUTPUT_SIZE.append(shape)
+        self.layers_type.append(type(module))
+        self.layers_dim.append(dim)
+        self.output_size.append(shape)
 
     def get_original_model(self):
-        return self.ORIG_MODEL
+        return self.original_model
 
     def get_corrupted_model(self):
-        return self.CORRUPTED_MODEL
+        return self.corrupted_model
 
     def get_output_size(self):
-        return self.OUTPUT_SIZE
+        return self.output_size
 
     def get_layer_type(self, layer_num):
-        return self.LAYERS_TYPE[layer_num]
+        return self.layers_type[layer_num]
 
     def get_layer_dim(self, layer_num):
-        return self.LAYERS_DIM[layer_num]
+        return self.layers_dim[layer_num]
 
     def get_inj_layer_types(self):
-        return self._INJ_LAYER_TYPES
+        return self._inj_layer_types
 
     def updateLayer(self, value=1):
-        self.CURR_LAYER += value
+        self.current_layer += value
 
-    def reset_curr_layer(self):
-        self.CURR_LAYER = 0
+    def reset_current_layer(self):
+        self.current_layer = 0
 
     def set_corrupt_layer(self, value):
-        self.CORRUPT_LAYER = value
+        self.corrupt_layer = value
 
-    def get_curr_layer(self):
-        return self.CURR_LAYER
+    def get_current_layer(self):
+        return self.current_layer
 
     def get_corrupt_layer(self):
-        return self.CORRUPT_LAYER
+        return self.corrupt_layer
 
     def get_total_batches(self):
-        return self._BATCH_SIZE
+        return self._batch_size
 
     def get_total_layers(self):
-        return len(self.OUTPUT_SIZE)
+        return len(self.output_size)
 
     def get_fmaps_num(self, layer):
-        return self.OUTPUT_SIZE[layer][1]
+        return self.output_size[layer][1]
 
     def get_fmaps_H(self, layer):
-        return self.OUTPUT_SIZE[layer][2]
+        return self.output_size[layer][2]
 
     def get_fmaps_W(self, layer):
-        return self.OUTPUT_SIZE[layer][3]
+        return self.output_size[layer][3]
 
     def get_fmap_HW(self, layer):
         return (self.get_fmaps_H(layer), self.get_fmaps_W(layer))
@@ -459,7 +454,7 @@ class fault_injection:
         summary_str += (
             "----------------------------------------------------------------" + "\n"
         )
-        for l_type in self._INJ_LAYER_TYPES:
+        for l_type in self._inj_layer_types:
             summary_str += "{:>5}".format("- ")
             substring = str(l_type).split(".")[-1].split("'")[0]
             summary_str += substring + "\n"
@@ -471,11 +466,11 @@ class fault_injection:
         )
 
         summary_str += "   - Shape of input into the model: ("
-        for dim in self._INPUT_SHAPE:
+        for dim in self._input_shape:
             summary_str += str(dim) + " "
         summary_str += ")\n"
 
-        summary_str += "   - Batch Size: " + str(self._BATCH_SIZE) + "\n"
+        summary_str += "   - Batch Size: " + str(self._batch_size) + "\n"
         summary_str += "   - CUDA Enabled: " + str(self.use_cuda) + "\n\n"
 
         summary_str += "Layer Info:\n"
@@ -489,12 +484,12 @@ class fault_injection:
         summary_str += (
             "----------------------------------------------------------------" + "\n"
         )
-        for layer, _dim in enumerate(self.OUTPUT_SIZE):
+        for layer, _dim in enumerate(self.output_size):
             line_new = "{:>5}  {:>20}  {:>15} {:>20}".format(
                 layer,
-                str(self.LAYERS_TYPE[layer]).split(".")[-1].split("'")[0],
-                str(self.LAYERS_DIM[layer]),
-                str(self.OUTPUT_SIZE[layer]),
+                str(self.layers_type[layer]).split(".")[-1].split("'")[0],
+                str(self.layers_dim[layer]),
+                str(self.output_size[layer]),
             )
             summary_str += line_new + "\n"
 

@@ -174,9 +174,7 @@ class TestNeuronFiBatch:
         self.img_size = 32
         self.use_gpu = True
 
-        self.model, self.dataset = CIFAR10_set_up_custom(
-            self.batch_size, self.workers
-        )
+        self.model, self.dataset = CIFAR10_set_up_custom(self.batch_size, self.workers)
         dataiter = iter(self.dataset)
         self.images, self.labels = dataiter.next()
 
