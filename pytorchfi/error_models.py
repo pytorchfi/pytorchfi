@@ -185,11 +185,7 @@ class single_bit_flip_func(core.fault_injection):
         return val  # return positive value as is
 
     def _twos_comp_shifted(self, val, nbits):
-        if val < 0:
-            val = (1 << nbits) + val
-        else:
-            val = self._twos_comp(val, nbits)
-        return val
+        return (1 << nbits) + val if val < 0 else self._twos_comp(val, nbits)
 
     def _flip_bit_signed(self, orig_value, max_value, bit_pos):
         # quantum value
