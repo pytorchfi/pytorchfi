@@ -239,7 +239,7 @@ class single_bit_flip_func(core.fault_injection):
             raise AssertionError
         new_quantum = int(bits_str_new, 2)
         out = self._twos_comp(new_quantum, total_bits)
-        logging.info("out", out)
+        logging.info("Out: %s", out)
 
         # get FP equivalent from quantum
         new_value = out * ((2.0 ** (-1 * (total_bits - 1))) * max_value)
@@ -251,7 +251,7 @@ class single_bit_flip_func(core.fault_injection):
         corrupt_conv_set = self.get_corrupt_layer()
         range_max = self.get_conv_max(self.get_curr_layer())
         logging.info("Current layer: %s", self.get_curr_layer())
-        logging.info("range_max", range_max)
+        logging.info("Range_max: %s", range_max)
 
         if type(corrupt_conv_set) is list:
             inj_list = list(

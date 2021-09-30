@@ -32,7 +32,8 @@ class TestLayers:
         self.golden_label = list(torch.argmax(self.golden_softmax, dim=1))[0].item()
 
     def test_golden_inference(self):
-        assert self.golden_label == 556
+        if self.golden_label != 556:
+            raise AssertionError
 
     def test_single_conv_neuron(self):
 
