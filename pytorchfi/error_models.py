@@ -242,14 +242,14 @@ class single_bit_flip_func(core.fault_injection):
 
     def single_bit_flip_signed_across_batch(self, module, input_val, output):
         corrupt_conv_set = self.get_corrupt_layer()
-        range_max = self.get_conv_max(self.get_curr_layer())
-        logging.info("Current layer: %s", self.get_curr_layer())
+        range_max = self.get_conv_max(self.get_current_layer())
+        logging.info("Current layer: %s", self.get_current_layer())
         logging.info("Range_max: %s", range_max)
 
         if type(corrupt_conv_set) is list:
             inj_list = list(
                 filter(
-                    lambda x: corrupt_conv_set[x] == self.get_curr_layer(),
+                    lambda x: corrupt_conv_set[x] == self.get_current_layer(),
                     range(len(corrupt_conv_set)),
                 )
             )
@@ -268,7 +268,7 @@ class single_bit_flip_func(core.fault_injection):
                 ][self.CORRUPT_DIM3[i]] = new_value
 
         else:
-            if self.get_curr_layer() == corrupt_conv_set:
+            if self.get_current_layer() == corrupt_conv_set:
                 prev_value = output[self.CORRUPT_BATCH][self.CORRUPT_DIM1][
                     self.CORRUPT_DIM2
                 ][self.CORRUPT_DIM3]
@@ -282,7 +282,7 @@ class single_bit_flip_func(core.fault_injection):
                 ] = new_value
 
         self.updateLayer()
-        if self.get_curr_layer() >= self.get_total_layers():
+        if self.get_current_layer() >= self.get_total_layers():
             self.reset_curr_layer()
 
 
