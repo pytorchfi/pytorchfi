@@ -51,7 +51,7 @@ def alexnet(**kwargs):
     return model
 
 
-def helper_setUp_IMAGENET(batchsize, workers, dataset_path):
+def IMAGENET_set_up(batchsize, workers, dataset_path):
     valdir = os.path.join(dataset_path + "/imagenet/", "val")
     normalize = transforms.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
@@ -93,7 +93,7 @@ def _get_custom_sampler(singleIndex, total):
     return Custom_Sampler(indices)
 
 
-def helper_setUp_CIFAR10(batchsize, workers):
+def CIFAR10_set_up(batchsize, workers):
     transform = transforms.Compose(
         [
             transforms.ToTensor(),
@@ -114,7 +114,7 @@ def helper_setUp_CIFAR10(batchsize, workers):
     return model, val_loader
 
 
-def helper_setUp_CIFAR10_same(batchsize, workers, specificIndex=0):
+def CIFAR10_set_up_custom(batchsize, workers, specificIndex=0):
     custom_sampler = _get_custom_sampler(specificIndex, batchsize)
 
     transform = transforms.Compose(

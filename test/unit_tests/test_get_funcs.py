@@ -1,7 +1,7 @@
 import torch
 from pytorchfi.core import fault_injection as pfi_core
 
-from .util_test import helper_setUp_CIFAR10_same
+from .util_test import CIFAR10_set_up_custom
 
 
 class TestCoreGetFuncs:
@@ -18,7 +18,7 @@ class TestCoreGetFuncs:
         self.LAYER_TYPES = [torch.nn.Conv2d]
         self.USE_GPU = False
 
-        self.model, self.dataset = helper_setUp_CIFAR10_same(
+        self.model, self.dataset = CIFAR10_set_up_custom(
             self.BATCH_SIZE, self.WORKERS
         )
 

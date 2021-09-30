@@ -2,7 +2,7 @@ import pytest
 import torch
 from pytorchfi.core import fault_injection as pfi_core
 
-from .util_test import helper_setUp_CIFAR10_same
+from .util_test import CIFAR10_set_up_custom
 
 
 class TestNeuronFi:
@@ -16,7 +16,7 @@ class TestNeuronFi:
         self.channels = 3
         self.img_size = 32
 
-        self.model, dataset = helper_setUp_CIFAR10_same(self.batch_size, self.workers)
+        self.model, dataset = CIFAR10_set_up_custom(self.batch_size, self.workers)
         dataiter = iter(dataset)
         self.images, self.labels = dataiter.next()
 
@@ -174,7 +174,7 @@ class TestNeuronFiBatch:
         self.img_size = 32
         self.use_gpu = True
 
-        self.model, self.dataset = helper_setUp_CIFAR10_same(
+        self.model, self.dataset = CIFAR10_set_up_custom(
             self.batch_size, self.workers
         )
         dataiter = iter(self.dataset)

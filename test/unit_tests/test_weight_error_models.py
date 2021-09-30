@@ -6,7 +6,7 @@ from pytorchfi.error_models import (
     zeroFunc_rand_weight,
 )
 
-from .util_test import helper_setUp_CIFAR10_same
+from .util_test import CIFAR10_set_up_custom
 
 
 class TestWeightErrorModels:
@@ -21,7 +21,7 @@ class TestWeightErrorModels:
         img_size = 32
         use_gpu = False
 
-        model, self.dataset = helper_setUp_CIFAR10_same(batch_size, workers)
+        model, self.dataset = CIFAR10_set_up_custom(batch_size, workers)
         dataiter = iter(self.dataset)
         self.images, self.labels = dataiter.next()
 
