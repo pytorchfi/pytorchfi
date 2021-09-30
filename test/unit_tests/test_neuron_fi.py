@@ -5,48 +5,42 @@ from pytorchfi.core import fault_injection as pfi_core
 from .util_test import helper_setUp_CIFAR10_same
 
 
-class TestNeuronFIgpu:
-    """Testing focuses on neuron perturbations on GPU with batch = 1."""
+class TestNeuronFi:
+    """Testing focuses on neuron perturbations on with batch = 1."""
 
     def setup_class(self):
         torch.manual_seed(0)
 
-        batch_size = 1
-        workers = 1
-        channels = 3
-        img_size = 32
-        use_gpu = True
+        self.batch_size = 1
+        self.workers = 1
+        self.channels = 3
+        self.img_size = 32
 
-        model, dataset = helper_setUp_CIFAR10_same(batch_size, workers)
+        self.model, dataset = helper_setUp_CIFAR10_same(self.batch_size, self.workers)
         dataiter = iter(dataset)
         self.images, self.labels = dataiter.next()
-        self.images = self.images.cuda()
+        self.images_gpu = self.images.cuda()
 
-        self.p = pfi_core(
-            model,
-            batch_size,
-            input_shape=[channels, img_size, img_size],
-            use_cuda=use_gpu,
-        )
-
-        model.cuda()
-        model.eval()
+    def test_neuron_single_fi_cpu(self):        
+        self.model.eval()
         with torch.no_grad():
-            self.golden_output = model(self.images)
-
-    @pytest.mark.skipif(
-        not torch.cuda.is_available(), reason="GPU not supported on this machine"
-    )
-    def test_neuronFI_singleElement(self):
+            golden_output = self.model(self.images)
+        
         batch_i = [0]
         layer_i = [4]
         c_i = [0]
         h_i = [1]
         w_i = [1]
-
         inj_value_i = [10000.0]
 
-        corrupt_model_1 = self.p.declare_neuron_fi(
+        p = pfi_core(
+            self.model,
+            self.batch_size,
+            input_shape=[self.channels, self.img_size, self.img_size],
+            use_cuda=False,
+        )
+
+        corrupt_model_1 = p.declare_neuron_fi(
             batch=batch_i,
             layer_num=layer_i,
             dim1=c_i,
@@ -59,10 +53,10 @@ class TestNeuronFIgpu:
         with torch.no_grad():
             corrupt_output_1 = corrupt_model_1(self.images)
 
-        if torch.all(corrupt_output_1.eq(self.golden_output)):
+        if torch.all(corrupt_output_1.eq(golden_output)):
             raise AssertionError
 
-        uncorrupt_model = self.p.declare_neuron_fi(
+        uncorrupt_model = p.declare_neuron_fi(
             batch=batch_i,
             layer_num=layer_i,
             dim1=c_i,
@@ -75,97 +69,10 @@ class TestNeuronFIgpu:
         with torch.no_grad():
             uncorrupted_output = uncorrupt_model(self.images)
 
-        if not torch.all(uncorrupted_output.eq(self.golden_output)):
+        if not torch.all(uncorrupted_output.eq(golden_output)):
             raise AssertionError
 
-        corrupt_model_2 = self.p.declare_neuron_fi(
-            batch=batch_i,
-            layer_num=layer_i,
-            dim1=c_i,
-            dim2=h_i,
-            dim3=w_i,
-            value=inj_value_i * 2,
-        )
-
-        corrupt_model_2.eval()
-        with torch.no_grad():
-            corrupted_output_2 = corrupt_model_2(self.images)
-
-        if torch.all(corrupted_output_2.eq(self.golden_output)):
-            raise AssertionError
-        if not torch.all(corrupted_output_2.eq(corrupted_output_2)):
-            raise AssertionError
-
-
-class TestNeuronFIcpu:
-    """Testing focuses on neuron perturbations on CPU with batch = 1."""
-
-    def setup_class(self):
-        torch.manual_seed(0)
-
-        batch_size = 1
-        workers = 1
-        channels = 3
-        img_size = 32
-        use_gpu = False
-
-        model, dataset = helper_setUp_CIFAR10_same(batch_size, workers)
-        dataiter = iter(dataset)
-        self.images, self.labels = dataiter.next()
-
-        self.p = pfi_core(
-            model,
-            batch_size,
-            input_shape=[channels, img_size, img_size],
-            use_cuda=use_gpu,
-        )
-
-        model.eval()
-        with torch.no_grad():
-            self.golden_output = model(self.images)
-
-    def test_neuronFI_singleElement(self):
-        batch_i = [0]
-        layer_i = [4]
-        c_i = [0]
-        h_i = [1]
-        w_i = [1]
-
-        inj_value_i = [10000.0]
-
-        corrupt_model_1 = self.p.declare_neuron_fi(
-            batch=batch_i,
-            layer_num=layer_i,
-            dim1=c_i,
-            dim2=h_i,
-            dim3=w_i,
-            value=inj_value_i,
-        )
-
-        corrupt_model_1.eval()
-        with torch.no_grad():
-            corrupt_output_1 = corrupt_model_1(self.images)
-
-        if torch.all(corrupt_output_1.eq(self.golden_output)):
-            raise AssertionError
-
-        uncorrupt_model = self.p.declare_neuron_fi(
-            batch=batch_i,
-            layer_num=layer_i,
-            dim1=c_i,
-            dim2=h_i,
-            dim3=w_i,
-            value=[0],
-        )
-
-        uncorrupt_model.eval()
-        with torch.no_grad():
-            uncorrupted_output = uncorrupt_model(self.images)
-
-        if not torch.all(uncorrupted_output.eq(self.golden_output)):
-            raise AssertionError
-
-        corrupt_model_2 = self.p.declare_neuron_fi(
+        corrupt_model_2 = p.declare_neuron_fi(
             batch=batch_i,
             layer_num=layer_i,
             dim1=c_i,
@@ -178,11 +85,84 @@ class TestNeuronFIcpu:
         with torch.no_grad():
             corrupt_output_2 = corrupt_model_2(self.images)
 
-        if torch.all(corrupt_output_2.eq(self.golden_output)):
+        if torch.all(corrupt_output_2.eq(golden_output)):
             raise AssertionError
 
+    @pytest.mark.skipif(
+        not torch.cuda.is_available(), reason="GPU not supported on this machine"
+    )
+    def test_neuron_single_fi_gpu(self):
+        
+        self.model.cuda()
+        self.model.eval()
+        with torch.no_grad():
+            golden_output = self.model(self.images_gpu)
 
-class TestNeuronFIgpuBatch:
+        batch_i = [0]
+        layer_i = [4]
+        c_i = [0]
+        h_i = [1]
+        w_i = [1]
+        inj_value_i = [10000.0]
+
+        p = pfi_core(
+            self.model,
+            self.batch_size,
+            input_shape=[self.channels, self.img_size, self.img_size],
+            use_cuda=False,
+        )
+
+        corrupt_model_1 = p.declare_neuron_fi(
+            batch=batch_i,
+            layer_num=layer_i,
+            dim1=c_i,
+            dim2=h_i,
+            dim3=w_i,
+            value=inj_value_i,
+        )
+
+        corrupt_model_1.eval()
+        with torch.no_grad():
+            corrupt_output_1 = corrupt_model_1(self.images_gpu)
+
+        if torch.all(corrupt_output_1.eq(golden_output)):
+            raise AssertionError
+
+        uncorrupt_model = p.declare_neuron_fi(
+            batch=batch_i,
+            layer_num=layer_i,
+            dim1=c_i,
+            dim2=h_i,
+            dim3=w_i,
+            value=[0],
+        )
+
+        uncorrupt_model.eval()
+        with torch.no_grad():
+            uncorrupted_output = uncorrupt_model(self.images_gpu)
+
+        if not torch.all(uncorrupted_output.eq(golden_output)):
+            raise AssertionError
+
+        corrupt_model_2 = self.p.declare_neuron_fi(
+            batch=batch_i,
+            layer_num=layer_i,
+            dim1=c_i,
+            dim2=h_i,
+            dim3=w_i,
+            value=inj_value_i * 2,
+        )
+
+        corrupt_model_2.eval()
+        with torch.no_grad():
+            corrupted_output_2 = corrupt_model_2(self.images_gpu)
+
+        if torch.all(corrupted_output_2.eq(golden_output)):
+            raise AssertionError
+        if not torch.all(corrupted_output_2.eq(corrupted_output_2)):
+            raise AssertionError
+
+class TestNeuronFiGpuBatch:
     """Testing focuses on neuron perturbations on GPU with batch = N."""
 
     def setup_class(self):
@@ -280,7 +260,7 @@ class TestNeuronFIgpuBatch:
             raise AssertionError
 
 
-class TestNeuronFIcpuBatch:
+class TestNeuronFiCpuBatch:
     """Testing focuses on neuron perturbations on cpu with batch = N."""
 
     def setup_class(self):
