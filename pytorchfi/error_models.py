@@ -179,10 +179,9 @@ class single_bit_flip_func(core.fault_injection):
 
     @staticmethod
     def _twos_comp(val, bits):
-        # compute the 2's complement of int value val
-        if (val & (1 << (bits - 1))) != 0:  # if sign bit is set e.g., 8bit: 128-255
-            val = val - (1 << bits)  # compute negative value
-        return val  # return positive value as is
+        if (val & (1 << (bits - 1))) != 0:
+            val = val - (1 << bits)
+        return val
 
     def _twos_comp_shifted(self, val, nbits):
         return (1 << nbits) + val if val < 0 else self._twos_comp(val, nbits)
@@ -255,30 +254,30 @@ class single_bit_flip_func(core.fault_injection):
             )
             for i in inj_list:
                 self.assert_inj_bounds(index=i)
-                prev_value = output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][
-                    self.CORRUPT_DIM2[i]
-                ][self.CORRUPT_DIM3[i]]
+                prev_value = output[self.corrupt_batch[i]][self.corrupt_dim1[i]][
+                    self.corrupt_dim2[i]
+                ][self.corrupt_dim3[i]]
 
                 rand_bit = random.randint(0, self.bits - 1)
                 logging.info("Random Bit: %d", rand_bit)
                 new_value = self._flip_bit_signed(prev_value, range_max, rand_bit)
 
-                output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][
-                    self.CORRUPT_DIM2[i]
-                ][self.CORRUPT_DIM3[i]] = new_value
+                output[self.corrupt_batch[i]][self.corrupt_dim1[i]][
+                    self.corrupt_dim2[i]
+                ][self.corrupt_dim3[i]] = new_value
 
         else:
             if self.get_current_layer() == corrupt_conv_set:
-                prev_value = output[self.CORRUPT_BATCH][self.CORRUPT_DIM1][
-                    self.CORRUPT_DIM2
-                ][self.CORRUPT_DIM3]
+                prev_value = output[self.corrupt_batch][self.corrupt_dim1][
+                    self.corrupt_dim2
+                ][self.corrupt_dim3]
 
                 rand_bit = random.randint(0, self.bits - 1)
                 logging.info("Random Bit: %d", rand_bit)
                 new_value = self._flip_bit_signed(prev_value, range_max, rand_bit)
 
-                output[self.CORRUPT_BATCH][self.CORRUPT_DIM1][self.CORRUPT_DIM2][
-                    self.CORRUPT_DIM3
+                output[self.corrupt_batch][self.corrupt_dim1][self.corrupt_dim2][
+                    self.corrupt_dim3
                 ] = new_value
 
         self.updateLayer()
