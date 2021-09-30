@@ -177,19 +177,19 @@ class single_bit_flip_func(core.fault_injection):
     def get_conv_max(self, layer):
         return self.LayerRanges[layer]
 
+    @staticmethod
+    def _twos_comp(val, bits):
+        # compute the 2's complement of int value val
+        if (val & (1 << (bits - 1))) != 0:  # if sign bit is set e.g., 8bit: 128-255
+            val = val - (1 << bits)  # compute negative value
+        return val  # return positive value as is
+
     def _twos_comp_shifted(self, val, nbits):
         if val < 0:
             val = (1 << nbits) + val
         else:
             val = self._twos_comp(val, nbits)
         return val
-
-    @staticmethod
-    def _twos_comp(self, val, bits):
-        # compute the 2's complement of int value val
-        if (val & (1 << (bits - 1))) != 0:  # if sign bit is set e.g., 8bit: 128-255
-            val = val - (1 << bits)  # compute negative value
-        return val  # return positive value as is
 
     def _flip_bit_signed(self, orig_value, max_value, bit_pos):
         # quantum value
