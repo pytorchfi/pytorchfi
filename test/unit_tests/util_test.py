@@ -105,7 +105,6 @@ def CIFAR10_set_up(batchsize, workers):
         root="./data", train=False, download=True, transform=transform
     )
 
-    # TODO use the same image across the whole batch
     val_loader = torch.utils.data.DataLoader(
         testset, batch_size=batchsize, shuffle=False, num_workers=workers
     )
