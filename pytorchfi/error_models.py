@@ -70,9 +70,7 @@ def random_neuron_inj(pfi, min_val=-1, max_val=1):
 
 
 # single random neuron error in each batch element.
-def random_neuron_inj_batched(
-    pfi, min_val=-1, max_val=1, randLoc=True, randVal=True
-):
+def random_neuron_inj_batched(pfi, min_val=-1, max_val=1, randLoc=True, randVal=True):
     batch, layer_num, c_rand, h_rand, w_rand, value = ([] for i in range(6))
 
     if not randLoc:

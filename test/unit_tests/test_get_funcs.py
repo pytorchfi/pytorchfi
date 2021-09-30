@@ -129,6 +129,7 @@ class TestCoreGetFuncs:
         if "CUDA Enabled: False" not in outputString:
             raise AssertionError
         if (
-            "================================================================" not in outputString
+            "================================================================"
+            not in outputString
         ):
             raise AssertionError
