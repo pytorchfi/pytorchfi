@@ -9,6 +9,7 @@
     <img src="https://img.shields.io/circleci/build/github/pytorchfi/pytorchfi/master"></img>
     <a href="https://codecov.io/gh/pytorchfi/pytorchfi"><img src="https://codecov.io/gh/pytorchfi/pytorchfi/branch/master/graph/badge.svg"></a>
     <a href="https://pypi.org/project/pytorchfi/"><img src="https://static.pepy.tech/personalized-badge/pytorchfi?period=total&units=international_system&left_color=grey&right_color=magenta&left_text=downloads"></a>
+<a href="https://app.fossa.com/projects/git%2Bgithub.com%2Fpytorchfi%2Fpytorchfi?ref=badge_shield" alt="FOSSA Status"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Fpytorchfi%2Fpytorchfi.svg?type=shield"/></a>
     <a href="https://opensource.org/licenses/NCSA"><img src="https://img.shields.io/badge/license-NCSA-blue"></a>
 </p>
 
@@ -20,6 +21,9 @@
   <a href="#citation">Citation</a> •
   <a href="#license">License</a>
 </p>
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fpytorchfi%2Fpytorchfi.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fpytorchfi%2Fpytorchfi?ref=badge_large)
 
 ## Background
 
