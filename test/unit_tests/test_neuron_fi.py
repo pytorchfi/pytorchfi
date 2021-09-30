@@ -182,7 +182,7 @@ class TestNeuronFIcpu:
 
         corrupt_model_2.eval()
         with torch.no_grad():
-            corrupt_output_2 = self.inj_model(self.images)
+            corrupt_output_2 = corrupt_model_2(self.images)
 
         if torch.all(corrupt_output_2.eq(self.golden_output)):
             raise AssertionError
