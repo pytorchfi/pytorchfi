@@ -15,28 +15,25 @@ class TestWeightErrorModels:
     def setup_class(self):
         torch.manual_seed(0)
 
-        self.BATCH_SIZE = 4
-        self.WORKERS = 1
-        self.channels = 3
-        self.img_size = 32
-        self.USE_GPU = False
+        batch_size = 4
+        workers = 1
+        channels = 3
+        img_size = 32
+        use_gpu = False
 
-        self.model, self.dataset = helper_setUp_CIFAR10_same(
-            self.BATCH_SIZE, self.WORKERS
-        )
-        self.dataiter = iter(self.dataset)
+        model, self.dataset = helper_setUp_CIFAR10_same(batch_size, workers)
+        dataiter = iter(self.dataset)
+        self.images, self.labels = dataiter.next()
 
-        self.images, self.labels = self.dataiter.next()
-
-        self.model.eval()
+        model.eval()
         with torch.no_grad():
-            self.output = self.model(self.images)
+            self.golden_output = model(self.images)
 
         self.p = pfi_core(
-            self.model,
-            self.BATCH_SIZE,
-            input_shape=[self.channels, self.img_size, self.img_size],
-            use_cuda=self.USE_GPU,
+            model,
+            batch_size,
+            input_shape=[channels, img_size, img_size],
+            use_cuda=use_gpu,
         )
 
     def test_random_weight_inj(self):
@@ -48,31 +45,31 @@ class TestWeightErrorModels:
         with torch.no_grad():
             corrupted_output_1 = self.inj_model(self.images)
 
-        if torch.all(corrupted_output_1.eq(self.output)):
+        if torch.all(corrupted_output_1.eq(self.golden_output)):
             raise AssertionError
 
     def test_random_weight_inj_conv(self):
         # TODO Update for Weights
         random.seed(1)
-        self.inj_model = random_weight_inj(
+        corrupt_model = random_weight_inj(
             self.p, corrupt_conv=3, min_val=10000, max_val=20000
         )
 
-        self.inj_model.eval()
+        corrupt_model.eval()
         with torch.no_grad():
-            corrupted_output_1 = self.inj_model(self.images)
+            corrupt_output = corrupt_model(self.images)
 
-        if torch.all(corrupted_output_1.eq(self.output)):
+        if torch.all(corrupt_output.eq(self.golden_output)):
             raise AssertionError
 
     def test_random_weight_zero_inj(self):
         # TODO Update for Weights
         random.seed(2)
-        self.inj_model = zeroFunc_rand_weight(self.p)
+        corrupt_model = zeroFunc_rand_weight(self.p)
 
-        self.inj_model.eval()
+        corrupt_model.eval()
         with torch.no_grad():
-            corrupted_output_1 = self.inj_model(self.images)
+            corrupt_output = corrupt_model(self.images)
 
-        if torch.all(corrupted_output_1.eq(self.output)):
+        if torch.all(corrupt_output.eq(self.golden_output)):
             raise AssertionError
