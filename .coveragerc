@@ -1,4 +1,5 @@
-# ignore logging
+ignore:
+    - "test"
 [report]
 exclude_lines =
     logging
