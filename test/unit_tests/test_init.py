@@ -6,7 +6,10 @@ from .util_test import helper_setUp_CIFAR10_same
 
 
 class TestNeuronCPUSingle:
-    """Testing focuses on neuron perturbations on the CPU with a single batch element."""
+    """
+    Testing focuses on neuron perturbations on the CPU
+    with a single batch element.
+    """
 
     def setup_class(self):
         self.BATCH_SIZE = 1
@@ -48,7 +51,10 @@ class TestNeuronCPUSingle:
 
 
 class TestNeuronGPUSingle:
-    """Testing focuses on neuron perturbations on the GPU with a single batch element."""
+    """
+    Testing focuses on neuron perturbations on the
+    GPU with a single batch element.
+    """
 
     def setup_class(self):
         self.BATCH_SIZE = 1
@@ -177,7 +183,7 @@ class TestDtypes:
     @pytest.mark.skip(reason="Experimental in PyTorch")
     def test_INT8_cpu(self):
         # TODO: More comprehensive test
-        
+
         self.USE_GPU = False
         self.model.to("cpu")
 

@@ -5,7 +5,10 @@ from .util_test import helper_setUp_CIFAR10_same
 
 
 class TestCoreGetFuncs:
-    """Testing focuses on neuron perturbations on the CPU with a single batch element."""
+    """
+    Testing focuses on neuron perturbations on
+    the CPU with a single batch element.
+    """
 
     def setup_class(self):
         self.BATCH_SIZE = 4
