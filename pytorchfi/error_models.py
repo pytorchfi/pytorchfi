@@ -282,7 +282,7 @@ class single_bit_flip_func(core.fault_injection):
 
         self.updateLayer()
         if self.get_current_layer() >= self.get_total_layers():
-            self.reset_curr_layer()
+            self.reset_current_layer()
 
 
 def random_neuron_single_bit_inj_batched(pfi, layer_ranges, randLoc=True):
