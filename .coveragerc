@@ -1,7 +1,7 @@
-ignore:
-    - "test"
 [report]
 exclude_lines =
     logging
     if __name__ == .main__.:
+omit =
+    test/*
 
