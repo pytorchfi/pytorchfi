@@ -297,19 +297,13 @@ class fault_injection:
                 layerShape[1],
             ))
 
-        if layerDim > 2:
-            if (
-                self.CORRUPT_DIM2[index] >= layerShape[2]
-            ):
+        if layerDim > 2 and self.CORRUPT_DIM2[index] >= layerShape[2]:
                 raise AssertionError("%d < %d: Out of bounds error in Dimension 2!" % (
                     self.CORRUPT_DIM2[index],
                     layerShape[2],
                 ))
 
-        if layerDim > 3:
-            if (
-                self.CORRUPT_DIM3[index] >= layerShape[3]
-            ):
+        if layerDim > 3 and self.CORRUPT_DIM3[index] >= layerShape[3]:
                 raise AssertionError("%d < %d: Out of bounds error in Dimension 3!" % (
                     self.CORRUPT_DIM3[index],
                     layerShape[3],

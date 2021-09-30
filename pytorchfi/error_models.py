@@ -274,7 +274,7 @@ class single_bit_flip_func(core.fault_injection):
                     self.CORRUPT_DIM2[i]
                 ][self.CORRUPT_DIM3[i]] = new_value
 
-        else: 
+        else:
             if self.get_curr_layer() == corrupt_conv_set:
                 prev_value = output[self.CORRUPT_BATCH][self.CORRUPT_DIM1][
                     self.CORRUPT_DIM2
