@@ -19,7 +19,6 @@ class TestNeuronFi:
         self.model, dataset = helper_setUp_CIFAR10_same(self.batch_size, self.workers)
         dataiter = iter(dataset)
         self.images, self.labels = dataiter.next()
-        self.images_gpu = self.images.cuda()
 
     def test_neuron_single_fi_cpu(self):        
         self.model.eval()
@@ -92,7 +91,7 @@ class TestNeuronFi:
         not torch.cuda.is_available(), reason="GPU not supported on this machine"
     )
     def test_neuron_single_fi_gpu(self):
-        
+        self.images_gpu = self.images.cuda()
         self.model.cuda()
         self.model.eval()
         with torch.no_grad():
