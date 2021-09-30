@@ -1,6 +1,4 @@
-"""
-pytorchfi.error_models provides different error models out-of-the-box for use.
-"""
+"""pytorchfi.error_models provides different error models out-of-the-box for use."""
 
 import random
 import logging
@@ -70,9 +68,7 @@ def random_neuron_inj(pfi, min_val=-1, max_val=1):
 
 
 # single random neuron error in each batch element.
-def random_neuron_inj_batched(
-    pfi, min_val=-1, max_val=1, randLoc=True, randVal=True
-):
+def random_neuron_inj_batched(pfi, min_val=-1, max_val=1, randLoc=True, randVal=True):
     batch, layer_num, c_rand, h_rand, w_rand, value = ([] for i in range(6))
 
     if not randLoc:
@@ -181,18 +177,15 @@ class single_bit_flip_func(core.fault_injection):
     def get_conv_max(self, layer):
         return self.LayerRanges[layer]
 
-    def _twos_comp_shifted(self, val, nbits):
-        if val < 0:
-            val = (1 << nbits) + val
-        else:
-            val = self._twos_comp(val, nbits)
-        return val
-
-    def _twos_comp(self, val, bits):
+    @staticmethod
+    def _twos_comp(val, bits):
         # compute the 2's complement of int value val
         if (val & (1 << (bits - 1))) != 0:  # if sign bit is set e.g., 8bit: 128-255
             val = val - (1 << bits)  # compute negative value
         return val  # return positive value as is
+
+    def _twos_comp_shifted(self, val, nbits):
+        return (1 << nbits) + val if val < 0 else self._twos_comp(val, nbits)
 
     def _flip_bit_signed(self, orig_value, max_value, bit_pos):
         # quantum value
@@ -239,7 +232,7 @@ class single_bit_flip_func(core.fault_injection):
             raise AssertionError
         new_quantum = int(bits_str_new, 2)
         out = self._twos_comp(new_quantum, total_bits)
-        logging.info("out", out)
+        logging.info("Out: %s", out)
 
         # get FP equivalent from quantum
         new_value = out * ((2.0 ** (-1 * (total_bits - 1))) * max_value)
@@ -251,7 +244,7 @@ class single_bit_flip_func(core.fault_injection):
         corrupt_conv_set = self.get_corrupt_layer()
         range_max = self.get_conv_max(self.get_curr_layer())
         logging.info("Current layer: %s", self.get_curr_layer())
-        logging.info("range_max", range_max)
+        logging.info("Range_max: %s", range_max)
 
         if type(corrupt_conv_set) is list:
             inj_list = list(
@@ -274,7 +267,7 @@ class single_bit_flip_func(core.fault_injection):
                     self.CORRUPT_DIM2[i]
                 ][self.CORRUPT_DIM3[i]] = new_value
 
-        else: 
+        else:
             if self.get_curr_layer() == corrupt_conv_set:
                 prev_value = output[self.CORRUPT_BATCH][self.CORRUPT_DIM1][
                     self.CORRUPT_DIM2

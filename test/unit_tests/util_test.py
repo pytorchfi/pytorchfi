@@ -9,14 +9,13 @@ import torchvision.models as models
 import torchvision.transforms as transforms
 
 
-"""
-AlexNet for CIFAR10. FC layers are removed. Paddings are adjusted.
-Without BN, the start learning rate should be 0.01
-(c) YANG, Wei
-"""
-
-
 class AlexNet(nn.Module):
+    """
+    AlexNet for CIFAR10. FC layers are removed. Paddings are adjusted.
+    Without BN, the start learning rate should be 0.01
+    (c) YANG, Wei
+    """
+
     def __init__(self, num_classes=10):
         super(AlexNet, self).__init__()
         self.features = nn.Sequential(

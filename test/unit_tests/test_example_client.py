@@ -4,9 +4,7 @@ from pytorchfi.core import fault_injection
 
 
 class TestCoreExampleClient:
-    """
-    Testing PyTorchFI.Core example client.
-    """
+    """Testing PyTorchFI.Core example client."""
 
     def setup_class(self):
         torch.manual_seed(5)

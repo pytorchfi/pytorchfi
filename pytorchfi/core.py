@@ -1,6 +1,4 @@
-"""
-pytorchfi.core contains the core functionality for fault injections.
-"""
+"""pytorchfi.core contains the core functionality for fault injections"""
 
 import copy
 import logging
@@ -41,13 +39,9 @@ class fault_injection:
 
         self.use_cuda = kwargs.get("use_cuda", next(model.parameters()).is_cuda)
 
-        if not isinstance(
-            input_shape, list
-        ):
+        if not isinstance(input_shape, list):
             raise AssertionError("Error: Input shape must be provided as a list.")
-        if not (
-            isinstance(batch_size, int) and batch_size >= 1
-        ):
+        if not (isinstance(batch_size, int) and batch_size >= 1):
             raise AssertionError("Error: Batch size must be an integer greater than 1.")
         if len(layer_types) < 0:
             raise AssertionError("Error: At least one layer type must be selected.")
@@ -269,51 +263,54 @@ class fault_injection:
     def assert_inj_bounds(self, index, **kwargs):
         if index < 0:
             raise AssertionError("Invalid injection index: %d" % (index))
-        if (
-            self.CORRUPT_BATCH[index] >= self.get_total_batches()
-        ):
-            raise AssertionError("%d < %d: Invalid batch element!" % (
-                self.CORRUPT_BATCH[index],
-                self.get_total_batches(),
-            ))
-        if (
-            self.CORRUPT_LAYER[index] >= self.get_total_layers()
-        ):
-            raise AssertionError("%d < %d: Invalid layer!" % (
-                self.CORRUPT_LAYER[index],
-                self.get_total_layers(),
-            ))
+        if self.CORRUPT_BATCH[index] >= self.get_total_batches():
+            raise AssertionError(
+                "%d < %d: Invalid batch element!"
+                % (
+                    self.CORRUPT_BATCH[index],
+                    self.get_total_batches(),
+                )
+            )
+        if self.CORRUPT_LAYER[index] >= self.get_total_layers():
+            raise AssertionError(
+                "%d < %d: Invalid layer!"
+                % (
+                    self.CORRUPT_LAYER[index],
+                    self.get_total_layers(),
+                )
+            )
 
         corruptLayerNum = self.CORRUPT_LAYER[index]
         layerType = self.LAYERS_TYPE[corruptLayerNum]
         layerDim = self.LAYERS_DIM[corruptLayerNum]
         layerShape = self.OUTPUT_SIZE[corruptLayerNum]
 
-        if (
-            self.CORRUPT_DIM1[index] >= layerShape[1]
-        ):
-            raise AssertionError("%d < %d: Out of bounds error in Dimension 1!" % (
-                self.CORRUPT_DIM1[index],
-                layerShape[1],
-            ))
+        if self.CORRUPT_DIM1[index] >= layerShape[1]:
+            raise AssertionError(
+                "%d < %d: Out of bounds error in Dimension 1!"
+                % (
+                    self.CORRUPT_DIM1[index],
+                    layerShape[1],
+                )
+            )
 
-        if layerDim > 2:
-            if (
-                self.CORRUPT_DIM2[index] >= layerShape[2]
-            ):
-                raise AssertionError("%d < %d: Out of bounds error in Dimension 2!" % (
+        if layerDim > 2 and self.CORRUPT_DIM2[index] >= layerShape[2]:
+            raise AssertionError(
+                "%d < %d: Out of bounds error in Dimension 2!"
+                % (
                     self.CORRUPT_DIM2[index],
                     layerShape[2],
-                ))
+                )
+            )
 
-        if layerDim > 3:
-            if (
-                self.CORRUPT_DIM3[index] >= layerShape[3]
-            ):
-                raise AssertionError("%d < %d: Out of bounds error in Dimension 3!" % (
+        if layerDim > 3 and self.CORRUPT_DIM3[index] >= layerShape[3]:
+            raise AssertionError(
+                "%d < %d: Out of bounds error in Dimension 3!"
+                % (
                     self.CORRUPT_DIM3[index],
                     layerShape[3],
-                ))
+                )
+            )
 
         if layerDim <= 2 and (
             self.CORRUPT_DIM2[index] is not None or self.CORRUPT_DIM3[index] is not None
@@ -366,12 +363,13 @@ class fault_injection:
                     self.CORRUPT_BATCH[i],
                     self.CORRUPT_DIM1[i],
                     self.CORRUPT_DIM2[i],
-                    output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][self.CORRUPT_DIM2[i]],
+                    output[self.CORRUPT_BATCH[i]][self.CORRUPT_DIM1[i]][
+                        self.CORRUPT_DIM2[i]
+                    ],
                 )
                 logging.info("Changing value to %f", self.CORRUPT_VALUE[i])
                 output[self.CORRUPT_BATCH[i]][
-                    self.CORRUPT_DIM1[i],
-                    self.CORRUPT_DIM2[i]
+                    self.CORRUPT_DIM1[i], self.CORRUPT_DIM2[i]
                 ] = self.CORRUPT_VALUE[i]
         elif layerDim == 4:
             for i in inj_list:
@@ -464,11 +462,7 @@ class fault_injection:
         for l_type in self._INJ_LAYER_TYPES:
             summary_str += "{:>5}".format("- ")
             substring = str(l_type).split(".")[-1].split("'")[0]
-            summary_str += substring
-            # summary_str += "{:>15}".format(
-            #     str(substring),
-            # )
-            summary_str += "\n"
+            summary_str += substring + "\n"
         summary_str += "\n"
 
         summary_str += "Model Info:\n"

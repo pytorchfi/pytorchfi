@@ -1,3 +1,5 @@
+"""Testing PyTorchFI.Core example client."""
+
 import torch
 import torchvision.models as models
 from pytorchfi.core import fault_injection
@@ -5,10 +7,6 @@ import pytest
 
 
 class TestLayers:
-    """
-    Testing PyTorchFI.Core example client.
-    """
-
     def setup_class(self):
         torch.manual_seed(5)
 
@@ -32,7 +30,8 @@ class TestLayers:
         self.golden_label = list(torch.argmax(self.golden_softmax, dim=1))[0].item()
 
     def test_golden_inference(self):
-        assert self.golden_label == 556
+        if self.golden_label != 556:
+            raise AssertionError
 
     def test_single_conv_neuron(self):
 
@@ -95,8 +94,13 @@ class TestLayers:
         )
 
         (b, layer, C, H, W, err_val) = (
-            [0,1,2,3], [0,1,2,20], [4,4,0,4], [2, 2, 2, None], [4, 2, 2, None],
-            [10000, 10000, 10000, 1000])
+            [0, 1, 2, 3],
+            [0, 1, 2, 20],
+            [4, 4, 0, 4],
+            [2, 2, 2, None],
+            [4, 2, 2, None],
+            [10000, 10000, 10000, 1000],
+        )
 
         inj = p.declare_neuron_fi(
             batch=b, layer_num=layer, dim1=C, dim2=H, dim3=W, value=err_val

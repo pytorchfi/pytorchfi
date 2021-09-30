@@ -5,9 +5,7 @@ from .util_test import helper_setUp_CIFAR10_same
 
 
 class TestWeightFIcpu:
-    """
-    Testing focuses on weight perturbations.
-    """
+    """Testing focuses on weight perturbations."""
 
     def setup_class(self):
         torch.manual_seed(0)
