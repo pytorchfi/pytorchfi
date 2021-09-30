@@ -1,6 +1,4 @@
-"""
-pytorchfi.core contains the core functionality for fault injections.
-"""
+"""pytorchfi.core contains the core functionality for fault injections"""
 
 import copy
 import logging
@@ -464,11 +462,7 @@ class fault_injection:
         for l_type in self._INJ_LAYER_TYPES:
             summary_str += "{:>5}".format("- ")
             substring = str(l_type).split(".")[-1].split("'")[0]
-            summary_str += substring
-            # summary_str += "{:>15}".format(
-            #     str(substring),
-            # )
-            summary_str += "\n"
+            summary_str += substring + "\n"
         summary_str += "\n"
 
         summary_str += "Model Info:\n"

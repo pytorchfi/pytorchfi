@@ -10,9 +10,7 @@ from .util_test import helper_setUp_CIFAR10_same
 
 
 class TestWeightErrorModels:
-    """
-    Testing weight perturbation error models.
-    """
+    """Testing weight perturbation error models."""
 
     def setup_class(self):
         torch.manual_seed(0)

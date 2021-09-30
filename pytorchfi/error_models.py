@@ -1,6 +1,4 @@
-"""
-pytorchfi.error_models provides different error models out-of-the-box for use.
-"""
+"""pytorchfi.error_models provides different error models out-of-the-box for use."""
 
 import random
 import logging
@@ -186,6 +184,7 @@ class single_bit_flip_func(core.fault_injection):
             val = self._twos_comp(val, nbits)
         return val
 
+    @staticmethod
     def _twos_comp(self, val, bits):
         # compute the 2's complement of int value val
         if (val & (1 << (bits - 1))) != 0:  # if sign bit is set e.g., 8bit: 128-255

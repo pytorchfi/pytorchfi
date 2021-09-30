@@ -6,9 +6,7 @@ from .util_test import helper_setUp_CIFAR10_same
 
 
 class TestNeuronFIgpu:
-    """
-    Testing focuses on neuron perturbations on GPU with batch = 1.
-    """
+    """Testing focuses on neuron perturbations on GPU with batch = 1."""
 
     def setup_class(self):
         torch.manual_seed(0)
@@ -104,9 +102,7 @@ class TestNeuronFIgpu:
 
 
 class TestNeuronFIcpu:
-    """
-    Testing focuses on neuron perturbations on CPU with batch = 1.
-    """
+    """Testing focuses on neuron perturbations on CPU with batch = 1."""
 
     def setup_class(self):
         torch.manual_seed(0)
@@ -196,9 +192,7 @@ class TestNeuronFIcpu:
 
 
 class TestNeuronFIgpuBatch:
-    """
-    Testing focuses on neuron perturbations on GPU with batch = N.
-    """
+    """Testing focuses on neuron perturbations on GPU with batch = N."""
 
     def setup_class(self):
         torch.manual_seed(0)
@@ -302,9 +296,7 @@ class TestNeuronFIgpuBatch:
 
 
 class TestNeuronFIcpuBatch:
-    """
-    Testing focuses on neuron perturbations on cpu with batch = N.
-    """
+    """Testing focuses on neuron perturbations on cpu with batch = N."""
 
     def setup_class(self):
         torch.manual_seed(0)

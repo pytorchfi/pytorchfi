@@ -6,9 +6,7 @@ from .util_test import helper_setUp_CIFAR10_same
 
 
 class TestNeuronCPUSingle:
-    """
-    Testing focuses on neuron perturbations on the CPU with a single batch element.
-    """
+    """Testing focuses on neuron perturbations on the CPU with a single batch element."""
 
     def setup_class(self):
         self.BATCH_SIZE = 1
@@ -28,9 +26,7 @@ class TestNeuronCPUSingle:
         self.output = self.model(self.images)
 
     def test_init_cpu(self):
-        """
-        #TODO: More comprehensive test
-        """
+        # TODO: More comprehensive test
         pfi_core(
             self.model,
             self.BATCH_SIZE,
@@ -52,9 +48,7 @@ class TestNeuronCPUSingle:
 
 
 class TestNeuronGPUSingle:
-    """
-    Testing focuses on neuron perturbations on the GPU with a single batch element.
-    """
+    """Testing focuses on neuron perturbations on the GPU with a single batch element."""
 
     def setup_class(self):
         self.BATCH_SIZE = 1
@@ -79,9 +73,7 @@ class TestNeuronGPUSingle:
         not torch.cuda.is_available(), reason="GPU not supported on this machine"
     )
     def test_init_gpu(self):
-        """
-        TODO: More comprehensive test
-        """
+        # TODO: More comprehensive test
         pfi_core(
             self.model,
             self.BATCH_SIZE,
@@ -106,9 +98,7 @@ class TestNeuronGPUSingle:
 
 
 class TestDtypes:
-    """
-    Testing focuses on using different model datatypes
-    """
+    """Testing focuses on using different model datatypes"""
 
     def setup_class(self):
         self.BATCH_SIZE = 1
@@ -127,9 +117,8 @@ class TestDtypes:
         not torch.cuda.is_available(), reason="GPU not supported on this machine"
     )
     def test_fp32_gpu(self):
-        """
-        TODO: More comprehensive test
-        """
+        # TODO: More comprehensive test
+
         self.USE_GPU = True
         self.model.to("cuda")
         self.model.eval()
@@ -146,9 +135,8 @@ class TestDtypes:
         )
 
     def test_fp32_cpu(self):
-        """
-        TODO: More comprehensive test
-        """
+        # TODO: More comprehensive test
+
         self.USE_GPU = False
         self.model.to("cpu")
         self.model.eval()
@@ -167,9 +155,8 @@ class TestDtypes:
         not torch.cuda.is_available(), reason="GPU not supported on this machine"
     )
     def test_fp16_gpu(self):
-        """
-        TODO: More comprehensive test
-        """
+        # TODO: More comprehensive test
+
         self.USE_GPU = True
         self.model.to("cuda")
 
@@ -189,9 +176,8 @@ class TestDtypes:
 
     @pytest.mark.skip(reason="Experimental in PyTorch")
     def test_INT8_cpu(self):
-        """
-        TODO: More comprehensive test
-        """
+        # TODO: More comprehensive test
+        
         self.USE_GPU = False
         self.model.to("cpu")
 

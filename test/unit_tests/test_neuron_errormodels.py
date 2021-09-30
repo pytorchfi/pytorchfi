@@ -15,9 +15,7 @@ from .util_test import helper_setUp_CIFAR10_same
 
 
 class TestNeuronErrorModels:
-    """
-    Testing neuron perturbation error models.
-    """
+    """Testing neuron perturbation error models."""
 
     def setup_class(self):
         torch.manual_seed(0)
@@ -173,9 +171,7 @@ class TestNeuronErrorModels:
 
 
 class TestNeuronErrorModelsFunc:
-    """
-    Testing neuron perturbation error models.
-    """
+    """Testing neuron perturbation error models."""
 
     def setup_class(self):
         torch.manual_seed(1)
