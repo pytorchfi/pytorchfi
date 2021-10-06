@@ -1,7 +1,7 @@
 import torch
 from pytorchfi.core import fault_injection as pfi_core
 
-from .util_test import helper_setUp_CIFAR10_same
+from .util_test import CIFAR10_set_up_custom
 
 
 class TestCoreGetFuncs:
@@ -11,30 +11,27 @@ class TestCoreGetFuncs:
     """
 
     def setup_class(self):
-        self.BATCH_SIZE = 4
-        self.WORKERS = 1
-        self.channels = 3
-        self.img_size = 32
-        self.LAYER_TYPES = [torch.nn.Conv2d]
-        self.USE_GPU = False
+        batch_size = 4
+        workers = 1
+        channels = 3
+        img_size = 32
+        layer_types = [torch.nn.Conv2d]
+        self.use_gpu = False
 
-        self.model, self.dataset = helper_setUp_CIFAR10_same(
-            self.BATCH_SIZE, self.WORKERS
-        )
+        model, dataset = CIFAR10_set_up_custom(batch_size, workers)
 
-        self.dataiter = iter(self.dataset)
-        self.model.eval()
+        dataiter = iter(dataset)
+        model.eval()
 
         torch.no_grad()
-        self.images, self.labels = self.dataiter.next()
-        self.output = self.model(self.images)
+        self.images, self.labels = dataiter.next()
 
         self.p = pfi_core(
-            self.model,
-            self.BATCH_SIZE,
-            input_shape=[self.channels, self.img_size, self.img_size],
-            layer_types=self.LAYER_TYPES,
-            use_cuda=self.USE_GPU,
+            model,
+            batch_size,
+            input_shape=[channels, img_size, img_size],
+            layer_types=layer_types,
+            use_cuda=self.use_gpu,
         )
 
     def test_get_output_size(self):

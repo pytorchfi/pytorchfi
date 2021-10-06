@@ -9,30 +9,27 @@ class TestCoreExampleClient:
     def setup_class(self):
         torch.manual_seed(5)
 
-        self.C = 3
-        self.H = 224
-        self.W = 224
-        self.BATCH_SIZE = 4
+        c = 3
+        h = 224
+        w = 224
+        batch_size = 4
 
-        self.IMAGE = torch.rand((self.BATCH_SIZE, self.C, self.H, self.W))
-
-        self.USE_GPU = False
-
+        self.image = torch.rand((batch_size, c, h, w))
         self.softmax = torch.nn.Softmax(dim=1)
 
         self.model = models.alexnet(pretrained=True)
         self.model.eval()
 
         # Error free inference to gather golden value
-        self.output = self.model(self.IMAGE)
+        self.output = self.model(self.image)
         self.golden_softmax = self.softmax(self.output)
         self.golden_label = list(torch.argmax(self.golden_softmax, dim=1))[0].item()
 
         self.p = fault_injection(
             self.model,
-            self.BATCH_SIZE,
-            input_shape=[self.C, self.H, self.W],
-            use_cuda=self.USE_GPU,
+            batch_size,
+            input_shape=[c, h, w],
+            use_cuda=False,
         )
 
     def test_golden_inference(self):
@@ -44,7 +41,7 @@ class TestCoreExampleClient:
         inj = self.p.declare_neuron_fi(
             batch=b, layer_num=layer, dim1=C, dim2=H, dim3=W, value=err_val
         )
-        inj_output = inj(self.IMAGE)
+        inj_output = inj(self.image)
         inj_softmax = self.softmax(inj_output)
         inj_label = list(torch.argmax(inj_softmax, dim=1))[0].item()
 
@@ -63,7 +60,7 @@ class TestCoreExampleClient:
         inj = self.p.declare_neuron_fi(
             batch=b, layer_num=layer, dim1=C, dim2=H, dim3=W, value=err_val
         )
-        inj_output = inj(self.IMAGE)
+        inj_output = inj(self.image)
         inj_softmax = self.softmax(inj_output)
         inj_label = list(torch.argmax(inj_softmax, dim=1))[0].item()
 

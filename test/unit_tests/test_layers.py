@@ -13,12 +13,10 @@ class TestLayers:
         self.Cin = 3
         self.Hin = 224
         self.Win = 224
-        self.BATCH_SIZE = 4
+        self.batch_size = 4
+        self.use_gpu = False
 
-        self.IMAGE = torch.rand((self.BATCH_SIZE, self.Cin, self.Hin, self.Win))
-
-        self.USE_GPU = False
-
+        self.IMAGE = torch.rand((self.batch_size, self.Cin, self.Hin, self.Win))
         self.softmax = torch.nn.Softmax(dim=1)
 
         self.model = models.alexnet(pretrained=True)
@@ -37,9 +35,9 @@ class TestLayers:
 
         p = fault_injection(
             self.model,
-            self.BATCH_SIZE,
+            self.batch_size,
             layer_types=[torch.nn.Conv2d],
-            use_cuda=self.USE_GPU,
+            use_cuda=self.use_gpu,
         )
 
         (b, layer, C, H, W, err_val) = ([0], [3], [4], [2], [4], [10000])
@@ -56,9 +54,9 @@ class TestLayers:
     def test_single_linear_layer(self):
         p = fault_injection(
             self.model,
-            self.BATCH_SIZE,
+            self.batch_size,
             layer_types=[torch.nn.Linear],
-            use_cuda=self.USE_GPU,
+            use_cuda=self.use_gpu,
         )
 
         if p.get_total_layers() != 3:
@@ -71,9 +69,9 @@ class TestLayers:
     def test_inj_all_layers(self):
         p = fault_injection(
             self.model,
-            self.BATCH_SIZE,
+            self.batch_size,
             layer_types=["all"],
-            use_cuda=self.USE_GPU,
+            use_cuda=self.use_gpu,
         )
 
         if p.get_total_layers() != 21:
@@ -88,9 +86,9 @@ class TestLayers:
     def test_inj_all_layers_injections(self):
         p = fault_injection(
             self.model,
-            self.BATCH_SIZE,
+            self.batch_size,
             layer_types=["all"],
-            use_cuda=self.USE_GPU,
+            use_cuda=self.use_gpu,
         )
 
         (b, layer, C, H, W, err_val) = (
@@ -124,9 +122,9 @@ class TestLayers:
     def test_single_linear_neuron_inj(self):
         p = fault_injection(
             self.model,
-            self.BATCH_SIZE,
+            self.batch_size,
             layer_types=[torch.nn.Linear],
-            use_cuda=self.USE_GPU,
+            use_cuda=self.use_gpu,
         )
 
         (b, layer, C, H, W, err_val) = (0, 2, 888, None, None, 10000)
@@ -143,10 +141,10 @@ class TestLayers:
     def test_combo_layers(self):
         p = fault_injection(
             self.model,
-            self.BATCH_SIZE,
+            self.batch_size,
             layer_types=[torch.nn.Conv2d, torch.nn.Linear],
             # layer_types=[torch.nn.Conv2d],
-            use_cuda=self.USE_GPU,
+            use_cuda=self.use_gpu,
         )
 
         (b, layer, C, H, W, err_val) = (

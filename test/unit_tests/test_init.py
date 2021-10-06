@@ -2,25 +2,19 @@ import pytest
 import torch
 from pytorchfi.core import fault_injection as pfi_core
 
-from .util_test import helper_setUp_CIFAR10_same
+from .util_test import CIFAR10_set_up_custom
 
 
-class TestNeuronCPUSingle:
-    """
-    Testing focuses on neuron perturbations on the CPU
-    with a single batch element.
-    """
+class TestSingleNeuron:
+    """Testing focuses on neuron perturbations with a single batch element."""
 
     def setup_class(self):
-        self.BATCH_SIZE = 1
-        self.WORKERS = 1
+        self.batch_size = 1
+        workers = 1
         self.channels = 3
         self.img_size = 32
-        self.USE_GPU = False
 
-        self.model, self.dataset = helper_setUp_CIFAR10_same(
-            self.BATCH_SIZE, self.WORKERS
-        )
+        self.model, self.dataset = CIFAR10_set_up_custom(self.batch_size, workers)
         self.dataiter = iter(self.dataset)
         self.model.eval()
 
@@ -32,48 +26,21 @@ class TestNeuronCPUSingle:
         # TODO: More comprehensive test
         pfi_core(
             self.model,
-            self.BATCH_SIZE,
+            self.batch_size,
             input_shape=[self.channels, self.img_size, self.img_size],
-            use_cuda=self.USE_GPU,
+            use_cuda=False,
         )
 
     def test_orig_model_cpu(self):
         p = pfi_core(
             self.model,
-            self.BATCH_SIZE,
+            self.batch_size,
             input_shape=[self.channels, self.img_size, self.img_size],
-            use_cuda=self.USE_GPU,
+            use_cuda=False,
         )
 
-        self.faulty_model = p.get_original_model()
-        if self.faulty_model is not self.model:
+        if p.get_original_model() is not self.model:
             raise AssertionError
-
-
-class TestNeuronGPUSingle:
-    """
-    Testing focuses on neuron perturbations on the
-    GPU with a single batch element.
-    """
-
-    def setup_class(self):
-        self.BATCH_SIZE = 1
-        self.WORKERS = 1
-        self.channels = 3
-        self.img_size = 32
-        self.USE_GPU = True
-
-        self.model, self.dataset = helper_setUp_CIFAR10_same(
-            self.BATCH_SIZE, self.WORKERS
-        )
-        self.model.cuda()
-        self.dataiter = iter(self.dataset)
-        self.model.eval()
-
-        torch.no_grad()
-        self.images, self.labels = self.dataiter.next()
-        self.images = self.images.cuda()
-        self.output = self.model(self.images)
 
     @pytest.mark.skipif(
         not torch.cuda.is_available(), reason="GPU not supported on this machine"
@@ -82,9 +49,9 @@ class TestNeuronGPUSingle:
         # TODO: More comprehensive test
         pfi_core(
             self.model,
-            self.BATCH_SIZE,
+            self.batch_size,
             input_shape=[self.channels, self.img_size, self.img_size],
-            use_cuda=self.USE_GPU,
+            use_cuda=True,
         )
 
     @pytest.mark.skipif(
@@ -93,13 +60,12 @@ class TestNeuronGPUSingle:
     def test_orig_model_gpu(self):
         p = pfi_core(
             self.model,
-            self.BATCH_SIZE,
+            self.batch_size,
             input_shape=[self.channels, self.img_size, self.img_size],
-            use_cuda=self.USE_GPU,
+            use_cuda=True,
         )
 
-        self.faulty_model = p.get_original_model()
-        if self.faulty_model is not self.model:
+        if p.get_original_model() is not self.model:
             raise AssertionError
 
 
@@ -107,17 +73,30 @@ class TestDtypes:
     """Testing focuses on using different model datatypes"""
 
     def setup_class(self):
-        self.BATCH_SIZE = 1
-        self.WORKERS = 1
+        self.batch_size = 1
+        workers = 1
         self.channels = 3
         self.img_size = 32
 
-        self.model, self.dataset = helper_setUp_CIFAR10_same(
-            self.BATCH_SIZE, self.WORKERS
-        )
-        self.dataiter = iter(self.dataset)
+        self.model, dataset = CIFAR10_set_up_custom(self.batch_size, workers)
+        dataiter = iter(dataset)
+        self.images, self.labels = dataiter.next()
 
-        self.images, self.labels = self.dataiter.next()
+    def test_fp32_cpu(self):
+        # TODO: More comprehensive test
+
+        self.model.to("cpu")
+        self.model.eval()
+
+        torch.no_grad()
+        self.output = self.model(self.images)
+
+        pfi_core(
+            self.model,
+            self.batch_size,
+            input_shape=[self.channels, self.img_size, self.img_size],
+            use_cuda=False,
+        )
 
     @pytest.mark.skipif(
         not torch.cuda.is_available(), reason="GPU not supported on this machine"
@@ -125,7 +104,6 @@ class TestDtypes:
     def test_fp32_gpu(self):
         # TODO: More comprehensive test
 
-        self.USE_GPU = True
         self.model.to("cuda")
         self.model.eval()
 
@@ -135,26 +113,9 @@ class TestDtypes:
 
         pfi_core(
             self.model,
-            self.BATCH_SIZE,
+            self.batch_size,
             input_shape=[self.channels, self.img_size, self.img_size],
-            use_cuda=self.USE_GPU,
-        )
-
-    def test_fp32_cpu(self):
-        # TODO: More comprehensive test
-
-        self.USE_GPU = False
-        self.model.to("cpu")
-        self.model.eval()
-
-        torch.no_grad()
-        self.output = self.model(self.images)
-
-        pfi_core(
-            self.model,
-            self.BATCH_SIZE,
-            input_shape=[self.channels, self.img_size, self.img_size],
-            use_cuda=self.USE_GPU,
+            use_cuda=True,
         )
 
     @pytest.mark.skipif(
@@ -163,9 +124,7 @@ class TestDtypes:
     def test_fp16_gpu(self):
         # TODO: More comprehensive test
 
-        self.USE_GPU = True
         self.model.to("cuda")
-
         self.model.half()
         self.model.eval()
 
@@ -175,16 +134,15 @@ class TestDtypes:
 
         pfi_core(
             self.model,
-            self.BATCH_SIZE,
+            self.batch_size,
             input_shape=[self.channels, self.img_size, self.img_size],
-            use_cuda=self.USE_GPU,
+            use_cuda=True,
         )
 
     @pytest.mark.skip(reason="Experimental in PyTorch")
     def test_INT8_cpu(self):
         # TODO: More comprehensive test
 
-        self.USE_GPU = False
         self.model.to("cpu")
 
         self.model = torch.quantization.quantize_dynamic(
@@ -198,7 +156,7 @@ class TestDtypes:
 
         pfi_core(
             self.model,
-            self.BATCH_SIZE,
+            self.batch_size,
             input_shape=[self.channels, self.img_size, self.img_size],
-            use_cuda=self.USE_GPU,
+            use_cuda=False,
         )
