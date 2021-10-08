@@ -6,7 +6,7 @@
 </h1>
 
 <p align="center">
-    <img src="https://img.shields.io/pypi/v/pytorchfi"></img>
+    <a href="https://pypi.org/project/pytorchfi/"><img src="https://img.shields.io/pypi/v/pytorchfi"></img></a>
     <img src="https://img.shields.io/github/checks-status/hack4impact-uiuc/ymca/master"></img>
     <a href="https://codecov.io/gh/pytorchfi/pytorchfi"><img src="https://codecov.io/gh/pytorchfi/pytorchfi/branch/master/graph/badge.svg"></a>
     <a href="https://pypi.org/project/pytorchfi/"><img src="https://static.pepy.tech/personalized-badge/pytorchfi?period=total&units=international_system&left_color=grey&right_color=magenta&left_text=downloads"></a>
