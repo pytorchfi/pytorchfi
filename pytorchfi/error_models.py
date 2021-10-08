@@ -341,7 +341,7 @@ def random_weight_inj(pfi, corrupt_conv=-1, min_val=-1, max_val=1):
     )
 
 
-def zeroFunc_rand_weight(pfi):
+def zero_func_rand_weight(pfi):
     (layer, k, c_in, kH, kW) = random_weight_location(pfi)
     return pfi.declare_weight_fi(
         function=_zero_rand_weight, layer_num=layer, k=k, dim1=c_in, dim2=kH, dim3=kW

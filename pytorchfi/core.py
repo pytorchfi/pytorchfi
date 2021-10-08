@@ -44,7 +44,7 @@ class fault_injection:
         if len(layer_types) < 0:
             raise AssertionError("Error: At least one layer type must be selected.")
 
-        handles, _shapes = self._traverseModelAndSetHooks(
+        handles, _shapes = self._traverse_model_set_hooks(
             self.original_model, self._inj_layer_types
         )
 
@@ -90,7 +90,7 @@ class fault_injection:
         for index, _handle in enumerate(self.handles):
             self.handles[index].remove()
 
-    def _traverseModelAndSetHooks(self, model, layer_types):
+    def _traverse_model_set_hooks(self, model, layer_types):
         handles = []
         shape = []
         for layer in model.children():
@@ -107,7 +107,7 @@ class fault_injection:
                             shape.append(layer)
             # unpack node
             else:
-                subHandles, subBase = self._traverseModelAndSetHooks(layer, layer_types)
+                subHandles, subBase = self._traverse_model_set_hooks(layer, layer_types)
                 for i in subHandles:
                     handles.append(i)
                 for i in subBase:
@@ -115,7 +115,7 @@ class fault_injection:
 
         return (handles, shape)
 
-    def _traverseModelAndSetHooksNeurons(self, model, layer_types, customInj, injFunc):
+    def _traverse_model_set_hooks_neurons(self, model, layer_types, customInj, injFunc):
         handles = []
         for layer in model.children():
             # leaf node
@@ -130,7 +130,7 @@ class fault_injection:
                             handles.append(layer.register_forward_hook(hook))
             # unpack node
             else:
-                subHandles = self._traverseModelAndSetHooksNeurons(
+                subHandles = self._traverse_model_set_hooks_neurons(
                     layer, layer_types, customInj, injFunc
                 )
                 for i in subHandles:
@@ -229,7 +229,7 @@ class fault_injection:
         )
 
         self.corrupted_model = copy.deepcopy(self.original_model)
-        handles_neurons = self._traverseModelAndSetHooksNeurons(
+        handles_neurons = self._traverse_model_set_hooks_neurons(
             self.corrupted_model,
             self._inj_layer_types,
             custom_injection,
