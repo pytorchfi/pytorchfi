@@ -144,11 +144,9 @@ class TestDtypes:
         # TODO: More comprehensive test
 
         self.model.to("cpu")
-
         self.model = torch.quantization.quantize_dynamic(
             self.model, {torch.nn.Linear}, dtype=torch.qint8
         )
-
         self.model.eval()
 
         with torch.no_grad():

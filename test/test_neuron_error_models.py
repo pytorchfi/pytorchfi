@@ -15,12 +15,17 @@ from pytorchfi.error_models import (
 from .util_test import CIFAR10_set_up_custom
 
 
+@pytest.fixture(autouse=True)
+def seed_random():
+    random.seed(2)
+    yield
+
+
 class TestNeuronErrorModels:
     """Testing neuron perturbation error models."""
 
     def setup_class(self):
         torch.manual_seed(0)
-        # random.seed(0)
 
         batch_size = 4
         workers = 1
@@ -132,9 +137,7 @@ class TestNeuronErrorModelsFunc:
         self.ranges = [24.375, 26.375, 13.179688, 3.367188, 3.314453]
 
     def test_random_neuron_single_bit_inj_rand(self):
-        random.seed(3)
         corrupt_model = random_neuron_single_bit_inj_batched(self.p, self.ranges)
-
         corrupt_model.eval()
         with torch.no_grad():
             corrupt_output = corrupt_model(self.images)
@@ -149,11 +152,9 @@ class TestNeuronErrorModelsFunc:
             raise AssertionError
 
     def test_random_neuron_single_bit_inj_sameLoc(self):
-        random.seed(2)
         corrupt_model = random_neuron_single_bit_inj_batched(
             self.p, self.ranges, rand_loc=False
         )
-
         corrupt_model.eval()
         with torch.no_grad():
             corrupt_output = corrupt_model(self.images)
@@ -168,9 +169,7 @@ class TestNeuronErrorModelsFunc:
             raise AssertionError
 
     def test_random_neuron_single_bit_inj_single(self):
-        random.seed(0)
         corrupt_model = random_neuron_single_bit_inj(self.p, self.ranges)
-
         corrupt_model.eval()
         with torch.no_grad():
             corrupt_output = corrupt_model(self.images)
