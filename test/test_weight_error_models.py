@@ -10,12 +10,6 @@ from pytorchfi.error_models import (
 from .util_test import CIFAR10_set_up_custom
 
 
-@pytest.fixture(autouse=True)
-def seed_random():
-    random.seed(2)
-    yield "seed_random"
-
-
 class TestWeightErrorModels:
     """
     Testing weight perturbation error models.
@@ -47,6 +41,8 @@ class TestWeightErrorModels:
         )
 
     def test_random_weight_inj(self):
+        random.seed(2)
+
         corrupt_model = random_weight_inj(self.p, min_val=10000, max_val=20000)
         corrupt_model.eval()
         with torch.no_grad():
@@ -56,6 +52,8 @@ class TestWeightErrorModels:
             raise AssertionError
 
     def test_random_weight_inj_conv(self):
+        random.seed(1)
+
         corrupt_model = random_weight_inj(
             self.p, corrupt_conv=3, min_val=10000, max_val=20000
         )
@@ -67,6 +65,8 @@ class TestWeightErrorModels:
             raise AssertionError
 
     def test_random_weight_zero_inj(self):
+        random.seed(2)
+
         corrupt_model = zero_func_rand_weight(self.p)
         corrupt_model.eval()
         with torch.no_grad():
