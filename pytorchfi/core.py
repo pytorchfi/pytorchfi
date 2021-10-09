@@ -255,7 +255,7 @@ class fault_injection:
         for i in range(len(b)):
             self.assert_inj_bounds(i)
 
-    def assert_inj_bounds(self, index, **kwargs):
+    def assert_inj_bounds(self, index):
         if index < 0:
             raise AssertionError("Invalid injection index: %d" % (index))
         if self.corrupt_batch[index] >= self.get_total_batches():

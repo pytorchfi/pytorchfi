@@ -62,7 +62,7 @@ class TestNeuronErrorModels:
     def test_random_neuron_inj_batched(self, loc, val):
         # TODO make better test
         corrupt_model = random_neuron_inj_batched(
-            self.p, min_val=10000, max_val=20000, randLoc=loc, randVal=val
+            self.p, min_val=10000, max_val=20000, rand_loc=loc, rand_val=val
         )
 
         corrupt_model.eval()
@@ -90,7 +90,7 @@ class TestNeuronErrorModels:
     def test_random_inj_per_layer_batched(self, loc, val):
         # TODO make better test
         corrupt_model = random_inj_per_layer_batched(
-            self.p, min_val=10000, max_val=20000, randLoc=loc, randVal=val
+            self.p, min_val=10000, max_val=20000, rand_loc=loc, rand_val=val
         )
 
         corrupt_model.eval()
@@ -151,7 +151,7 @@ class TestNeuronErrorModelsFunc:
     def test_random_neuron_single_bit_inj_sameLoc(self):
         random.seed(2)
         corrupt_model = random_neuron_single_bit_inj_batched(
-            self.p, self.ranges, randLoc=False
+            self.p, self.ranges, rand_loc=False
         )
 
         corrupt_model.eval()
