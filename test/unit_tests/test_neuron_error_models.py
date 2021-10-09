@@ -1,5 +1,6 @@
 import torch
 import random
+import pytest
 from pytorchfi.core import fault_injection as pfi_core
 from pytorchfi.error_models import (
     single_bit_flip_func,
@@ -56,47 +57,14 @@ class TestNeuronErrorModels:
         if torch.all(corrupt_output.eq(self.golden_output)):
             raise AssertionError
 
-    def test_random_neuron_inj_batched_locTrue_valTrue(self):
-        # TODO make sure only all batch elements are different
-        corrupt_model = random_neuron_inj_batched(self.p, min_val=10000, max_val=20000)
-
-        corrupt_model.eval()
-        with torch.no_grad():
-            corrupt_output = corrupt_model(self.images)
-
-        if torch.all(corrupt_output.eq(self.golden_output)):
-            raise AssertionError
-
-    def test_random_neuron_inj_batched_locFalse_valTrue(self):
+    @pytest.mark.parametrize(
+        "loc, val",
+        [(True, True), (False, True), (True, False), (False, False)],
+    )
+    def test_random_neuron_inj_batched(self, loc, val):
         # TODO make better test
         corrupt_model = random_neuron_inj_batched(
-            self.p, min_val=10000, max_val=20000, randLoc=False
-        )
-
-        corrupt_model.eval()
-        with torch.no_grad():
-            corrupt_output = corrupt_model(self.images)
-
-        if torch.all(corrupt_output.eq(self.golden_output)):
-            raise AssertionError
-
-    def test_random_neuron_inj_batched_locTrue_valFalse(self):
-        # TODO make better test
-        corrupt_model = random_neuron_inj_batched(
-            self.p, min_val=10000, max_val=20000, randVal=False
-        )
-
-        corrupt_model.eval()
-        with torch.no_grad():
-            corrupt_output = corrupt_model(self.images)
-
-        if torch.all(corrupt_output.eq(self.golden_output)):
-            raise AssertionError
-
-    def test_random_neuron_inj_batched_locFalse_valFalse(self):
-        # TODO make better test
-        corrupt_model = random_neuron_inj_batched(
-            self.p, min_val=10000, max_val=20000, randLoc=False, randVal=False
+            self.p, min_val=10000, max_val=20000, randLoc=loc, randVal=val
         )
 
         corrupt_model.eval()
