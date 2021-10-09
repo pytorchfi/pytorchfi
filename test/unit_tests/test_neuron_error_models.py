@@ -28,9 +28,7 @@ class TestNeuronErrorModels:
         img_size = 32
         use_gpu = False
 
-        model, dataset = CIFAR10_set_up_custom(
-            batch_size, workers
-        )
+        model, dataset = CIFAR10_set_up_custom(batch_size, workers)
         dataiter = iter(dataset)
 
         self.images, self.labels = dataiter.next()
@@ -85,49 +83,14 @@ class TestNeuronErrorModels:
         if torch.all(corrupt_output.eq(self.golden_output)):
             raise AssertionError
 
-    def test_random_inj_per_layer_batched_locTrue_valTrue(self):
+    @pytest.mark.parametrize(
+        "loc, val",
+        [(True, True), (False, True), (True, False), (False, False)],
+    )
+    def test_random_inj_per_layer_batched(self, loc, val):
         # TODO make better test
         corrupt_model = random_inj_per_layer_batched(
-            self.p, min_val=10000, max_val=20000, randLoc=True, randVal=True
-        )
-
-        corrupt_model.eval()
-        with torch.no_grad():
-            corrupt_output = corrupt_model(self.images)
-
-        if torch.all(corrupt_output.eq(self.golden_output)):
-            raise AssertionError
-
-    def test_random_inj_per_layer_batched_locFalse_valTrue(self):
-        # TODO make better test
-        corrupt_model = random_inj_per_layer_batched(
-            self.p, min_val=10000, max_val=20000, randLoc=False, randVal=True
-        )
-
-        corrupt_model.eval()
-        with torch.no_grad():
-            corrupt_output = corrupt_model(self.images)
-
-        if torch.all(corrupt_output.eq(self.golden_output)):
-            raise AssertionError
-
-    def test_random_inj_per_layer_batched_locTrue_valFalse(self):
-        # TODO make better test
-        corrupt_model = random_inj_per_layer_batched(
-            self.p, min_val=10000, max_val=20000, randLoc=True, randVal=False
-        )
-
-        corrupt_model.eval()
-        with torch.no_grad():
-            corrupt_output = corrupt_model(self.images)
-
-        if torch.all(corrupt_output.eq(self.golden_output)):
-            raise AssertionError
-
-    def test_random_inj_per_layer_batched_locFalse_valFalse(self):
-        # TODO make better test
-        corrupt_model = random_inj_per_layer_batched(
-            self.p, min_val=10000, max_val=20000, randLoc=False, randVal=False
+            self.p, min_val=10000, max_val=20000, randLoc=loc, randVal=val
         )
 
         corrupt_model.eval()
@@ -150,9 +113,7 @@ class TestNeuronErrorModelsFunc:
         img_size = 32
         use_gpu = False
 
-        model, dataset = CIFAR10_set_up_custom(
-            batch_size, workers
-        )
+        model, dataset = CIFAR10_set_up_custom(batch_size, workers)
         dataiter = iter(dataset)
 
         self.images, self.labels = dataiter.next()
