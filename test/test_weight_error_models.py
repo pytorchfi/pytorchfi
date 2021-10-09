@@ -1,5 +1,6 @@
 import torch
 import random
+import pytest
 from pytorchfi.core import fault_injection as pfi_core
 from pytorchfi.error_models import (
     random_weight_inj,
@@ -7,6 +8,12 @@ from pytorchfi.error_models import (
 )
 
 from .util_test import CIFAR10_set_up_custom
+
+
+@pytest.fixture(autouse=True)
+def seed_random():
+    random.seed(2)
+    yield
 
 
 class TestWeightErrorModels:
@@ -17,7 +24,6 @@ class TestWeightErrorModels:
 
     def setup_class(self):
         torch.manual_seed(0)
-        random.seed(2)
 
         batch_size = 4
         workers = 1
