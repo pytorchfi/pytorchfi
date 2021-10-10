@@ -108,7 +108,7 @@ class TestNeuronFi:
             self.model,
             self.batch_size,
             input_shape=[self.channels, self.img_size, self.img_size],
-            use_cuda=False,
+            use_cuda=True,
         )
 
         corrupt_model_1 = p.declare_neuron_fi(
@@ -143,7 +143,7 @@ class TestNeuronFi:
         if not torch.all(uncorrupted_output.eq(golden_output)):
             raise AssertionError
 
-        corrupt_model_2 = self.p.declare_neuron_fi(
+        corrupt_model_2 = p.declare_neuron_fi(
             batch=batch_i,
             layer_num=layer_i,
             dim1=c_i,

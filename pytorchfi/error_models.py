@@ -26,11 +26,9 @@ def random_neuron_location(pfi, layer=-1):
 
 def random_weight_location(pfi, layer=-1):
     loc = []
+    total_layers = pfi.get_total_layers()
 
-    if layer == -1:
-        corrupt_layer = random.randint(0, pfi.get_total_layers() - 1)
-    else:
-        corrupt_layer = layer
+    corrupt_layer = random.randint(0, total_layers - 1) if layer == -1 else layer
     loc.append(corrupt_layer)
 
     curr_layer = 0
@@ -41,12 +39,10 @@ def random_weight_location(pfi, layer=-1):
                     loc.append(random.randint(0, dim - 1))
             curr_layer += 1
 
-    if curr_layer != pfi.get_total_layers():
-        raise AssertionError
-    if len(loc) != 5:
+    if curr_layer != total_layers or len(loc) != 5:
         raise AssertionError
 
-    return tuple(loc)
+    return loc
 
 
 def random_value(min_val=-1, max_val=1):
@@ -68,18 +64,18 @@ def random_neuron_inj(pfi, min_val=-1, max_val=1):
 
 
 # single random neuron error in each batch element.
-def random_neuron_inj_batched(pfi, min_val=-1, max_val=1, randLoc=True, randVal=True):
+def random_neuron_inj_batched(pfi, min_val=-1, max_val=1, rand_loc=True, rand_val=True):
     batch, layer_num, c_rand, h_rand, w_rand, value = ([] for i in range(6))
 
-    if not randLoc:
+    if not rand_loc:
         (layer, C, H, W) = random_neuron_location(pfi)
-    if not randVal:
+    if not rand_val:
         err_val = random_value(min_val=min_val, max_val=max_val)
 
     for i in range(pfi.get_total_batches()):
-        if randLoc:
+        if rand_loc:
             (layer, C, H, W) = random_neuron_location(pfi)
-        if randVal:
+        if rand_val:
             err_val = random_value(min_val=min_val, max_val=max_val)
 
         batch.append(i)
@@ -125,20 +121,20 @@ def random_inj_per_layer(pfi, min_val=-1, max_val=1):
 
 # one random neuron error per layer in each batch element
 def random_inj_per_layer_batched(
-    pfi, min_val=-1, max_val=1, randLoc=True, randVal=True
+    pfi, min_val=-1, max_val=1, rand_loc=True, rand_val=True
 ):
     batch, layer_num, c_rand, h_rand, w_rand, value = ([] for i in range(6))
 
     for i in range(pfi.get_total_layers()):
-        if not randLoc:
+        if not rand_loc:
             (layer, C, H, W) = random_neuron_location(pfi, layer=i)
-        if not randVal:
+        if not rand_val:
             err_val = random_value(min_val=min_val, max_val=max_val)
 
         for b in range(pfi.get_total_batches()):
-            if randLoc:
+            if rand_loc:
                 (layer, C, H, W) = random_neuron_location(pfi, layer=i)
-            if randVal:
+            if rand_val:
                 err_val = random_value(min_val=min_val, max_val=max_val)
 
             batch.append(b)
@@ -285,15 +281,15 @@ class single_bit_flip_func(core.fault_injection):
             self.reset_current_layer()
 
 
-def random_neuron_single_bit_inj_batched(pfi, layer_ranges, randLoc=True):
+def random_neuron_single_bit_inj_batched(pfi, layer_ranges, rand_loc=True):
     pfi.set_conv_max(layer_ranges)
     batch, layer_num, c_rand, h_rand, w_rand = ([] for i in range(5))
 
-    if not randLoc:
+    if not rand_loc:
         (layer, C, H, W) = random_neuron_location(pfi)
 
     for i in range(pfi.get_total_batches()):
-        if randLoc:
+        if rand_loc:
             (layer, C, H, W) = random_neuron_location(pfi)
 
         batch.append(i)
@@ -333,7 +329,7 @@ def random_neuron_single_bit_inj(pfi, layer_ranges):
 
 
 def random_weight_inj(pfi, corrupt_conv=-1, min_val=-1, max_val=1):
-    (layer, k, c_in, kH, kW) = random_weight_location(pfi, corrupt_conv)
+    layer, k, c_in, kH, kW = random_weight_location(pfi, corrupt_conv)
     faulty_val = random_value(min_val=min_val, max_val=max_val)
 
     return pfi.declare_weight_fi(
@@ -341,8 +337,8 @@ def random_weight_inj(pfi, corrupt_conv=-1, min_val=-1, max_val=1):
     )
 
 
-def zeroFunc_rand_weight(pfi):
-    (layer, k, c_in, kH, kW) = random_weight_location(pfi)
+def zero_func_rand_weight(pfi):
+    layer, k, c_in, kH, kW = random_weight_location(pfi)
     return pfi.declare_weight_fi(
         function=_zero_rand_weight, layer_num=layer, k=k, dim1=c_in, dim2=kH, dim3=kW
     )
