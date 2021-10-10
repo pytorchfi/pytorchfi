@@ -48,7 +48,7 @@ class TestSingleNeuron:
     def test_init_gpu(self):
         # TODO: More comprehensive test
         pfi_core(
-            self.model,
+            self.model.cuda(),
             self.batch_size,
             input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=True,
