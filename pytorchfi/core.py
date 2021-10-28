@@ -168,7 +168,7 @@ class fault_injection:
 
         current_layer = 0
         for name, param in self.corrupted_model.named_parameters():
-            if "weight" in name and ( "features" in name or 'conv' in name):
+            if "weight" in name and ("features" in name or "conv" in name):
                 if current_layer == corrupt_layer:
                     corrupt_idx = (
                         tuple(corrupt_idx)
@@ -408,6 +408,9 @@ class fault_injection:
 
     def get_layer_dim(self, layer_num):
         return self.layers_dim[layer_num]
+
+    def get_layer_shape(self, layer_num):
+        return self.output_size[layer_num]
 
     def get_inj_layer_types(self):
         return self._inj_layer_types
