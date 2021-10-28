@@ -17,11 +17,23 @@ def random_neuron_location(pfi, layer=-1):
     if layer == -1:
         layer = random.randint(0, pfi.get_total_layers() - 1)
 
-    c = random.randint(0, pfi.get_fmaps_num(layer) - 1)
-    h = random.randint(0, pfi.get_fmaps_H(layer) - 1)
-    w = random.randint(0, pfi.get_fmaps_W(layer) - 1)
+    dim = pfi.get_layer_dim(layer)
+    shape = pfi.get_layer_shape(layer)
 
-    return (layer, c, h, w)
+    dim1_shape = shape[1]
+    dim1_rand = random.randint(0, dim1_shape - 1)
+    if dim > 2:
+        dim2_shape = shape[2]
+        dim2_rand = random.randint(0, dim2_shape - 1)
+    else:
+        dim2_rand = None
+    if dim > 3:
+        dim3_shape = shape[3]
+        dim3_rand = random.randint(0, dim3_shape - 1)
+    else:
+        dim3_rand = None
+
+    return (layer, dim1_rand, dim2_rand, dim3_rand)
 
 
 def random_weight_location(pfi, layer=-1):
