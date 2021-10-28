@@ -57,6 +57,18 @@ class TestCoreGetFuncs:
         if self.p.get_layer_type(3) != torch.nn.Conv2d:
             raise AssertionError
 
+    def test_get_layer_shape(self):
+        if self.p.get_layer_shape(0) != [1, 64, 8, 8]:
+            raise AssertionError
+        if self.p.get_layer_shape(1) != [1, 192, 4, 4]:
+            raise AssertionError
+        if self.p.get_layer_shape(2) != [1, 384, 2, 2]:
+            raise AssertionError
+        if self.p.get_layer_shape(3) != [1, 256, 2, 2]:
+            raise AssertionError
+        if self.p.get_layer_shape(4) != [1, 256, 2, 2]:
+            raise AssertionError
+
     def test_get_layer_dim(self):
         if self.p.get_layer_dim(3) != 4:
             raise AssertionError
