@@ -168,7 +168,7 @@ class fault_injection:
 
         current_layer = 0
         for name, param in self.corrupted_model.named_parameters():
-            if "weight" in name and "features" in name:
+            if "weight" in name and ( "features" in name or 'conv' in name):
                 if current_layer == corrupt_layer:
                     corrupt_idx = (
                         tuple(corrupt_idx)
