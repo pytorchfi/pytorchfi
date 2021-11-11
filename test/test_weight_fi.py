@@ -16,9 +16,7 @@ class TestWeightFi:
         img_size = 32
         use_gpu = False
 
-        self.model, self.dataset = CIFAR10_set_up_custom(
-            batch_size, workers
-        )
+        self.model, self.dataset = CIFAR10_set_up_custom(batch_size, workers)
         dataiter = iter(self.dataset)
         self.images, self.labels = dataiter.next()
 

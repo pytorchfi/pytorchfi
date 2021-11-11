@@ -21,6 +21,32 @@ def random_neuron_location(pfi, layer=-1):
 
     dim = pfi.get_layer_dim(layer)
     shape = pfi.get_layer_shape(layer)
+<<<<<<< HEAD:pytorchfi/neuron_error_models.py
+=======
+
+    dim1_shape = shape[1]
+    dim1_rand = random.randint(0, dim1_shape - 1)
+    if dim > 2:
+        dim2_shape = shape[2]
+        dim2_rand = random.randint(0, dim2_shape - 1)
+    else:
+        dim2_rand = None
+    if dim > 3:
+        dim3_shape = shape[3]
+        dim3_rand = random.randint(0, dim3_shape - 1)
+    else:
+        dim3_rand = None
+
+    return (layer, dim1_rand, dim2_rand, dim3_rand)
+
+
+def random_weight_location(pfi, layer=-1):
+    loc = []
+    total_layers = pfi.get_total_layers()
+
+    corrupt_layer = random.randint(0, total_layers - 1) if layer == -1 else layer
+    loc.append(corrupt_layer)
+>>>>>>> master:pytorchfi/error_models.py
 
     dim1_shape = shape[1]
     dim1_rand = random.randint(0, dim1_shape - 1)

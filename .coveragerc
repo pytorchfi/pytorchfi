@@ -4,4 +4,3 @@ exclude_lines =
     if __name__ == .main__.:
 omit =
     test/*
-
