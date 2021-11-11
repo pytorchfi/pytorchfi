@@ -7,8 +7,10 @@ from pytorchfi import core
 
 # Helper functions
 
+
 def random_value(min_val=-1, max_val=1):
     return random.uniform(min_val, max_val)
+
 
 def random_weight_location(pfi, layer=-1):
     loc = []

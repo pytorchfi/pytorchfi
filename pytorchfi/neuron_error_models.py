@@ -12,8 +12,10 @@ from pytorchfi import core
 def random_batch_element(pfi):
     return random.randint(0, pfi.get_total_batches() - 1)
 
+
 def random_value(min_val=-1, max_val=1):
     return random.uniform(min_val, max_val)
+
 
 def random_neuron_location(pfi, layer=-1):
     if layer == -1:
@@ -311,4 +313,3 @@ def random_neuron_single_bit_inj(pfi, layer_ranges):
         dim3=[W],
         function=pfi.single_bit_flip_signed_across_batch,
     )
-
