@@ -2,7 +2,7 @@ import torch
 import random
 import pytest
 from pytorchfi.core import fault_injection as pfi_core
-from pytorchfi.error_models import (
+from pytorchfi.weight_error_models import (
     random_weight_inj,
     zero_func_rand_weight,
 )
