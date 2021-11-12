@@ -9,6 +9,7 @@ from pytorchfi import core
 def random_value(min_val=-1, max_val=1):
     return random.uniform(min_val, max_val)
 
+
 def random_weight_location(pfi, layer=-1):
     if layer == -1:
         layer = random.randint(0, pfi.get_total_layers() - 1)
@@ -33,6 +34,7 @@ def random_weight_location(pfi, layer=-1):
         dim3_rand = None
 
     return (layer, k, dim1_rand, dim2_rand, dim3_rand)
+
 
 # Weight Perturbation Models
 def random_weight_inj(pfi, corrupt_layer=-1, min_val=-1, max_val=1):
