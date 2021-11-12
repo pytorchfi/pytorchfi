@@ -466,12 +466,14 @@ class fault_injection:
 
     def print_pytorchfi_layer_summary(self):
         summary_str = (
-            "==================== PYTORCHFI INIT SUMMARY =====================" + "\n\n"
+            "============================ PYTORCHFI INIT SUMMARY =============================="
+            + "\n\n"
         )
 
         summary_str += "Layer types allowing injections:\n"
         summary_str += (
-            "----------------------------------------------------------------" + "\n"
+            "----------------------------------------------------------------------------------"
+            + "\n"
         )
         for l_type in self._inj_layer_types:
             summary_str += "{:>5}".format("- ")
@@ -481,7 +483,8 @@ class fault_injection:
 
         summary_str += "Model Info:\n"
         summary_str += (
-            "----------------------------------------------------------------" + "\n"
+            "----------------------------------------------------------------------------------"
+            + "\n"
         )
 
         summary_str += "   - Shape of input into the model: ("
@@ -494,26 +497,31 @@ class fault_injection:
 
         summary_str += "Layer Info:\n"
         summary_str += (
-            "----------------------------------------------------------------" + "\n"
+            "----------------------------------------------------------------------------------"
+            + "\n"
         )
-        line_new = "{:>5}  {:>20}  {:>15} {:>20}".format(
-            "Layer #", "Layer type", "Dimensions", "Output Shape"
+        line_new = "{:>5}  {:>15}  {:>10} {:>20} {:>20}".format(
+            "Layer #", "Layer type", "Dimensions", "Weight Shape", "Output Shape"
         )
         summary_str += line_new + "\n"
         summary_str += (
-            "----------------------------------------------------------------" + "\n"
+            "----------------------------------------------------------------------------------"
+            + "\n"
         )
         for layer, _dim in enumerate(self.output_size):
-            line_new = "{:>5}  {:>20}  {:>15} {:>20}".format(
+            line_new = "{:>5}  {:>15}  {:>10} {:>20} {:>20}".format(
                 layer,
                 str(self.layers_type[layer]).split(".")[-1].split("'")[0],
                 str(self.layers_dim[layer]),
+                str(list(self.weights_size[layer])),
                 str(self.output_size[layer]),
             )
             summary_str += line_new + "\n"
 
         summary_str += (
-            "================================================================" + "\n"
+            "=================================================================================="
+            + "\n"
         )
 
+        print(summary_str)
         return summary_str
