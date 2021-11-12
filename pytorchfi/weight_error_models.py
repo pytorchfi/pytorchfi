@@ -6,37 +6,40 @@ import torch
 from pytorchfi import core
 
 # Helper functions
-
-
 def random_value(min_val=-1, max_val=1):
     return random.uniform(min_val, max_val)
 
-
 def random_weight_location(pfi, layer=-1):
-    loc = []
-    total_layers = pfi.get_total_layers()
+    if layer == -1:
+        layer = random.randint(0, pfi.get_total_layers() - 1)
 
-    corrupt_layer = random.randint(0, total_layers - 1) if layer == -1 else layer
-    loc.append(corrupt_layer)
+    dim = pfi.get_weights_dim(layer)
+    shape = pfi.get_weights_size(layer)
 
-    curr_layer = 0
-    for name, param in pfi.get_original_model().named_parameters():
-        if "features" in name and "weight" in name:
-            if curr_layer == corrupt_layer:
-                for dim in param.size():
-                    loc.append(random.randint(0, dim - 1))
-            curr_layer += 1
+    dim0_shape = shape[0]
+    k = random.randint(0, dim0_shape - 1)
+    if dim > 1:
+        dim1_shape = shape[1]
+        dim1_rand = random.randint(0, dim1_shape - 1)
+    if dim > 2:
+        dim2_shape = shape[2]
+        dim2_rand = random.randint(0, dim2_shape - 1)
+    else:
+        dim2_rand = None
+    if dim > 3:
+        dim3_shape = shape[3]
+        dim3_rand = random.randint(0, dim3_shape - 1)
+    else:
+        dim3_rand = None
 
-    if curr_layer != total_layers or len(loc) != 5:
-        raise AssertionError
-
-    return loc
-
+    return (layer, k, dim1_rand, dim2_rand, dim3_rand)
 
 # Weight Perturbation Models
 def random_weight_inj(pfi, corrupt_conv=-1, min_val=-1, max_val=1):
     layer, k, c_in, kH, kW = random_weight_location(pfi, corrupt_conv)
     faulty_val = random_value(min_val=min_val, max_val=max_val)
+
+    print(layer, k, c_in, kH, kW)
 
     return pfi.declare_weight_fi(
         layer_num=layer, k=k, dim1=c_in, dim2=kH, dim3=kW, value=faulty_val

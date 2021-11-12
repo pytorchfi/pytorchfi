@@ -177,26 +177,26 @@ class fault_injection:
         corrupt_idx = [corrupt_k, corrupt_c, corrupt_kH, corrupt_kW]
 
         current_layer = 0
-        for name, param in self.corrupted_model.named_parameters():
-            if "weight" in name and ("features" in name or "conv" in name):
-                if current_layer == corrupt_layer:
-                    corrupt_idx = (
-                        tuple(corrupt_idx)
-                        if isinstance(corrupt_idx, list)
-                        else corrupt_idx
-                    )
-                    orig_value = param.data[corrupt_idx].item()
-                    if custom_injection:
-                        corrupt_value = CUSTOM_FUNCTION(param.data, corrupt_idx)
-                    param.data[corrupt_idx] = corrupt_value
+        for layer in self.corrupted_model.children():
+            for i in self.get_inj_layer_types():
+                if isinstance(layer, i):
+                    if current_layer == corrupt_layer:
+                        corrupt_idx = (
+                            tuple(corrupt_idx)
+                            if isinstance(corrupt_idx, list)
+                            else corrupt_idx
+                        )
+                        orig_value = layer.weight[corrupt_idx].item()
+                        if custom_injection:
+                            corrupt_value = CUSTOM_FUNCTION(layer.weight, corrupt_idx)
+                        layer.weight[corrupt_idx] = corrupt_value
 
-                    logging.info("Weight Injection")
-                    logging.info("Layer index: %s", corrupt_layer)
-                    logging.info("Module: %s", name)
-                    logging.info("Original value: %s", orig_value)
-                    logging.info("Injected value: %s", corrupt_value)
-
-                current_layer += 1
+                        logging.info("Weight Injection")
+                        logging.info("Layer index: %s", corrupt_layer)
+                        logging.info("Module: %s", layer)
+                        logging.info("Original value: %s", orig_value)
+                        logging.info("Injected value: %s", corrupt_value)
+                    current_layer += 1
         return self.corrupted_model
 
     def declare_neuron_fi(self, **kwargs):
