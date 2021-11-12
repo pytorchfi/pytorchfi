@@ -66,7 +66,7 @@ class TestWeightErrorModels:
         random.seed(1)
 
         corrupt_model = random_weight_inj(
-            self.p, corrupt_conv=3, min_val=10000, max_val=20000
+            self.p, corrupt_layer=3, min_val=10000, max_val=20000
         )
         corrupt_model.eval()
         with torch.no_grad():

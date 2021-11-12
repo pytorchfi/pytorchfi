@@ -177,7 +177,7 @@ class fault_injection:
         corrupt_idx = [corrupt_k, corrupt_c, corrupt_kH, corrupt_kW]
 
         current_layer = 0
-        for layer in self.corrupted_model.children():
+        for layer in self.corrupted_model.modules():
             for i in self.get_inj_layer_types():
                 if isinstance(layer, i):
                     if current_layer == corrupt_layer:
@@ -189,13 +189,15 @@ class fault_injection:
                         orig_value = layer.weight[corrupt_idx].item()
                         if custom_injection:
                             corrupt_value = CUSTOM_FUNCTION(layer.weight, corrupt_idx)
-                        layer.weight[corrupt_idx] = corrupt_value
+
+                        with torch.no_grad():
+                            layer.weight[corrupt_idx] = corrupt_value
 
                         logging.info("Weight Injection")
                         logging.info("Layer index: %s", corrupt_layer)
                         logging.info("Module: %s", layer)
                         logging.info("Original value: %s", orig_value)
-                        logging.info("Injected value: %s", corrupt_value)
+                        logging.info("Injected value: %s", layer.weight[corrupt_idx])
                     current_layer += 1
         return self.corrupted_model
 
