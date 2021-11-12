@@ -20,6 +20,7 @@ class fault_injection:
         self.output_size = []
         self.layers_type = []
         self.layers_dim = []
+        self.weights_size = []
 
         self._input_shape = input_shape
         self._batch_size = batch_size
@@ -44,7 +45,7 @@ class fault_injection:
         if len(layer_types) < 0:
             raise AssertionError("Error: At least one layer type must be selected.")
 
-        handles, _shapes = self._traverse_model_set_hooks(
+        handles, _shapes, self.weights_size = self._traverse_model_set_hooks(
             self.original_model, self._inj_layer_types
         )
 
@@ -92,7 +93,8 @@ class fault_injection:
 
     def _traverse_model_set_hooks(self, model, layer_types):
         handles = []
-        shape = []
+        output_shape = []
+        weights_shape = []
         for layer in model.children():
             # leaf node
             if list(layer.children()) == []:
@@ -101,19 +103,27 @@ class fault_injection:
                 else:
                     for i in layer_types:
                         if isinstance(layer, i):
+                            # neurons
                             handles.append(
                                 layer.register_forward_hook(self._save_output_size)
                             )
-                            shape.append(layer)
+                            output_shape.append(layer)
+
+                            # weights
+                            weights_shape.append(layer.weight.shape)
             # unpack node
             else:
-                subHandles, subBase = self._traverse_model_set_hooks(layer, layer_types)
+                subHandles, subBase, subWeight = self._traverse_model_set_hooks(
+                    layer, layer_types
+                )
                 for i in subHandles:
                     handles.append(i)
                 for i in subBase:
-                    shape.append(i)
+                    output_shape.append(i)
+                for i in subWeight:
+                    weights_shape.append(i)
 
-        return (handles, shape)
+        return (handles, output_shape, weights_shape)
 
     def _traverse_model_set_hooks_neurons(self, model, layer_types, customInj, injFunc):
         handles = []
@@ -402,6 +412,12 @@ class fault_injection:
 
     def get_output_size(self):
         return self.output_size
+
+    def get_weights_size(self, layer_num):
+        return self.weights_size[layer_num]
+
+    def get_weights_dim(self, layer_num):
+        return len(self.weights_size[layer_num])
 
     def get_layer_type(self, layer_num):
         return self.layers_type[layer_num]
