@@ -173,32 +173,44 @@ class fault_injection:
         else:
             raise ValueError("Please specify an injection or injection function")
 
-        self.corrupted_model = copy.deepcopy(self.original_model)
-        corrupt_idx = [corrupt_k, corrupt_c, corrupt_kH, corrupt_kW]
+        # bound check here
 
-        current_layer = 0
+        self.corrupted_model = copy.deepcopy(self.original_model)
+
+        current_weight_layer = 0
         for layer in self.corrupted_model.modules():
-            for i in self.get_inj_layer_types():
-                if isinstance(layer, i):
-                    if current_layer == corrupt_layer:
-                        corrupt_idx = (
-                            tuple(corrupt_idx)
-                            if isinstance(corrupt_idx, list)
-                            else corrupt_idx
-                        )
-                        orig_value = layer.weight[corrupt_idx].item()
+            if isinstance(layer, tuple(self.get_inj_layer_types())):
+                inj_list = list(
+                    filter(
+                        lambda x: corrupt_layer[x] == current_weight_layer,
+                        range(len(corrupt_layer)),
+                    )
+                )
+
+                for inj in inj_list:
+                    corrupt_idx = tuple(
+                        [
+                            corrupt_k[inj],
+                            corrupt_c[inj],
+                            corrupt_kH[inj],
+                            corrupt_kW[inj],
+                        ]
+                    )
+                    orig_value = layer.weight[corrupt_idx].item()
+
+                    with torch.no_grad():
                         if custom_injection:
                             corrupt_value = CUSTOM_FUNCTION(layer.weight, corrupt_idx)
-
-                        with torch.no_grad():
                             layer.weight[corrupt_idx] = corrupt_value
+                        else:
+                            layer.weight[corrupt_idx] = corrupt_value[inj]
 
-                        logging.info("Weight Injection")
-                        logging.info("Layer index: %s", corrupt_layer)
-                        logging.info("Module: %s", layer)
-                        logging.info("Original value: %s", orig_value)
-                        logging.info("Injected value: %s", layer.weight[corrupt_idx])
-                    current_layer += 1
+                    logging.info("Weight Injection")
+                    logging.info("Layer index: %s", corrupt_layer)
+                    logging.info("Module: %s", layer)
+                    logging.info("Original value: %s", orig_value)
+                    logging.info("Injected value: %s", layer.weight[corrupt_idx])
+                current_weight_layer += 1
         return self.corrupted_model
 
     def declare_neuron_fi(self, **kwargs):
