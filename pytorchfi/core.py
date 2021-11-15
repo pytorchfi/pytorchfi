@@ -173,7 +173,7 @@ class fault_injection:
         else:
             raise ValueError("Please specify an injection or injection function")
 
-        # bound check here
+        # TODO: bound check here
 
         self.corrupted_model = copy.deepcopy(self.original_model)
 

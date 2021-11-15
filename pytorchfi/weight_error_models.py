@@ -54,5 +54,5 @@ def zero_func_rand_weight(pfi):
 
 
 def _zero_rand_weight(data, location):
-    newData = data[location] * 0
-    return newData
+    new_data = data[location] * 0
+    return new_data
