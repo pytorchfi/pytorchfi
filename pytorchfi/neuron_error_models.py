@@ -12,6 +12,7 @@ from pytorchfi.util import *
 def random_batch_element(pfi):
     return random.randint(0, pfi.get_total_batches() - 1)
 
+
 def random_neuron_location(pfi, layer=-1):
     if layer == -1:
         layer = random.randint(0, pfi.get_total_layers() - 1)
