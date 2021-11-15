@@ -113,14 +113,14 @@ class fault_injection:
                             weights_shape.append(layer.weight.shape)
             # unpack node
             else:
-                subHandles, subBase, subWeight = self._traverse_model_set_hooks(
+                subhandles, subbase, subweight = self._traverse_model_set_hooks(
                     layer, layer_types
                 )
-                for i in subHandles:
+                for i in subhandles:
                     handles.append(i)
-                for i in subBase:
+                for i in subbase:
                     output_shape.append(i)
-                for i in subWeight:
+                for i in subweight:
                     weights_shape.append(i)
 
         return (handles, output_shape, weights_shape)

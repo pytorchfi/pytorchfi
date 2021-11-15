@@ -56,18 +56,9 @@ class TestCoreGetFuncs:
             [10, 256],
         ]
 
-        if list(self.p.get_weights_size(0)) != shape[0]:
-            raise AssertionError
-        if list(self.p.get_weights_size(1)) != shape[1]:
-            raise AssertionError
-        if list(self.p.get_weights_size(2)) != shape[2]:
-            raise AssertionError
-        if list(self.p.get_weights_size(3)) != shape[3]:
-            raise AssertionError
-        if list(self.p.get_weights_size(4)) != shape[4]:
-            raise AssertionError
-        if list(self.p.get_weights_size(5)) != shape[5]:
-            raise AssertionError
+        for i in range(6):
+            if list(self.p.get_weights_size(i)) != shape[i]:
+                raise AssertionError
 
     def test_get_total_batches(self):
         if self.p.get_total_batches() != 4:
