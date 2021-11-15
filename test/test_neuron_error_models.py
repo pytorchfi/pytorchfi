@@ -2,7 +2,7 @@ import torch
 import random
 import pytest
 from pytorchfi.core import fault_injection as pfi_core
-from pytorchfi.error_models import (
+from pytorchfi.neuron_error_models import (
     single_bit_flip_func,
     random_inj_per_layer,
     random_inj_per_layer_batched,

@@ -28,16 +28,18 @@ class TestWeightFi:
             self.model,
             batch_size,
             input_shape=[channels, img_size, img_size],
+            layer_types=[torch.nn.Conv2d, torch.nn.Linear],
             use_cuda=use_gpu,
         )
 
     def test_single_weight_fi_cpu(self):
-        layer_i = 1
-        k = 15
-        c_i = 20
-        h_i = 2
-        w_i = 3
-        inj_value_i = 10000.0
+        layer_i = [1]
+        k = [15]
+        c_i = [20]
+        h_i = [2]
+        w_i = [3]
+        inj_value_base = 10000.0
+        inj_value_i = [inj_value_base]
 
         corrupt_model = self.p.declare_weight_fi(
             layer_num=layer_i, k=k, dim1=c_i, dim2=h_i, dim3=w_i, value=inj_value_i
@@ -56,7 +58,7 @@ class TestWeightFi:
             dim1=c_i,
             dim2=h_i,
             dim3=w_i,
-            value=0.01388985849916935,
+            value=[0.01388985849916935],
         )
 
         corrupt_model.eval()
@@ -72,7 +74,7 @@ class TestWeightFi:
             dim1=c_i,
             dim2=h_i,
             dim3=w_i,
-            value=inj_value_i * 2,
+            value=[inj_value_base * 2],
         )
 
         corrupt_model.eval()
@@ -85,12 +87,12 @@ class TestWeightFi:
             raise AssertionError
 
     def test_single_weight_fi_no_error_cpu(self):
-        layer_i = 4
-        k = 153
-        c_i = 254
-        h_i = 0
-        w_i = 0
-        inj_value_i = 10000.0
+        layer_i = [4]
+        k = [153]
+        c_i = [254]
+        h_i = [0]
+        w_i = [0]
+        inj_value_i = [10000.0]
 
         corrupt_model = self.p.declare_weight_fi(
             layer_num=layer_i, k=k, dim1=c_i, dim2=h_i, dim3=w_i, value=inj_value_i
@@ -101,4 +103,24 @@ class TestWeightFi:
             corrupt_output = corrupt_model(self.images)
 
         if not torch.all(corrupt_output.eq(self.golden_output)):
+            raise AssertionError
+
+    def test_multi_weight_fi_cpu(self):
+        layer_i = [1, 2, 5]
+        k = [15, 12, 1]
+        c_i = [20, 8, 1]
+        h_i = [2, 1, None]
+        w_i = [3, 1, None]
+        inj_value_base = 10000.0
+        inj_value_i = [inj_value_base, inj_value_base, inj_value_base]
+
+        corrupt_model = self.p.declare_weight_fi(
+            layer_num=layer_i, k=k, dim1=c_i, dim2=h_i, dim3=w_i, value=inj_value_i
+        )
+
+        corrupt_model.eval()
+        with torch.no_grad():
+            corrupt_output = corrupt_model(self.images)
+
+        if torch.all(corrupt_output.eq(self.golden_output)):
             raise AssertionError

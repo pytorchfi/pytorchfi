@@ -1,7 +1,8 @@
 import torch
 import random
 from pytorchfi.core import fault_injection as pfi_core
-from pytorchfi.error_models import (
+from pytorchfi.weight_error_models import (
+    random_weight_location,
     random_weight_inj,
     zero_func_rand_weight,
 )
@@ -36,8 +37,20 @@ class TestWeightErrorModels:
             model,
             batch_size,
             input_shape=[channels, img_size, img_size],
+            layer_types=[torch.nn.Conv2d, torch.nn.Linear],
             use_cuda=use_gpu,
         )
+
+    def test_random_weight_loc(self):
+        random.seed(3)
+
+        (a1, b1, c1, d1, e1) = random_weight_location(self.p)
+        if (a1, b1, c1, d1, e1) != ([1], [151], [16], [2], [4]):
+            raise AssertionError
+
+        (a2, b2, c2, d2, e2) = random_weight_location(self.p, layer=3)
+        if (a2, b2, c2, d2, e2) != ([3], [242], [320], [2], [0]):
+            raise AssertionError
 
     def test_random_weight_inj(self):
         random.seed(2)
@@ -54,7 +67,7 @@ class TestWeightErrorModels:
         random.seed(1)
 
         corrupt_model = random_weight_inj(
-            self.p, corrupt_conv=3, min_val=10000, max_val=20000
+            self.p, corrupt_layer=3, min_val=10000, max_val=20000
         )
         corrupt_model.eval()
         with torch.no_grad():

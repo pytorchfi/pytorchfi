@@ -20,6 +20,7 @@ class fault_injection:
         self.output_size = []
         self.layers_type = []
         self.layers_dim = []
+        self.weights_size = []
 
         self._input_shape = input_shape
         self._batch_size = batch_size
@@ -44,7 +45,7 @@ class fault_injection:
         if len(layer_types) < 0:
             raise AssertionError("Error: At least one layer type must be selected.")
 
-        handles, _shapes = self._traverse_model_set_hooks(
+        handles, _shapes, self.weights_size = self._traverse_model_set_hooks(
             self.original_model, self._inj_layer_types
         )
 
@@ -92,7 +93,8 @@ class fault_injection:
 
     def _traverse_model_set_hooks(self, model, layer_types):
         handles = []
-        shape = []
+        output_shape = []
+        weights_shape = []
         for layer in model.children():
             # leaf node
             if list(layer.children()) == []:
@@ -101,19 +103,27 @@ class fault_injection:
                 else:
                     for i in layer_types:
                         if isinstance(layer, i):
+                            # neurons
                             handles.append(
                                 layer.register_forward_hook(self._save_output_size)
                             )
-                            shape.append(layer)
+                            output_shape.append(layer)
+
+                            # weights
+                            weights_shape.append(layer.weight.shape)
             # unpack node
             else:
-                subHandles, subBase = self._traverse_model_set_hooks(layer, layer_types)
-                for i in subHandles:
+                subhandles, subbase, subweight = self._traverse_model_set_hooks(
+                    layer, layer_types
+                )
+                for i in subhandles:
                     handles.append(i)
-                for i in subBase:
-                    shape.append(i)
+                for i in subbase:
+                    output_shape.append(i)
+                for i in subweight:
+                    weights_shape.append(i)
 
-        return (handles, shape)
+        return (handles, output_shape, weights_shape)
 
     def _traverse_model_set_hooks_neurons(self, model, layer_types, customInj, injFunc):
         handles = []
@@ -163,30 +173,44 @@ class fault_injection:
         else:
             raise ValueError("Please specify an injection or injection function")
 
-        self.corrupted_model = copy.deepcopy(self.original_model)
-        corrupt_idx = [corrupt_k, corrupt_c, corrupt_kH, corrupt_kW]
+        # TODO: bound check here
 
-        current_layer = 0
-        for name, param in self.corrupted_model.named_parameters():
-            if "weight" in name and ("features" in name or "conv" in name):
-                if current_layer == corrupt_layer:
-                    corrupt_idx = (
-                        tuple(corrupt_idx)
-                        if isinstance(corrupt_idx, list)
-                        else corrupt_idx
+        self.corrupted_model = copy.deepcopy(self.original_model)
+
+        current_weight_layer = 0
+        for layer in self.corrupted_model.modules():
+            if isinstance(layer, tuple(self.get_inj_layer_types())):
+                inj_list = list(
+                    filter(
+                        lambda x: corrupt_layer[x] == current_weight_layer,
+                        range(len(corrupt_layer)),
                     )
-                    orig_value = param.data[corrupt_idx].item()
-                    if custom_injection:
-                        corrupt_value = CUSTOM_FUNCTION(param.data, corrupt_idx)
-                    param.data[corrupt_idx] = corrupt_value
+                )
+
+                for inj in inj_list:
+                    corrupt_idx = tuple(
+                        [
+                            corrupt_k[inj],
+                            corrupt_c[inj],
+                            corrupt_kH[inj],
+                            corrupt_kW[inj],
+                        ]
+                    )
+                    orig_value = layer.weight[corrupt_idx].item()
+
+                    with torch.no_grad():
+                        if custom_injection:
+                            corrupt_value = CUSTOM_FUNCTION(layer.weight, corrupt_idx)
+                            layer.weight[corrupt_idx] = corrupt_value
+                        else:
+                            layer.weight[corrupt_idx] = corrupt_value[inj]
 
                     logging.info("Weight Injection")
                     logging.info("Layer index: %s", corrupt_layer)
-                    logging.info("Module: %s", name)
+                    logging.info("Module: %s", layer)
                     logging.info("Original value: %s", orig_value)
-                    logging.info("Injected value: %s", corrupt_value)
-
-                current_layer += 1
+                    logging.info("Injected value: %s", layer.weight[corrupt_idx])
+                current_weight_layer += 1
         return self.corrupted_model
 
     def declare_neuron_fi(self, **kwargs):
@@ -403,6 +427,12 @@ class fault_injection:
     def get_output_size(self):
         return self.output_size
 
+    def get_weights_size(self, layer_num):
+        return self.weights_size[layer_num]
+
+    def get_weights_dim(self, layer_num):
+        return len(self.weights_size[layer_num])
+
     def get_layer_type(self, layer_num):
         return self.layers_type[layer_num]
 
@@ -450,12 +480,14 @@ class fault_injection:
 
     def print_pytorchfi_layer_summary(self):
         summary_str = (
-            "==================== PYTORCHFI INIT SUMMARY =====================" + "\n\n"
+            "============================ PYTORCHFI INIT SUMMARY =============================="
+            + "\n\n"
         )
 
         summary_str += "Layer types allowing injections:\n"
         summary_str += (
-            "----------------------------------------------------------------" + "\n"
+            "----------------------------------------------------------------------------------"
+            + "\n"
         )
         for l_type in self._inj_layer_types:
             summary_str += "{:>5}".format("- ")
@@ -465,7 +497,8 @@ class fault_injection:
 
         summary_str += "Model Info:\n"
         summary_str += (
-            "----------------------------------------------------------------" + "\n"
+            "----------------------------------------------------------------------------------"
+            + "\n"
         )
 
         summary_str += "   - Shape of input into the model: ("
@@ -478,26 +511,31 @@ class fault_injection:
 
         summary_str += "Layer Info:\n"
         summary_str += (
-            "----------------------------------------------------------------" + "\n"
+            "----------------------------------------------------------------------------------"
+            + "\n"
         )
-        line_new = "{:>5}  {:>20}  {:>15} {:>20}".format(
-            "Layer #", "Layer type", "Dimensions", "Output Shape"
+        line_new = "{:>5}  {:>15}  {:>10} {:>20} {:>20}".format(
+            "Layer #", "Layer type", "Dimensions", "Weight Shape", "Output Shape"
         )
         summary_str += line_new + "\n"
         summary_str += (
-            "----------------------------------------------------------------" + "\n"
+            "----------------------------------------------------------------------------------"
+            + "\n"
         )
         for layer, _dim in enumerate(self.output_size):
-            line_new = "{:>5}  {:>20}  {:>15} {:>20}".format(
+            line_new = "{:>5}  {:>15}  {:>10} {:>20} {:>20}".format(
                 layer,
                 str(self.layers_type[layer]).split(".")[-1].split("'")[0],
                 str(self.layers_dim[layer]),
+                str(list(self.weights_size[layer])),
                 str(self.output_size[layer]),
             )
             summary_str += line_new + "\n"
 
         summary_str += (
-            "================================================================" + "\n"
+            "=================================================================================="
+            + "\n"
         )
 
+        print(summary_str)
         return summary_str

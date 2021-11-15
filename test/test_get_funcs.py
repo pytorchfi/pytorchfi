@@ -15,7 +15,7 @@ class TestCoreGetFuncs:
         workers = 1
         channels = 3
         img_size = 32
-        layer_types = [torch.nn.Conv2d]
+        layer_types = [torch.nn.Conv2d, torch.nn.Linear]
         self.use_gpu = False
 
         model, dataset = CIFAR10_set_up_custom(batch_size, workers)
@@ -41,20 +41,37 @@ class TestCoreGetFuncs:
             [1, 384, 2, 2],
             [1, 256, 2, 2],
             [1, 256, 2, 2],
+            [1, 10],
         ]
         if self.p.get_output_size() != shape:
             raise AssertionError
+
+    def test_get_weights_size(self):
+        shape = [
+            [64, 3, 11, 11],
+            [192, 64, 5, 5],
+            [384, 192, 3, 3],
+            [256, 384, 3, 3],
+            [256, 256, 3, 3],
+            [10, 256],
+        ]
+
+        for i in range(6):
+            if list(self.p.get_weights_size(i)) != shape[i]:
+                raise AssertionError
 
     def test_get_total_batches(self):
         if self.p.get_total_batches() != 4:
             raise AssertionError
 
     def test_get_inj_layer_types(self):
-        if self.p.get_inj_layer_types() != [torch.nn.Conv2d]:
+        if self.p.get_inj_layer_types() != [torch.nn.Conv2d, torch.nn.Linear]:
             raise AssertionError
 
     def test_get_layer_type(self):
         if self.p.get_layer_type(3) != torch.nn.Conv2d:
+            raise AssertionError
+        if self.p.get_layer_type(5) != torch.nn.Linear:
             raise AssertionError
 
     def test_get_layer_shape(self):
@@ -68,13 +85,15 @@ class TestCoreGetFuncs:
             raise AssertionError
         if self.p.get_layer_shape(4) != [1, 256, 2, 2]:
             raise AssertionError
+        if self.p.get_layer_shape(5) != [1, 10]:
+            raise AssertionError
 
     def test_get_layer_dim(self):
         if self.p.get_layer_dim(3) != 4:
             raise AssertionError
 
     def test_get_total_layers(self):
-        if self.p.get_total_layers() != 5:
+        if self.p.get_total_layers() != 6:
             raise AssertionError
 
     def test_get_fmap_num(self):
@@ -135,6 +154,8 @@ class TestCoreGetFuncs:
         if "Batch Size: 4" not in outputString:
             raise AssertionError
         if "Conv2d" not in outputString:
+            raise AssertionError
+        if "Linear" not in outputString:
             raise AssertionError
         if "CUDA Enabled: False" not in outputString:
             raise AssertionError
