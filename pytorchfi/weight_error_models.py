@@ -1,6 +1,6 @@
 """pytorchfi.error_models provides different error models out-of-the-box for use."""
 
-import random 
+import random
 
 from pytorchfi import core
 from pytorchfi.util import random_value

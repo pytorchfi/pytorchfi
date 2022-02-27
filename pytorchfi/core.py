@@ -30,9 +30,7 @@ class fault_injection:
         self.handles = []
         self.corrupt_batch = []
         self.corrupt_layer = []
-        self.corrupt_dim1 = []  # C
-        self.corrupt_dim2 = []  # H
-        self.corrupt_dim3 = []  # W
+        self.corrupt_dim = [[], [], []]  # C, H, W
         self.corrupt_value = []
 
         self.use_cuda = kwargs.get("use_cuda", next(model.parameters()).is_cuda)
@@ -51,9 +49,9 @@ class fault_injection:
         dummy_shape = (1, *self._input_shape)  # profiling only needs one batch element
         model_dtype = next(model.parameters()).dtype
         device = "cuda" if self.use_cuda else None
-        _dummyTensor = torch.randn(dummy_shape, dtype=model_dtype, device=device)
+        _dummy_tensor = torch.randn(dummy_shape, dtype=model_dtype, device=device)
 
-        self.original_model(_dummyTensor)
+        self.original_model(_dummy_tensor)
 
         for index, _handle in enumerate(handles):
             handles[index].remove()
@@ -74,18 +72,16 @@ class fault_injection:
     def fi_reset(self):
         self._fi_state_reset()
         self.corrupted_model = None
-        logging.info("Reset fault injector")
+        logging.info("Fault injector reset.")
 
     def _fi_state_reset(self):
         (
             self.current_layer,
             self.corrupt_batch,
             self.corrupt_layer,
-            self.corrupt_dim1,
-            self.corrupt_dim2,
-            self.corrupt_dim3,
+            self.corrupt_dim,
             self.corrupt_value,
-        ) = (0, [], [], [], [], [], [])
+        ) = (0, [], [], [[], [], []], [])
 
         for index, _handle in enumerate(self.handles):
             self.handles[index].remove()
@@ -227,18 +223,18 @@ class fault_injection:
 
             self.corrupt_layer = kwargs.get("layer_num", [])
             self.corrupt_batch = kwargs.get("batch", [])
-            self.corrupt_dim1 = kwargs.get("dim1", [])
-            self.corrupt_dim2 = kwargs.get("dim2", [])
-            self.corrupt_dim3 = kwargs.get("dim3", [])
+            self.corrupt_dim[0] = kwargs.get("dim1", [])
+            self.corrupt_dim[1] = kwargs.get("dim2", [])
+            self.corrupt_dim[2] = kwargs.get("dim3", [])
 
             logging.info("Convolution: %s", self.corrupt_layer)
             logging.info("Batch, x, y, z:")
             logging.info(
                 "%s, %s, %s, %s",
                 self.corrupt_batch,
-                self.corrupt_dim1,
-                self.corrupt_dim2,
-                self.corrupt_dim3,
+                self.corrupt_dim[0],
+                self.corrupt_dim[1],
+                self.corrupt_dim[2],
             )
         else:
             raise ValueError("Please specify an injection or injection function")
@@ -246,9 +242,7 @@ class fault_injection:
         self.check_bounds(
             self.corrupt_batch,
             self.corrupt_layer,
-            self.corrupt_dim1,
-            self.corrupt_dim2,
-            self.corrupt_dim3,
+            self.corrupt_dim,
         )
 
         self.corrupted_model = copy.deepcopy(self.original_model)
@@ -264,14 +258,13 @@ class fault_injection:
 
         return self.corrupted_model
 
-    def check_bounds(self, b, l, dim1, dim2, dim3):
-        if len(b) != len(l):
-            raise AssertionError("Injection location missing values.")
-        if len(b) != len(dim1):
-            raise AssertionError("Injection location missing values.")
-        if len(b) != len(dim2):
-            raise AssertionError("Injection location missing values.")
-        if len(b) != len(dim3):
+    def check_bounds(self, b, l, dim):
+        if (
+            len(b) != len(l)
+            or len(b) != len(dim[0])
+            or len(b) != len(dim[1])
+            or len(b) != len(dim[2])
+        ):
             raise AssertionError("Injection location missing values.")
 
         logging.info("Checking bounds before runtime")
@@ -303,41 +296,22 @@ class fault_injection:
         layer_dim = self.layers_dim[corrupt_layer_num]
         layer_shape = self.output_size[corrupt_layer_num]
 
-        if self.corrupt_dim1[index] >= layer_shape[1]:
-            raise AssertionError(
-                "%d < %d: Out of bounds error in Dimension 1!"
-                % (
-                    self.corrupt_dim1[index],
-                    layer_shape[1],
+        for d in range(1, 4):
+            if layer_dim > d and self.corrupt_dim[d - 1][index] >= layer_shape[d]:
+                raise AssertionError(
+                    "%d < %d: Out of bounds error in Dimension %d!"
+                    % (self.corrupt_dim[d - 1][index], layer_shape[d], d)
                 )
-            )
-
-        if layer_dim > 2 and self.corrupt_dim2[index] >= layer_shape[2]:
-            raise AssertionError(
-                "%d < %d: Out of bounds error in Dimension 2!"
-                % (
-                    self.corrupt_dim2[index],
-                    layer_shape[2],
-                )
-            )
-
-        if layer_dim > 3 and self.corrupt_dim3[index] >= layer_shape[3]:
-            raise AssertionError(
-                "%d < %d: Out of bounds error in Dimension 3!"
-                % (
-                    self.corrupt_dim3[index],
-                    layer_shape[3],
-                )
-            )
 
         if layer_dim <= 2 and (
-            self.corrupt_dim2[index] is not None or self.corrupt_dim3[index] is not None
+            self.corrupt_dim[1][index] is not None
+            or self.corrupt_dim[2][index] is not None
         ):
             warnings.warn(
                 "Values in Dim2 and Dim3 ignored, since layer is %s" % (layer_type)
             )
 
-        if layer_dim <= 3 and self.corrupt_dim3[index] is not None:
+        if layer_dim <= 3 and self.corrupt_dim[2][index] is not None:
             warnings.warn("Values Dim3 ignored, since layer is %s" % (layer_type))
 
         logging.info("Finished checking bounds on inj '%d'", (index))
@@ -366,12 +340,12 @@ class fault_injection:
                 logging.info(
                     "Original value at [%d][%d]: %f",
                     self.corrupt_batch[i],
-                    self.corrupt_dim1[i],
-                    output[self.corrupt_batch[i]][self.corrupt_dim1[i]],
+                    self.corrupt_dim[0][i],
+                    output[self.corrupt_batch[i]][self.corrupt_dim[0][i]],
                 )
                 logging.info("Changing value to %f", self.corrupt_value[i])
                 output[self.corrupt_batch[i]][
-                    self.corrupt_dim1[i]
+                    self.corrupt_dim[0][i]
                 ] = self.corrupt_value[i]
         elif layer_dim == 3:
             for i in inj_list:
@@ -379,15 +353,15 @@ class fault_injection:
                 logging.info(
                     "Original value at [%d][%d][%d]: %f",
                     self.corrupt_batch[i],
-                    self.corrupt_dim1[i],
-                    self.corrupt_dim2[i],
-                    output[self.corrupt_batch[i]][self.corrupt_dim1[i]][
-                        self.corrupt_dim2[i]
+                    self.corrupt_dim[0][i],
+                    self.corrupt_dim[1][i],
+                    output[self.corrupt_batch[i]][self.corrupt_dim[0][i]][
+                        self.corrupt_dim[1][i]
                     ],
                 )
                 logging.info("Changing value to %f", self.corrupt_value[i])
                 output[self.corrupt_batch[i]][
-                    self.corrupt_dim1[i], self.corrupt_dim2[i]
+                    self.corrupt_dim[0][i], self.corrupt_dim[1][i]
                 ] = self.corrupt_value[i]
         elif layer_dim == 4:
             for i in inj_list:
@@ -395,19 +369,19 @@ class fault_injection:
                 logging.info(
                     "Original value at [%d][%d][%d][%d]: %f",
                     self.corrupt_batch[i],
-                    self.corrupt_dim1[i],
-                    self.corrupt_dim2[i],
-                    self.corrupt_dim3[i],
-                    output[self.corrupt_batch[i]][self.corrupt_dim1[i]][
-                        self.corrupt_dim2[i]
-                    ][self.corrupt_dim3[i]],
+                    self.corrupt_dim[0][i],
+                    self.corrupt_dim[1][i],
+                    self.corrupt_dim[2][i],
+                    output[self.corrupt_batch[i]][self.corrupt_dim[0][i]][
+                        self.corrupt_dim[1][i]
+                    ][self.corrupt_dim[2][i]],
                 )
                 logging.info("Changing value to %f", self.corrupt_value[i])
-                output[self.corrupt_batch[i]][self.corrupt_dim1[i]][
-                    self.corrupt_dim2[i]
-                ][self.corrupt_dim3[i]] = self.corrupt_value[i]
+                output[self.corrupt_batch[i]][self.corrupt_dim[0][i]][
+                    self.corrupt_dim[1][i]
+                ][self.corrupt_dim[2][i]] = self.corrupt_value[i]
 
-        self.updateLayer()
+        self.update_layer()
 
     def _save_output_size(self, module, input_val, output):
         shape = list(output.size())
@@ -444,7 +418,7 @@ class fault_injection:
     def get_inj_layer_types(self):
         return self._inj_layer_types
 
-    def updateLayer(self, value=1):
+    def update_layer(self, value=1):
         self.current_layer += value
 
     def reset_current_layer(self):
@@ -536,5 +510,5 @@ class fault_injection:
             + "\n"
         )
 
-        print(summary_str)
+        logging.info(summary_str)
         return summary_str

@@ -238,33 +238,33 @@ class single_bit_flip_func(core.fault_injection):
             )
             for i in inj_list:
                 self.assert_inj_bounds(index=i)
-                prev_value = output[self.corrupt_batch[i]][self.corrupt_dim1[i]][
-                    self.corrupt_dim2[i]
-                ][self.corrupt_dim3[i]]
+                prev_value = output[self.corrupt_batch[i]][self.corrupt_dim[0][i]][
+                    self.corrupt_dim[1][i]
+                ][self.corrupt_dim[2][i]]
 
                 rand_bit = random.randint(0, self.bits - 1)
                 logging.info("Random Bit: %d", rand_bit)
                 new_value = self._flip_bit_signed(prev_value, range_max, rand_bit)
 
-                output[self.corrupt_batch[i]][self.corrupt_dim1[i]][
-                    self.corrupt_dim2[i]
-                ][self.corrupt_dim3[i]] = new_value
+                output[self.corrupt_batch[i]][self.corrupt_dim[0][i]][
+                    self.corrupt_dim[1][i]
+                ][self.corrupt_dim[2][i]] = new_value
 
         else:
             if self.get_current_layer() == corrupt_conv_set:
-                prev_value = output[self.corrupt_batch][self.corrupt_dim1][
-                    self.corrupt_dim2
-                ][self.corrupt_dim3]
+                prev_value = output[self.corrupt_batch][self.corrupt_dim[0]][
+                    self.corrupt_dim[1]
+                ][self.corrupt_dim[2]]
 
                 rand_bit = random.randint(0, self.bits - 1)
                 logging.info("Random Bit: %d", rand_bit)
                 new_value = self._flip_bit_signed(prev_value, range_max, rand_bit)
 
-                output[self.corrupt_batch][self.corrupt_dim1][self.corrupt_dim2][
-                    self.corrupt_dim3
+                output[self.corrupt_batch][self.corrupt_dim[0]][self.corrupt_dim[1]][
+                    self.corrupt_dim[2]
                 ] = new_value
 
-        self.updateLayer()
+        self.update_layer()
         if self.get_current_layer() >= self.get_total_layers():
             self.reset_current_layer()
 

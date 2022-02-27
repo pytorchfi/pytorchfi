@@ -1,6 +1,7 @@
 import torch
 import random
 import pytest
+
 from pytorchfi.core import fault_injection as pfi_core
 from pytorchfi.neuron_error_models import (
     single_bit_flip_func,
@@ -11,7 +12,6 @@ from pytorchfi.neuron_error_models import (
     random_neuron_single_bit_inj,
     random_neuron_single_bit_inj_batched,
 )
-
 from .util_test import CIFAR10_set_up_custom
 
 
