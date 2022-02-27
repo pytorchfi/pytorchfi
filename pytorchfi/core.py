@@ -2,10 +2,9 @@
 
 import copy
 import logging
-import warnings
-
 import torch
 import torch.nn as nn
+import warnings
 
 
 class fault_injection:

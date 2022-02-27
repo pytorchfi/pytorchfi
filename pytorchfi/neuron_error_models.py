@@ -1,9 +1,11 @@
 """pytorchfi.error_models provides different error models out-of-the-box for use."""
 
 import logging
+import random
 import torch
+
 from pytorchfi import core
-from pytorchfi.util import *
+from pytorchfi.util import random_value
 
 
 # Helper Functions

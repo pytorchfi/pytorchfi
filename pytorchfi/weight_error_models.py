@@ -1,13 +1,9 @@
 """pytorchfi.error_models provides different error models out-of-the-box for use."""
 
-import logging
-import torch
-from pytorchfi import core
-from pytorchfi.util import *
+import random 
 
-# Helper functions
-def random_value(min_val=-1, max_val=1):
-    return random.uniform(min_val, max_val)
+from pytorchfi import core
+from pytorchfi.util import random_value
 
 
 def random_weight_location(pfi, layer=-1):
