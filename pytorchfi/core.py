@@ -269,7 +269,7 @@ class FaultInjection:
             raise AssertionError("Injection location missing values.")
 
         logging.info("Checking bounds before runtime")
-        for i in range(len(b)):
+        for i in range(len(batch)):
             self.assert_inj_bounds(i)
 
     def assert_inj_bounds(self, index):
