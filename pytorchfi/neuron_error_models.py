@@ -174,23 +174,23 @@ class single_bit_flip_func(core.FaultInjection):
         # quantum value
         save_type = orig_value.dtype
         total_bits = self.bits
-        logging.info("Original Value: %d", orig_value)
+        logging.info(f"Original Value: {orig_value}")
 
         quantum = int((orig_value / max_value) * ((2.0 ** (total_bits - 1))))
         twos_comple = self._twos_comp_shifted(quantum, total_bits)  # signed
-        logging.info("Quantum: %d", quantum)
-        logging.info("Twos Couple: %d", twos_comple)
+        logging.info(f"Quantum: {quantum}")
+        logging.info(f"Twos Couple: {twos_comple}")
 
         # binary representation
         bits = bin(twos_comple)[2:]
-        logging.info("Bits: %s", bits)
+        logging.info(f"Bits: {bits}")
 
         # sign extend 0's
         temp = "0" * (total_bits - len(bits))
         bits = temp + bits
         if len(bits) != total_bits:
             raise AssertionError
-        logging.info("sign extend bits %s", bits)
+        logging.info(f"Sign extend bits {bits}")
 
         # flip a bit
         # use MSB -> LSB indexing
@@ -204,7 +204,7 @@ class single_bit_flip_func(core.FaultInjection):
         else:
             bits_new[bit_loc] = "0"
         bits_str_new = "".join(bits_new)
-        logging.info("New bits: %s", bits_str_new)
+        logging.info(f"New bits: {bits_str_new}")
 
         # GPU contention causes a weird bug...
         if not bits_str_new.isdigit():
@@ -215,19 +215,19 @@ class single_bit_flip_func(core.FaultInjection):
             raise AssertionError
         new_quantum = int(bits_str_new, 2)
         out = self._twos_comp(new_quantum, total_bits)
-        logging.info("Out: %s", out)
+        logging.info(f"Out: {out}")
 
         # get FP equivalent from quantum
         new_value = out * ((2.0 ** (-1 * (total_bits - 1))) * max_value)
-        logging.info("New Value: %d", new_value)
+        logging.info(f"New Value: {new_value}")
 
         return torch.tensor(new_value, dtype=save_type)
 
     def single_bit_flip_signed_across_batch(self, module, input_val, output):
         corrupt_conv_set = self.corrupt_layer
         range_max = self.get_conv_max(self.current_layer)
-        logging.info("Current layer: %s", self.current_layer)
-        logging.info("Range_max: %s", range_max)
+        logging.info(f"Current layer: {self.current_layer}")
+        logging.info(f"Range_max: {range_max}")
 
         if type(corrupt_conv_set) is list:
             inj_list = list(
@@ -243,7 +243,7 @@ class single_bit_flip_func(core.FaultInjection):
                 ][self.corrupt_dim[2][i]]
 
                 rand_bit = random.randint(0, self.bits - 1)
-                logging.info("Random Bit: %d", rand_bit)
+                logging.info(f"Random Bit: {rand_bit}")
                 new_value = self._flip_bit_signed(prev_value, range_max, rand_bit)
 
                 output[self.corrupt_batch[i]][self.corrupt_dim[0][i]][
@@ -257,7 +257,7 @@ class single_bit_flip_func(core.FaultInjection):
                 ][self.corrupt_dim[2]]
 
                 rand_bit = random.randint(0, self.bits - 1)
-                logging.info("Random Bit: %d", rand_bit)
+                logging.info(f"Random Bit: {rand_bit}")
                 new_value = self._flip_bit_signed(prev_value, range_max, rand_bit)
 
                 output[self.corrupt_batch][self.corrupt_dim[0]][self.corrupt_dim[1]][
