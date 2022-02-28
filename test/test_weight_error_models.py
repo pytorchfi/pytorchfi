@@ -45,12 +45,10 @@ class TestWeightErrorModels:
         random.seed(3)
 
         (a1, b1, c1, d1, e1) = random_weight_location(self.p)
-        if (a1, b1, c1, d1, e1) != ([1], [151], [16], [2], [4]):
-            raise AssertionError
+        assert (a1, b1, c1, d1, e1) == ([1], [151], [16], [2], [4])
 
         (a2, b2, c2, d2, e2) = random_weight_location(self.p, layer=3)
-        if (a2, b2, c2, d2, e2) != ([3], [242], [320], [2], [0]):
-            raise AssertionError
+        assert (a2, b2, c2, d2, e2) == ([3], [242], [320], [2], [0])
 
     def test_random_weight_inj(self):
         random.seed(2)
@@ -60,8 +58,7 @@ class TestWeightErrorModels:
         with torch.no_grad():
             corrupt_output = corrupt_model(self.images)
 
-        if torch.all(corrupt_output.eq(self.golden_output)):
-            raise AssertionError
+        assert not torch.all(corrupt_output.eq(self.golden_output))
 
     def test_random_weight_inj_conv(self):
         random.seed(1)
@@ -73,8 +70,7 @@ class TestWeightErrorModels:
         with torch.no_grad():
             corrupt_output = corrupt_model(self.images)
 
-        if torch.all(corrupt_output.eq(self.golden_output)):
-            raise AssertionError
+        assert not torch.all(corrupt_output.eq(self.golden_output))
 
     def test_random_weight_zero_inj(self):
         random.seed(2)
@@ -84,5 +80,4 @@ class TestWeightErrorModels:
         with torch.no_grad():
             corrupt_output = corrupt_model(self.images)
 
-        if torch.all(corrupt_output.eq(self.golden_output)):
-            raise AssertionError
+        assert not torch.all(corrupt_output.eq(self.golden_output))

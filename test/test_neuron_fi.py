@@ -52,8 +52,7 @@ class TestNeuronFi:
         with torch.no_grad():
             corrupt_output_1 = corrupt_model_1(self.images)
 
-        if torch.all(corrupt_output_1.eq(golden_output)):
-            raise AssertionError
+        assert not torch.all(corrupt_output_1.eq(golden_output))
 
         uncorrupt_model = p.declare_neuron_fi(
             batch=batch_i,
@@ -68,8 +67,7 @@ class TestNeuronFi:
         with torch.no_grad():
             uncorrupted_output = uncorrupt_model(self.images)
 
-        if not torch.all(uncorrupted_output.eq(golden_output)):
-            raise AssertionError
+        assert torch.all(uncorrupted_output.eq(golden_output))
 
         corrupt_model_2 = p.declare_neuron_fi(
             batch=batch_i,
@@ -84,8 +82,7 @@ class TestNeuronFi:
         with torch.no_grad():
             corrupt_output_2 = corrupt_model_2(self.images)
 
-        if torch.all(corrupt_output_2.eq(golden_output)):
-            raise AssertionError
+        assert not torch.all(corrupt_output_2.eq(golden_output))
 
     @pytest.mark.skipif(
         not torch.cuda.is_available(), reason="GPU not supported on this machine"
@@ -124,8 +121,7 @@ class TestNeuronFi:
         with torch.no_grad():
             corrupt_output_1 = corrupt_model_1(self.images_gpu)
 
-        if torch.all(corrupt_output_1.eq(golden_output)):
-            raise AssertionError
+        assert not torch.all(corrupt_output_1.eq(golden_output))
 
         uncorrupt_model = p.declare_neuron_fi(
             batch=batch_i,
@@ -140,8 +136,7 @@ class TestNeuronFi:
         with torch.no_grad():
             uncorrupted_output = uncorrupt_model(self.images_gpu)
 
-        if not torch.all(uncorrupted_output.eq(golden_output)):
-            raise AssertionError
+        assert torch.all(uncorrupted_output.eq(golden_output))
 
         corrupt_model_2 = p.declare_neuron_fi(
             batch=batch_i,
@@ -156,10 +151,7 @@ class TestNeuronFi:
         with torch.no_grad():
             corrupted_output_2 = corrupt_model_2(self.images_gpu)
 
-        if torch.all(corrupted_output_2.eq(golden_output)):
-            raise AssertionError
-        if not torch.all(corrupted_output_2.eq(corrupted_output_2)):
-            raise AssertionError
+        assert not torch.all(corrupted_output_2.eq(golden_output))
 
 
 class TestNeuronFiBatch:
@@ -208,14 +200,10 @@ class TestNeuronFiBatch:
         with torch.no_grad():
             corrupt_output = corrupt_model(self.images)
 
-        if not torch.all(corrupt_output[0].eq(golden_output[0])):
-            raise AssertionError
-        if not torch.all(corrupt_output[1].eq(golden_output[1])):
-            raise AssertionError
-        if torch.all(corrupt_output[2].eq(golden_output[2])):
-            raise AssertionError
-        if not torch.all(corrupt_output[3].eq(golden_output[3])):
-            raise AssertionError
+        assert torch.all(corrupt_output[0].eq(golden_output[0]))
+        assert torch.all(corrupt_output[1].eq(golden_output[1]))
+        assert not torch.all(corrupt_output[2].eq(golden_output[2]))
+        assert torch.all(corrupt_output[3].eq(golden_output[3]))
 
     def test_neuron_fi_batch_cpu_2(self):
         self.model.eval()
@@ -247,14 +235,10 @@ class TestNeuronFiBatch:
         with torch.no_grad():
             corrupt_output = corrupt_model(self.images)
 
-        if torch.all(corrupt_output[0].eq(golden_output[0])):
-            raise AssertionError
-        if not torch.all(corrupt_output[1].eq(golden_output[1])):
-            raise AssertionError
-        if torch.all(corrupt_output[2].eq(golden_output[2])):
-            raise AssertionError
-        if torch.all(corrupt_output[3].eq(golden_output[3])):
-            raise AssertionError
+        assert not torch.all(corrupt_output[0].eq(golden_output[0]))
+        assert torch.all(corrupt_output[1].eq(golden_output[1]))
+        assert not torch.all(corrupt_output[2].eq(golden_output[2]))
+        assert not torch.all(corrupt_output[3].eq(golden_output[3]))
 
     @pytest.mark.skipif(
         not torch.cuda.is_available(), reason="GPU not supported on this machine"
@@ -291,14 +275,10 @@ class TestNeuronFiBatch:
         with torch.no_grad():
             corrupt_output = corrupt_model(self.images_gpu)
 
-        if not torch.all(corrupt_output[0].eq(golden_output[0])):
-            raise AssertionError
-        if not torch.all(corrupt_output[1].eq(golden_output[1])):
-            raise AssertionError
-        if torch.all(corrupt_output[2].eq(golden_output[2])):
-            raise AssertionError
-        if not torch.all(corrupt_output[3].eq(golden_output[3])):
-            raise AssertionError
+        assert torch.all(corrupt_output[0].eq(golden_output[0]))
+        assert torch.all(corrupt_output[1].eq(golden_output[1]))
+        assert not torch.all(corrupt_output[2].eq(golden_output[2]))
+        assert torch.all(corrupt_output[3].eq(golden_output[3]))
 
     @pytest.mark.skipif(
         not torch.cuda.is_available(), reason="GPU not supported on this machine"
@@ -336,11 +316,7 @@ class TestNeuronFiBatch:
         with torch.no_grad():
             corrupt_output = corrupt_model(self.images_gpu)
 
-        if torch.all(corrupt_output[0].eq(golden_output[0])):
-            raise AssertionError
-        if not torch.all(corrupt_output[1].eq(golden_output[1])):
-            raise AssertionError
-        if torch.all(corrupt_output[2].eq(golden_output[2])):
-            raise AssertionError
-        if torch.all(corrupt_output[3].eq(golden_output[3])):
-            raise AssertionError
+        assert not torch.all(corrupt_output[0].eq(golden_output[0]))
+        assert torch.all(corrupt_output[1].eq(golden_output[1]))
+        assert not torch.all(corrupt_output[2].eq(golden_output[2]))
+        assert not torch.all(corrupt_output[3].eq(golden_output[3]))

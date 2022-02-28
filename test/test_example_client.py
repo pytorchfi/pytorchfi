@@ -33,8 +33,7 @@ class TestCoreExampleClient:
         )
 
     def test_golden_inference(self):
-        if self.golden_label != 556:
-            raise AssertionError
+        assert self.golden_label == 556
 
     def test_single_specified_neuron(self):
         (b, layer, C, H, W, err_val) = ([0], [3], [4], [2], [4], [10000])
@@ -45,8 +44,7 @@ class TestCoreExampleClient:
         inj_softmax = self.softmax(inj_output)
         inj_label = list(torch.argmax(inj_softmax, dim=1))[0].item()
 
-        if inj_label != 578:
-            raise AssertionError
+        assert inj_label == 578
 
     def test_multiple_specified_neuron(self):
         (b, layer, C, H, W, err_val) = (
@@ -64,5 +62,4 @@ class TestCoreExampleClient:
         inj_softmax = self.softmax(inj_output)
         inj_label = list(torch.argmax(inj_softmax, dim=1))[0].item()
 
-        if inj_label != 843:
-            raise AssertionError
+        assert inj_label == 843

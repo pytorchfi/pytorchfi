@@ -2,8 +2,8 @@
 
 import torch
 import torchvision.models as models
+
 from pytorchfi.core import fault_injection
-import pytest
 
 
 class TestLayers:
@@ -28,8 +28,7 @@ class TestLayers:
         self.golden_label = list(torch.argmax(self.golden_softmax, dim=1))[0].item()
 
     def test_golden_inference(self):
-        if self.golden_label != 556:
-            raise AssertionError
+        assert self.golden_label == 556
 
     def test_single_conv_neuron(self):
 
@@ -48,8 +47,7 @@ class TestLayers:
         inj_softmax = self.softmax(inj_output)
         inj_label = list(torch.argmax(inj_softmax, dim=1))[0].item()
 
-        if inj_label != 578:
-            raise AssertionError
+        assert inj_label == 578
 
     def test_single_linear_layer(self):
         p = fault_injection(
@@ -59,12 +57,9 @@ class TestLayers:
             use_cuda=self.use_gpu,
         )
 
-        if p.get_total_layers() != 3:
-            raise AssertionError
-        if p.get_layer_dim(2) != 2:
-            raise AssertionError
-        if p.get_layer_type(2) != torch.nn.Linear:
-            raise AssertionError
+        assert p.get_total_layers() == 3
+        assert p.get_layer_dim(2) == 2
+        assert p.get_layer_type(2) == torch.nn.Linear
 
     def test_inj_all_layers(self):
         p = fault_injection(
@@ -74,14 +69,10 @@ class TestLayers:
             use_cuda=self.use_gpu,
         )
 
-        if p.get_total_layers() != 21:
-            raise AssertionError
-        if p.get_layer_dim(2) != 4:
-            raise AssertionError
-        if p.get_layer_type(2) != torch.nn.MaxPool2d:
-            raise AssertionError
-        if p.get_layer_type(20) != torch.nn.Linear:
-            raise AssertionError
+        assert p.get_total_layers() == 21
+        assert p.get_layer_dim(2) == 4
+        assert p.get_layer_type(2) == torch.nn.MaxPool2d
+        assert p.get_layer_type(20) == torch.nn.Linear
 
     def test_inj_all_layers_injections(self):
         p = fault_injection(
@@ -110,14 +101,10 @@ class TestLayers:
         inj_label_2 = list(torch.argmax(inj_softmax, dim=1))[2].item()
         inj_label_3 = list(torch.argmax(inj_softmax, dim=1))[3].item()
 
-        if inj_label_0 != 722:
-            raise AssertionError
-        if inj_label_1 != 723:
-            raise AssertionError
-        if inj_label_2 != 968:
-            raise AssertionError
-        if inj_label_3 != 4:
-            raise AssertionError
+        assert inj_label_0 == 722
+        assert inj_label_1 == 723
+        assert inj_label_2 == 968
+        assert inj_label_3 == 4
 
     def test_single_linear_neuron_inj(self):
         p = fault_injection(
@@ -135,15 +122,13 @@ class TestLayers:
         inj_softmax = self.softmax(inj_output)
         inj_label = list(torch.argmax(inj_softmax, dim=1))[0].item()
 
-        if inj_label != 888:
-            raise AssertionError
+        assert inj_label == 888
 
     def test_combo_layers(self):
         p = fault_injection(
             self.model,
             self.batch_size,
             layer_types=[torch.nn.Conv2d, torch.nn.Linear],
-            # layer_types=[torch.nn.Conv2d],
             use_cuda=self.use_gpu,
         )
 
@@ -163,9 +148,6 @@ class TestLayers:
         inj_label_1 = list(torch.argmax(inj_softmax, dim=1))[0].item()
         inj_label_2 = list(torch.argmax(inj_softmax, dim=1))[1].item()
 
-        if p.get_total_layers() != 8:
-            raise AssertionError
-        if inj_label_1 != 695:
-            raise AssertionError
-        if inj_label_2 != 888:
-            raise AssertionError
+        assert p.get_total_layers() == 8
+        assert inj_label_1 == 695
+        assert inj_label_2 == 888

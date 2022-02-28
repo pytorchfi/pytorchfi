@@ -43,8 +43,7 @@ class TestCoreGetFuncs:
             [1, 256, 2, 2],
             [1, 10],
         ]
-        if self.p.get_output_size() != shape:
-            raise AssertionError
+        assert self.p.get_output_size() == shape
 
     def test_get_weights_size(self):
         shape = [
@@ -57,110 +56,66 @@ class TestCoreGetFuncs:
         ]
 
         for i in range(6):
-            if list(self.p.get_weights_size(i)) != shape[i]:
-                raise AssertionError
+            assert list(self.p.get_weights_size(i)) == shape[i]
 
     def test_get_total_batches(self):
-        if self.p.get_total_batches() != 4:
-            raise AssertionError
+        assert self.p.get_total_batches() == 4
 
     def test_get_inj_layer_types(self):
-        if self.p.get_inj_layer_types() != [torch.nn.Conv2d, torch.nn.Linear]:
-            raise AssertionError
+        assert self.p.get_inj_layer_types() == [torch.nn.Conv2d, torch.nn.Linear]
 
     def test_get_layer_type(self):
-        if self.p.get_layer_type(3) != torch.nn.Conv2d:
-            raise AssertionError
-        if self.p.get_layer_type(5) != torch.nn.Linear:
-            raise AssertionError
+        assert self.p.get_layer_type(3) == torch.nn.Conv2d
+        assert self.p.get_layer_type(5) == torch.nn.Linear
 
     def test_get_layer_shape(self):
-        if self.p.get_layer_shape(0) != [1, 64, 8, 8]:
-            raise AssertionError
-        if self.p.get_layer_shape(1) != [1, 192, 4, 4]:
-            raise AssertionError
-        if self.p.get_layer_shape(2) != [1, 384, 2, 2]:
-            raise AssertionError
-        if self.p.get_layer_shape(3) != [1, 256, 2, 2]:
-            raise AssertionError
-        if self.p.get_layer_shape(4) != [1, 256, 2, 2]:
-            raise AssertionError
-        if self.p.get_layer_shape(5) != [1, 10]:
-            raise AssertionError
+        assert self.p.get_layer_shape(0) == [1, 64, 8, 8]
+        assert self.p.get_layer_shape(1) == [1, 192, 4, 4]
+        assert self.p.get_layer_shape(2) == [1, 384, 2, 2]
+        assert self.p.get_layer_shape(3) == [1, 256, 2, 2]
+        assert self.p.get_layer_shape(4) == [1, 256, 2, 2]
+        assert self.p.get_layer_shape(5) == [1, 10]
 
     def test_get_layer_dim(self):
-        if self.p.get_layer_dim(3) != 4:
-            raise AssertionError
+        assert self.p.get_layer_dim(3) == 4
 
     def test_get_total_layers(self):
-        if self.p.get_total_layers() != 6:
-            raise AssertionError
+        assert self.p.get_total_layers() == 6
 
     def test_get_fmap_num(self):
-        if self.p.get_fmaps_num(0) != 64:
-            raise AssertionError
-        if self.p.get_fmaps_num(1) != 192:
-            raise AssertionError
-        if self.p.get_fmaps_num(2) != 384:
-            raise AssertionError
-        if self.p.get_fmaps_num(3) != 256:
-            raise AssertionError
-        if self.p.get_fmaps_num(4) != 256:
-            raise AssertionError
+        assert self.p.get_fmaps_num(0) == 64
+        assert self.p.get_fmaps_num(1) == 192
+        assert self.p.get_fmaps_num(2) == 384
+        assert self.p.get_fmaps_num(3) == 256
+        assert self.p.get_fmaps_num(4) == 256
 
     def test_get_fmaps_H(self):
-        if self.p.get_fmaps_H(0) != 8:
-            raise AssertionError
-        if self.p.get_fmaps_H(1) != 4:
-            raise AssertionError
-        if self.p.get_fmaps_H(2) != 2:
-            raise AssertionError
-        if self.p.get_fmaps_H(3) != 2:
-            raise AssertionError
-        if self.p.get_fmaps_H(4) != 2:
-            raise AssertionError
+        assert self.p.get_fmaps_H(0) == 8
+        assert self.p.get_fmaps_H(1) == 4
+        assert self.p.get_fmaps_H(2) == 2
+        assert self.p.get_fmaps_H(3) == 2
+        assert self.p.get_fmaps_H(4) == 2
 
     def test_get_fmaps_W(self):
-        if self.p.get_fmaps_W(0) != 8:
-            raise AssertionError
-        if self.p.get_fmaps_W(1) != 4:
-            raise AssertionError
-        if self.p.get_fmaps_W(2) != 2:
-            raise AssertionError
-        if self.p.get_fmaps_W(3) != 2:
-            raise AssertionError
-        if self.p.get_fmaps_W(4) != 2:
-            raise AssertionError
+        assert self.p.get_fmaps_W(0) == 8
+        assert self.p.get_fmaps_W(1) == 4
+        assert self.p.get_fmaps_W(2) == 2
+        assert self.p.get_fmaps_W(3) == 2
+        assert self.p.get_fmaps_W(4) == 2
 
     def test_get_fmap_HW(self):
-        if self.p.get_fmap_HW(0) != (8, 8):
-            raise AssertionError
-        if self.p.get_fmap_HW(1) != (4, 4):
-            raise AssertionError
-        if self.p.get_fmap_HW(2) != (2, 2):
-            raise AssertionError
-        if self.p.get_fmap_HW(3) != (2, 2):
-            raise AssertionError
-        if self.p.get_fmap_HW(4) != (2, 2):
-            raise AssertionError
+        assert self.p.get_fmap_HW(0) == (8, 8)
+        assert self.p.get_fmap_HW(1) == (4, 4)
+        assert self.p.get_fmap_HW(2) == (2, 2)
+        assert self.p.get_fmap_HW(3) == (2, 2)
+        assert self.p.get_fmap_HW(4) == (2, 2)
 
     def test_print_func(self):
-        outputString = self.p.print_pytorchfi_layer_summary()
+        output = self.p.print_pytorchfi_layer_summary()
 
-        if "PYTORCHFI INIT SUMMARY" not in outputString:
-            raise AssertionError
-        if "Shape of input into the model: (3 32 32 )" not in outputString:
-            raise AssertionError
-        if "Batch Size: 4" not in outputString:
-            raise AssertionError
-        if "Conv2d" not in outputString:
-            raise AssertionError
-        if "Linear" not in outputString:
-            raise AssertionError
-        if "CUDA Enabled: False" not in outputString:
-            raise AssertionError
-        if (
-            "================================================================"
-            not in outputString
-        ):
-            raise AssertionError
+        assert "PYTORCHFI INIT SUMMARY" in output
+        assert "Shape of input into the model: (3 32 32 )" in output
+        assert "Batch Size: 4" in output
+        assert "Conv2d" in output
+        assert "Linear" in output
+        assert "CUDA Enabled: False" in output
