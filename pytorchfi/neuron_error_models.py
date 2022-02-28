@@ -11,11 +11,11 @@ from pytorchfi.util import random_value
 # Helper Functions
 
 
-def random_batch_element(pfi):
+def random_batch_element(pfi: core.FaultInjection):
     return random.randint(0, pfi.batch_size - 1)
 
 
-def random_neuron_location(pfi, layer=-1):
+def random_neuron_location(pfi: core.FaultInjection, layer: int = -1):
     if layer == -1:
         layer = random.randint(0, pfi.get_total_layers() - 1)
 
@@ -41,7 +41,7 @@ def random_neuron_location(pfi, layer=-1):
 # Neuron Perturbation Models
 
 # single random neuron error in single batch element
-def random_neuron_inj(pfi, min_val=-1, max_val=1):
+def random_neuron_inj(pfi: core.FaultInjection, min_val: int = -1, max_val: int = 1):
     b = random_batch_element(pfi)
     (layer, C, H, W) = random_neuron_location(pfi)
     err_val = random_value(min_val=min_val, max_val=max_val)
@@ -52,8 +52,14 @@ def random_neuron_inj(pfi, min_val=-1, max_val=1):
 
 
 # single random neuron error in each batch element.
-def random_neuron_inj_batched(pfi, min_val=-1, max_val=1, rand_loc=True, rand_val=True):
-    batch, layer_num, c_rand, h_rand, w_rand, value = ([] for i in range(6))
+def random_neuron_inj_batched(
+    pfi: core.FaultInjection,
+    min_val: int = -1,
+    max_val: int = 1,
+    rand_loc: bool = True,
+    rand_val: bool = True,
+):
+    batch, layer_num, c_rand, h_rand, w_rand, value = ([] for _ in range(6))
 
     if not rand_loc:
         (layer, C, H, W) = random_neuron_location(pfi)
@@ -84,7 +90,7 @@ def random_neuron_inj_batched(pfi, min_val=-1, max_val=1, rand_loc=True, rand_va
 
 
 # one random neuron error per layer in single batch element
-def random_inj_per_layer(pfi, min_val=-1, max_val=1):
+def random_inj_per_layer(pfi: core.FaultInjection, min_val: int = -1, max_val: int = 1):
     batch, layer_num, c_rand, h_rand, w_rand, value = ([] for i in range(6))
 
     b = random_batch_element(pfi)
@@ -109,7 +115,11 @@ def random_inj_per_layer(pfi, min_val=-1, max_val=1):
 
 # one random neuron error per layer in each batch element
 def random_inj_per_layer_batched(
-    pfi, min_val=-1, max_val=1, rand_loc=True, rand_val=True
+    pfi: core.FaultInjection,
+    min_val: int = -1,
+    max_val: int = 1,
+    rand_loc: bool = True,
+    rand_val: bool = True,
 ):
     batch, layer_num, c_rand, h_rand, w_rand, value = ([] for i in range(6))
 
@@ -269,7 +279,7 @@ class single_bit_flip_func(core.FaultInjection):
             self.current_layer = 0
 
 
-def random_neuron_single_bit_inj_batched(pfi, layer_ranges):
+def random_neuron_single_bit_inj_batched(pfi: core.FaultInjection, layer_ranges):
     pfi.set_conv_max(layer_ranges)
     batch, layer_num, c_rand, h_rand, w_rand = ([] for i in range(5))
 
@@ -292,7 +302,7 @@ def random_neuron_single_bit_inj_batched(pfi, layer_ranges):
     )
 
 
-def random_neuron_single_bit_inj(pfi, layer_ranges):
+def random_neuron_single_bit_inj(pfi: core.FaultInjection, layer_ranges):
     # TODO Support multiple error models via list
     pfi.set_conv_max(layer_ranges)
 

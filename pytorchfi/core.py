@@ -3,13 +3,20 @@
 import copy
 import logging
 import warnings
-
+from typing import List
 import torch
 import torch.nn as nn
 
 
 class FaultInjection:
-    def __init__(self, model, batch_size, input_shape=None, layer_types=None, **kwargs):
+    def __init__(
+        self,
+        model,
+        batch_size: int,
+        input_shape: List[int] = None,
+        layer_types=None,
+        **kwargs,
+    ):
         if not input_shape:
             input_shape = [3, 224, 224]
         if not layer_types:
@@ -268,7 +275,7 @@ class FaultInjection:
         for i in range(len(batch)):
             self.assert_inj_bounds(i)
 
-    def assert_inj_bounds(self, index):
+    def assert_inj_bounds(self, index: int):
         if index < 0:
             raise AssertionError(f"Invalid injection index: {index}")
         if self.corrupt_batch[index] >= self.batch_size:
