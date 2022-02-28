@@ -2,11 +2,11 @@
 
 import logging
 import random
+
 import torch
 
 from pytorchfi import core
 from pytorchfi.util import random_value
-
 
 # Helper Functions
 

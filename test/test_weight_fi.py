@@ -1,4 +1,5 @@
 import torch
+
 from pytorchfi.core import fault_injection as pfi_core
 
 from .util_test import CIFAR10_set_up_custom

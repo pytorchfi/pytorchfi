@@ -1,17 +1,19 @@
-import torch
 import random
+
 import pytest
+import torch
 
 from pytorchfi.core import fault_injection as pfi_core
 from pytorchfi.neuron_error_models import (
-    single_bit_flip_func,
     random_inj_per_layer,
     random_inj_per_layer_batched,
     random_neuron_inj,
     random_neuron_inj_batched,
     random_neuron_single_bit_inj,
     random_neuron_single_bit_inj_batched,
+    single_bit_flip_func,
 )
+
 from .util_test import CIFAR10_set_up_custom
 
 

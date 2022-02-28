@@ -1,5 +1,6 @@
 import torch
 import torchvision.models as models
+
 from pytorchfi.core import fault_injection
 
 
