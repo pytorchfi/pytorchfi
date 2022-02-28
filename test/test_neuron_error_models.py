@@ -3,7 +3,7 @@ import random
 import pytest
 import torch
 
-from pytorchfi.core import fault_injection as pfi_core
+from pytorchfi.core import FaultInjection as pfi_core
 from pytorchfi.neuron_error_models import (
     random_inj_per_layer,
     random_inj_per_layer_batched,
@@ -132,21 +132,6 @@ class TestNeuronErrorModelsFunc:
         random.seed(3)
 
         corrupt_model = random_neuron_single_bit_inj_batched(self.p, self.ranges)
-        corrupt_model.eval()
-        with torch.no_grad():
-            corrupt_output = corrupt_model(self.images)
-
-        assert not torch.all(corrupt_output[0].eq(self.golden_output[0]))
-        assert not torch.all(corrupt_output[1].eq(self.golden_output[1]))
-        assert not torch.all(corrupt_output[2].eq(self.golden_output[2]))
-        assert not torch.all(corrupt_output[3].eq(self.golden_output[3]))
-
-    def test_random_neuron_single_bit_inj_sameLoc(self):
-        random.seed(2)
-
-        corrupt_model = random_neuron_single_bit_inj_batched(
-            self.p, self.ranges, rand_loc=False
-        )
         corrupt_model.eval()
         with torch.no_grad():
             corrupt_output = corrupt_model(self.images)

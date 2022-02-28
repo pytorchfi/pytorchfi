@@ -3,7 +3,7 @@
 import torch
 import torchvision.models as models
 
-from pytorchfi.core import fault_injection
+from pytorchfi.core import FaultInjection
 
 
 class TestLayers:
@@ -32,7 +32,7 @@ class TestLayers:
 
     def test_single_conv_neuron(self):
 
-        p = fault_injection(
+        p = FaultInjection(
             self.model,
             self.batch_size,
             layer_types=[torch.nn.Conv2d],
@@ -50,7 +50,7 @@ class TestLayers:
         assert inj_label == 578
 
     def test_single_linear_layer(self):
-        p = fault_injection(
+        p = FaultInjection(
             self.model,
             self.batch_size,
             layer_types=[torch.nn.Linear],
@@ -62,7 +62,7 @@ class TestLayers:
         assert p.get_layer_type(2) == torch.nn.Linear
 
     def test_inj_all_layers(self):
-        p = fault_injection(
+        p = FaultInjection(
             self.model,
             self.batch_size,
             layer_types=["all"],
@@ -75,7 +75,7 @@ class TestLayers:
         assert p.get_layer_type(20) == torch.nn.Linear
 
     def test_inj_all_layers_injections(self):
-        p = fault_injection(
+        p = FaultInjection(
             self.model,
             self.batch_size,
             layer_types=["all"],
@@ -107,7 +107,7 @@ class TestLayers:
         assert inj_label_3 == 4
 
     def test_single_linear_neuron_inj(self):
-        p = fault_injection(
+        p = FaultInjection(
             self.model,
             self.batch_size,
             layer_types=[torch.nn.Linear],
@@ -125,7 +125,7 @@ class TestLayers:
         assert inj_label == 888
 
     def test_combo_layers(self):
-        p = fault_injection(
+        p = FaultInjection(
             self.model,
             self.batch_size,
             layer_types=[torch.nn.Conv2d, torch.nn.Linear],

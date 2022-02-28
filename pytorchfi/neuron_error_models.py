@@ -142,7 +142,7 @@ def random_inj_per_layer_batched(
     )
 
 
-class single_bit_flip_func(core.fault_injection):
+class single_bit_flip_func(core.FaultInjection):
     def __init__(self, model, batch_size, input_shape=None, **kwargs):
         if input_shape is None:
             input_shape = [3, 224, 224]
@@ -269,16 +269,12 @@ class single_bit_flip_func(core.fault_injection):
             self.reset_current_layer()
 
 
-def random_neuron_single_bit_inj_batched(pfi, layer_ranges, rand_loc=True):
+def random_neuron_single_bit_inj_batched(pfi, layer_ranges):
     pfi.set_conv_max(layer_ranges)
     batch, layer_num, c_rand, h_rand, w_rand = ([] for i in range(5))
 
-    if not rand_loc:
-        (layer, C, H, W) = random_neuron_location(pfi)
-
     for i in range(pfi.get_total_batches()):
-        if rand_loc:
-            (layer, C, H, W) = random_neuron_location(pfi)
+        (layer, C, H, W) = random_neuron_location(pfi)
 
         batch.append(i)
         layer_num.append(layer)

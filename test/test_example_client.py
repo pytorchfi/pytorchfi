@@ -1,7 +1,7 @@
 import torch
 import torchvision.models as models
 
-from pytorchfi.core import fault_injection
+from pytorchfi.core import FaultInjection
 
 
 class TestCoreExampleClient:
@@ -26,7 +26,7 @@ class TestCoreExampleClient:
         self.golden_softmax = self.softmax(self.output)
         self.golden_label = list(torch.argmax(self.golden_softmax, dim=1))[0].item()
 
-        self.p = fault_injection(
+        self.p = FaultInjection(
             self.model,
             batch_size,
             input_shape=[c, h, w],

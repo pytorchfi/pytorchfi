@@ -2,7 +2,6 @@
 
 import random
 
-from pytorchfi import core
 from pytorchfi.util import random_value
 
 

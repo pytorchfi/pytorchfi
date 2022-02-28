@@ -8,11 +8,11 @@ import torch
 import torch.nn as nn
 
 
-class fault_injection:
+class FaultInjection:
     def __init__(self, model, batch_size, input_shape=None, layer_types=None, **kwargs):
-        if input_shape is None:
+        if not input_shape:
             input_shape = [3, 224, 224]
-        if layer_types is None:
+        if not layer_types:
             layer_types = [nn.Conv2d]
         logging.basicConfig(format="%(asctime)-15s %(clientip)s %(user)-8s %(message)s")
 
@@ -259,12 +259,12 @@ class fault_injection:
 
         return self.corrupted_model
 
-    def check_bounds(self, b, l, dim):
+    def check_bounds(self, batch, layer, dim):
         if (
-            len(b) != len(l)
-            or len(b) != len(dim[0])
-            or len(b) != len(dim[1])
-            or len(b) != len(dim[2])
+            len(batch) != len(layer)
+            or len(batch) != len(dim[0])
+            or len(batch) != len(dim[1])
+            or len(batch) != len(dim[2])
         ):
             raise AssertionError("Injection location missing values.")
 
