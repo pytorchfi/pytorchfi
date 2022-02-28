@@ -21,9 +21,9 @@ class FaultInjection:
         self.layers_type = []
         self.layers_dim = []
         self.weights_size = []
+        self.batch_size = batch_size
 
         self._input_shape = input_shape
-        self._batch_size = batch_size
         self._inj_layer_types = layer_types
 
         self.corrupted_model = None
@@ -147,11 +147,11 @@ class FaultInjection:
     def declare_weight_fi(self, **kwargs):
         self._fi_state_reset()
         custom_injection = False
-        CUSTOM_FUNCTION = False
+        custom_function = False
 
         if kwargs:
             if "function" in kwargs:
-                custom_injection, CUSTOM_FUNCTION = True, kwargs.get("function")
+                custom_injection, custom_function = True, kwargs.get("function")
                 corrupt_layer = kwargs.get("layer_num", [])
                 corrupt_k = kwargs.get("k", [])
                 corrupt_c = kwargs.get("dim1", [])
@@ -175,7 +175,7 @@ class FaultInjection:
 
         current_weight_layer = 0
         for layer in self.corrupted_model.modules():
-            if isinstance(layer, tuple(self.get_inj_layer_types())):
+            if isinstance(layer, tuple(self._inj_layer_types)):
                 inj_list = list(
                     filter(
                         lambda x: corrupt_layer[x] == current_weight_layer,
@@ -196,7 +196,7 @@ class FaultInjection:
 
                     with torch.no_grad():
                         if custom_injection:
-                            corrupt_value = CUSTOM_FUNCTION(layer.weight, corrupt_idx)
+                            corrupt_value = custom_function(layer.weight, corrupt_idx)
                             layer.weight[corrupt_idx] = corrupt_value
                         else:
                             layer.weight[corrupt_idx] = corrupt_value[inj]
@@ -275,20 +275,20 @@ class FaultInjection:
     def assert_inj_bounds(self, index):
         if index < 0:
             raise AssertionError("Invalid injection index: %d" % (index))
-        if self.corrupt_batch[index] >= self.get_total_batches():
+        if self.corrupt_batch[index] >= self.batch_size:
             raise AssertionError(
                 "%d < %d: Invalid batch element!"
                 % (
                     self.corrupt_batch[index],
-                    self.get_total_batches(),
+                    self.batch_size(),
                 )
             )
-        if self.corrupt_layer[index] >= self.get_total_layers():
+        if self.corrupt_layer[index] >= len(self.output_size):
             raise AssertionError(
                 "%d < %d: Invalid layer!"
                 % (
                     self.corrupt_layer[index],
-                    self.get_total_layers(),
+                    len(self.output_size),
                 )
             )
 
@@ -320,20 +320,20 @@ class FaultInjection:
     def _set_value(self, module, input_val, output):
         logging.info(
             "Processing hook of Layer %d: %s",
-            self.get_current_layer(),
-            self.get_layer_type(self.get_current_layer()),
+            self.current_layer,
+            self.layers_type[self.current_layer],
         )
         inj_list = list(
             filter(
-                lambda x: self.corrupt_layer[x] == self.get_current_layer(),
+                lambda x: self.corrupt_layer[x] == self.current_layer,
                 range(len(self.corrupt_layer)),
             )
         )
 
-        layer_dim = self.layers_dim[self.get_current_layer()]
+        layer_dim = self.layers_dim[self.current_layer]
 
         logging.info(
-            "Layer %d injection list size: %d", self.get_current_layer(), len(inj_list)
+            "Layer %d injection list size: %d", self.current_layer, len(inj_list)
         )
         if layer_dim == 2:
             for i in inj_list:
@@ -382,7 +382,7 @@ class FaultInjection:
                     self.corrupt_dim[1][i]
                 ][self.corrupt_dim[2][i]] = self.corrupt_value[i]
 
-        self.update_layer()
+        self.current_layer += 1
 
     def _save_output_size(self, module, input_val, output):
         shape = list(output.size())
@@ -391,15 +391,6 @@ class FaultInjection:
         self.layers_type.append(type(module))
         self.layers_dim.append(dim)
         self.output_size.append(shape)
-
-    def get_original_model(self):
-        return self.original_model
-
-    def get_corrupted_model(self):
-        return self.corrupted_model
-
-    def get_output_size(self):
-        return self.output_size
 
     def get_weights_size(self, layer_num):
         return self.weights_size[layer_num]
@@ -416,31 +407,10 @@ class FaultInjection:
     def get_layer_shape(self, layer_num):
         return self.output_size[layer_num]
 
-    def get_inj_layer_types(self):
-        return self._inj_layer_types
-
-    def update_layer(self, value=1):
-        self.current_layer += value
-
-    def reset_current_layer(self):
-        self.current_layer = 0
-
-    def set_corrupt_layer(self, value):
-        self.corrupt_layer = value
-
-    def get_current_layer(self):
-        return self.current_layer
-
-    def get_corrupt_layer(self):
-        return self.corrupt_layer
-
-    def get_total_batches(self):
-        return self._batch_size
-
     def get_total_layers(self):
         return len(self.output_size)
 
-    def get_fmaps_num(self, layer):
+    def get_fmaps_C(self, layer):
         return self.output_size[layer][1]
 
     def get_fmaps_H(self, layer):
@@ -448,9 +418,6 @@ class FaultInjection:
 
     def get_fmaps_W(self, layer):
         return self.output_size[layer][3]
-
-    def get_fmap_HW(self, layer):
-        return (self.get_fmaps_H(layer), self.get_fmaps_W(layer))
 
     def print_pytorchfi_layer_summary(self):
         summary_str = (
@@ -480,7 +447,7 @@ class FaultInjection:
             summary_str += str(dim) + " "
         summary_str += ")\n"
 
-        summary_str += "   - Batch Size: " + str(self._batch_size) + "\n"
+        summary_str += "   - Batch Size: " + str(self.batch_size) + "\n"
         summary_str += "   - CUDA Enabled: " + str(self.use_cuda) + "\n\n"
 
         summary_str += "Layer Info:\n"

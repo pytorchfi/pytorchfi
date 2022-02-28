@@ -7,8 +7,7 @@ from .util_test import CIFAR10_set_up_custom
 
 class TestCoreGetFuncs:
     """
-    Testing focuses on neuron perturbations on
-    the CPU with a single batch element.
+    Testing focuses on neuron perturbations on the CPU with a single batch element.
     """
 
     def setup_class(self):
@@ -35,7 +34,7 @@ class TestCoreGetFuncs:
             use_cuda=self.use_gpu,
         )
 
-    def test_get_output_size(self):
+    def test_output_size(self):
         shape = [
             [1, 64, 8, 8],
             [1, 192, 4, 4],
@@ -44,7 +43,7 @@ class TestCoreGetFuncs:
             [1, 256, 2, 2],
             [1, 10],
         ]
-        assert self.p.get_output_size() == shape
+        assert self.p.output_size == shape
 
     def test_get_weights_size(self):
         shape = [
@@ -59,11 +58,8 @@ class TestCoreGetFuncs:
         for i in range(6):
             assert list(self.p.get_weights_size(i)) == shape[i]
 
-    def test_get_total_batches(self):
-        assert self.p.get_total_batches() == 4
-
-    def test_get_inj_layer_types(self):
-        assert self.p.get_inj_layer_types() == [torch.nn.Conv2d, torch.nn.Linear]
+    def test_batch_size(self):
+        assert self.p.batch_size == 4
 
     def test_get_layer_type(self):
         assert self.p.get_layer_type(3) == torch.nn.Conv2d
@@ -80,15 +76,15 @@ class TestCoreGetFuncs:
     def test_get_layer_dim(self):
         assert self.p.get_layer_dim(3) == 4
 
-    def test_get_total_layers(self):
-        assert self.p.get_total_layers() == 6
+    def test_layer_output_size(self):
+        assert len(self.p.output_size) == 6
 
-    def test_get_fmap_num(self):
-        assert self.p.get_fmaps_num(0) == 64
-        assert self.p.get_fmaps_num(1) == 192
-        assert self.p.get_fmaps_num(2) == 384
-        assert self.p.get_fmaps_num(3) == 256
-        assert self.p.get_fmaps_num(4) == 256
+    def test_get_fmap_C(self):
+        assert self.p.get_fmaps_C(0) == 64
+        assert self.p.get_fmaps_C(1) == 192
+        assert self.p.get_fmaps_C(2) == 384
+        assert self.p.get_fmaps_C(3) == 256
+        assert self.p.get_fmaps_C(4) == 256
 
     def test_get_fmaps_H(self):
         assert self.p.get_fmaps_H(0) == 8
@@ -103,13 +99,6 @@ class TestCoreGetFuncs:
         assert self.p.get_fmaps_W(2) == 2
         assert self.p.get_fmaps_W(3) == 2
         assert self.p.get_fmaps_W(4) == 2
-
-    def test_get_fmap_HW(self):
-        assert self.p.get_fmap_HW(0) == (8, 8)
-        assert self.p.get_fmap_HW(1) == (4, 4)
-        assert self.p.get_fmap_HW(2) == (2, 2)
-        assert self.p.get_fmap_HW(3) == (2, 2)
-        assert self.p.get_fmap_HW(4) == (2, 2)
 
     def test_print_func(self):
         output = self.p.print_pytorchfi_layer_summary()

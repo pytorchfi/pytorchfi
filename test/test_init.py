@@ -40,7 +40,7 @@ class TestSingleNeuron:
             use_cuda=False,
         )
 
-        assert p.get_original_model() is self.model
+        assert p.original_model is self.model
 
     @pytest.mark.skipif(
         not torch.cuda.is_available(), reason="GPU not supported on this machine"
@@ -65,7 +65,7 @@ class TestSingleNeuron:
             use_cuda=True,
         )
 
-        assert p.get_original_model() is self.model
+        assert p.original_model is self.model
 
 
 class TestDtypes:

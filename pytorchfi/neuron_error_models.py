@@ -12,7 +12,7 @@ from pytorchfi.util import random_value
 
 
 def random_batch_element(pfi):
-    return random.randint(0, pfi.get_total_batches() - 1)
+    return random.randint(0, pfi.batch_size - 1)
 
 
 def random_neuron_location(pfi, layer=-1):
@@ -60,7 +60,7 @@ def random_neuron_inj_batched(pfi, min_val=-1, max_val=1, rand_loc=True, rand_va
     if not rand_val:
         err_val = random_value(min_val=min_val, max_val=max_val)
 
-    for i in range(pfi.get_total_batches()):
+    for i in range(pfi.batch_size):
         if rand_loc:
             (layer, C, H, W) = random_neuron_location(pfi)
         if rand_val:
@@ -119,7 +119,7 @@ def random_inj_per_layer_batched(
         if not rand_val:
             err_val = random_value(min_val=min_val, max_val=max_val)
 
-        for b in range(pfi.get_total_batches()):
+        for b in range(pfi.batch_size):
             if rand_loc:
                 (layer, C, H, W) = random_neuron_location(pfi, layer=i)
             if rand_val:
@@ -224,15 +224,15 @@ class single_bit_flip_func(core.FaultInjection):
         return torch.tensor(new_value, dtype=save_type)
 
     def single_bit_flip_signed_across_batch(self, module, input_val, output):
-        corrupt_conv_set = self.get_corrupt_layer()
-        range_max = self.get_conv_max(self.get_current_layer())
-        logging.info("Current layer: %s", self.get_current_layer())
+        corrupt_conv_set = self.corrupt_layer
+        range_max = self.get_conv_max(self.current_layer)
+        logging.info("Current layer: %s", self.current_layer)
         logging.info("Range_max: %s", range_max)
 
         if type(corrupt_conv_set) is list:
             inj_list = list(
                 filter(
-                    lambda x: corrupt_conv_set[x] == self.get_current_layer(),
+                    lambda x: corrupt_conv_set[x] == self.current_layer,
                     range(len(corrupt_conv_set)),
                 )
             )
@@ -251,7 +251,7 @@ class single_bit_flip_func(core.FaultInjection):
                 ][self.corrupt_dim[2][i]] = new_value
 
         else:
-            if self.get_current_layer() == corrupt_conv_set:
+            if self.current_layer == corrupt_conv_set:
                 prev_value = output[self.corrupt_batch][self.corrupt_dim[0]][
                     self.corrupt_dim[1]
                 ][self.corrupt_dim[2]]
@@ -264,16 +264,16 @@ class single_bit_flip_func(core.FaultInjection):
                     self.corrupt_dim[2]
                 ] = new_value
 
-        self.update_layer()
-        if self.get_current_layer() >= self.get_total_layers():
-            self.reset_current_layer()
+        self.current_layer += 1
+        if self.current_layer >= len(self.output_size):
+            self.current_layer = 0
 
 
 def random_neuron_single_bit_inj_batched(pfi, layer_ranges):
     pfi.set_conv_max(layer_ranges)
     batch, layer_num, c_rand, h_rand, w_rand = ([] for i in range(5))
 
-    for i in range(pfi.get_total_batches()):
+    for i in range(pfi.batch_size):
         (layer, C, H, W) = random_neuron_location(pfi)
 
         batch.append(i)
