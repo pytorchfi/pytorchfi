@@ -160,16 +160,16 @@ class single_bit_flip_func(core.FaultInjection):
         logging.basicConfig(format="%(asctime)-15s %(clientip)s %(user)-8s %(message)s")
 
         self.bits = kwargs.get("bits", 8)
-        self.LayerRanges = []
+        self.layer_ranges = []
 
     def set_conv_max(self, data):
-        self.LayerRanges = data
+        self.layer_ranges = data
 
     def reset_conv_max(self, data):
-        self.LayerRanges = []
+        self.layer_ranges = []
 
     def get_conv_max(self, layer):
-        return self.LayerRanges[layer]
+        return self.layer_ranges[layer]
 
     @staticmethod
     def _twos_comp(val, bits):
@@ -279,25 +279,26 @@ class single_bit_flip_func(core.FaultInjection):
             self.current_layer = 0
 
 
-def random_neuron_single_bit_inj_batched(pfi: core.FaultInjection, layer_ranges):
+def random_neuron_single_bit_inj_batched(pfi: core.FaultInjection, layer_ranges, batch_random=True):
+    """
+    Args:
+        pfi: The core.FaultInjection in which the neuron fault injection should be instantiated.
+        layer_ranges: 
+        batch_random (default True): True if each batch should have a random location, if false, then each
+                                     batch will use the same randomly generated location.
+    """
     pfi.set_conv_max(layer_ranges)
-    batch, layer_num, c_rand, h_rand, w_rand = ([] for i in range(5))
 
-    for i in range(pfi.batch_size):
-        (layer, C, H, W) = random_neuron_location(pfi)
-
-        batch.append(i)
-        layer_num.append(layer)
-        c_rand.append(C)
-        h_rand.append(H)
-        w_rand.append(W)
+    locations = [random_neuron_location(pfi) for _ in range(pfi.batch_size)] if batch_random else [random_neuron_location(pfi)] * pfi.batch_size
+    # Convert list of tuples [(1, 3), (2, 4)] to list of list [[1, 2], [3, 4]]
+    random_layers, random_c, random_h, random_w = map(list, zip(*locations))
 
     return pfi.declare_neuron_fi(
-        batch=batch,
-        layer_num=layer_num,
-        dim1=c_rand,
-        dim2=h_rand,
-        dim3=w_rand,
+        batch=range(pfi.batch_size),
+        layer_num=random_layers,
+        dim1=random_c,
+        dim2=random_h,
+        dim3=random_w,
         function=pfi.single_bit_flip_signed_across_batch,
     )
 

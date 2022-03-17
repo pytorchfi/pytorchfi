@@ -141,6 +141,21 @@ class TestNeuronErrorModelsFunc:
         assert not torch.all(corrupt_output[2].eq(self.golden_output[2]))
         assert not torch.all(corrupt_output[3].eq(self.golden_output[3]))
 
+    def test_random_neuron_single_bit_inj_sameLoc(self):
+        random.seed(2)
+
+        corrupt_model = random_neuron_single_bit_inj_batched(
+            self.p, self.ranges, batch_random=False
+        )
+        corrupt_model.eval()
+        with torch.no_grad():
+            corrupt_output = corrupt_model(self.images)
+
+        assert not torch.all(corrupt_output[0].eq(self.golden_output[0]))
+        assert not torch.all(corrupt_output[1].eq(self.golden_output[1]))
+        assert not torch.all(corrupt_output[2].eq(self.golden_output[2]))
+        assert not torch.all(corrupt_output[3].eq(self.golden_output[3]))
+
     def test_random_neuron_single_bit_inj_single(self):
         random.seed(0)
 
