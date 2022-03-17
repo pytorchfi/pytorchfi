@@ -279,17 +279,23 @@ class single_bit_flip_func(core.FaultInjection):
             self.current_layer = 0
 
 
-def random_neuron_single_bit_inj_batched(pfi: core.FaultInjection, layer_ranges, batch_random=True):
+def random_neuron_single_bit_inj_batched(
+    pfi: core.FaultInjection, layer_ranges, batch_random=True
+):
     """
     Args:
         pfi: The core.FaultInjection in which the neuron fault injection should be instantiated.
-        layer_ranges: 
+        layer_ranges:
         batch_random (default True): True if each batch should have a random location, if false, then each
                                      batch will use the same randomly generated location.
     """
     pfi.set_conv_max(layer_ranges)
 
-    locations = [random_neuron_location(pfi) for _ in range(pfi.batch_size)] if batch_random else [random_neuron_location(pfi)] * pfi.batch_size
+    locations = (
+        [random_neuron_location(pfi) for _ in range(pfi.batch_size)]
+        if batch_random
+        else [random_neuron_location(pfi)] * pfi.batch_size
+    )
     # Convert list of tuples [(1, 3), (2, 4)] to list of list [[1, 2], [3, 4]]
     random_layers, random_c, random_h, random_w = map(list, zip(*locations))
 
