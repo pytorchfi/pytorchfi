@@ -40,7 +40,7 @@ class TestNeuronFi:
             use_cuda=False,
         )
 
-        corrupt_model_1 = p.declare_neuron_fi(
+        corrupt_model_1 = p.declare_neuron_fault_injection(
             batch=batch_i,
             layer_num=layer_i,
             dim1=c_i,
@@ -55,7 +55,7 @@ class TestNeuronFi:
 
         assert not torch.all(corrupt_output_1.eq(golden_output))
 
-        uncorrupt_model = p.declare_neuron_fi(
+        uncorrupt_model = p.declare_neuron_fault_injection(
             batch=batch_i,
             layer_num=layer_i,
             dim1=c_i,
@@ -70,7 +70,7 @@ class TestNeuronFi:
 
         assert torch.all(uncorrupted_output.eq(golden_output))
 
-        corrupt_model_2 = p.declare_neuron_fi(
+        corrupt_model_2 = p.declare_neuron_fault_injection(
             batch=batch_i,
             layer_num=layer_i,
             dim1=c_i,
@@ -109,7 +109,7 @@ class TestNeuronFi:
             use_cuda=True,
         )
 
-        corrupt_model_1 = p.declare_neuron_fi(
+        corrupt_model_1 = p.declare_neuron_fault_injection(
             batch=batch_i,
             layer_num=layer_i,
             dim1=c_i,
@@ -124,7 +124,7 @@ class TestNeuronFi:
 
         assert not torch.all(corrupt_output_1.eq(golden_output))
 
-        uncorrupt_model = p.declare_neuron_fi(
+        uncorrupt_model = p.declare_neuron_fault_injection(
             batch=batch_i,
             layer_num=layer_i,
             dim1=c_i,
@@ -139,7 +139,7 @@ class TestNeuronFi:
 
         assert torch.all(uncorrupted_output.eq(golden_output))
 
-        corrupt_model_2 = p.declare_neuron_fi(
+        corrupt_model_2 = p.declare_neuron_fault_injection(
             batch=batch_i,
             layer_num=layer_i,
             dim1=c_i,
@@ -188,7 +188,7 @@ class TestNeuronFiBatch:
             self.batch_size,
             input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=False,
-        ).declare_neuron_fi(
+        ).declare_neuron_fault_injection(
             batch=batch_i,
             layer_num=layer_i,
             dim1=c_i,
@@ -223,7 +223,7 @@ class TestNeuronFiBatch:
             self.batch_size,
             input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=False,
-        ).declare_neuron_fi(
+        ).declare_neuron_fault_injection(
             batch=batch_i,
             layer_num=layer_i,
             dim1=c_i,
@@ -263,7 +263,7 @@ class TestNeuronFiBatch:
             self.batch_size,
             input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=True,
-        ).declare_neuron_fi(
+        ).declare_neuron_fault_injection(
             batch=batch_i,
             layer_num=layer_i,
             dim1=c_i,
@@ -304,7 +304,7 @@ class TestNeuronFiBatch:
             self.batch_size,
             input_shape=[self.channels, self.img_size, self.img_size],
             use_cuda=True,
-        ).declare_neuron_fi(
+        ).declare_neuron_fault_injection(
             batch=batch_i,
             layer_num=layer_i,
             dim1=c_i,

@@ -40,7 +40,7 @@ class TestLayers:
         )
 
         (b, layer, C, H, W, err_val) = ([0], [3], [4], [2], [4], [10000])
-        inj = p.declare_neuron_fi(
+        inj = p.declare_neuron_fault_injection(
             batch=b, layer_num=layer, dim1=C, dim2=H, dim3=W, value=err_val
         )
         inj_output = inj(self.IMAGE)
@@ -91,7 +91,7 @@ class TestLayers:
             [10000, 10000, 10000, 1000],
         )
 
-        inj = p.declare_neuron_fi(
+        inj = p.declare_neuron_fault_injection(
             batch=b, layer_num=layer, dim1=C, dim2=H, dim3=W, value=err_val
         )
         inj_output = inj(self.IMAGE)
@@ -115,7 +115,7 @@ class TestLayers:
         )
 
         (b, layer, C, H, W, err_val) = (0, 2, 888, None, None, 10000)
-        inj = p.declare_neuron_fi(
+        inj = p.declare_neuron_fault_injection(
             batch=[b], layer_num=[layer], dim1=[C], dim2=[H], dim3=[W], value=[err_val]
         )
         inj_output = inj(self.IMAGE)
@@ -140,7 +140,7 @@ class TestLayers:
             [3, None],
             [20000, 10000],
         )
-        inj = p.declare_neuron_fi(
+        inj = p.declare_neuron_fault_injection(
             batch=b, layer_num=layer, dim1=C, dim2=H, dim3=W, value=err_val
         )
         inj_output = inj(self.IMAGE)

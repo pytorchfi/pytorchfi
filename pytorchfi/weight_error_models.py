@@ -39,14 +39,14 @@ def random_weight_inj(
     layer, k, c_in, kH, kW = random_weight_location(pfi, corrupt_layer)
     faulty_val = [random_value(min_val=min_val, max_val=max_val)]
 
-    return pfi.declare_weight_fi(
+    return pfi.declare_weight_fault_injection(
         layer_num=layer, k=k, dim1=c_in, dim2=kH, dim3=kW, value=faulty_val
     )
 
 
 def zero_func_rand_weight(pfi: core.FaultInjection):
     layer, k, c_in, kH, kW = random_weight_location(pfi)
-    return pfi.declare_weight_fi(
+    return pfi.declare_weight_fault_injection(
         function=_zero_rand_weight, layer_num=layer, k=k, dim1=c_in, dim2=kH, dim3=kW
     )
 

@@ -78,12 +78,12 @@ class FaultInjection:
             )
         )
 
-    def fi_reset(self):
-        self._fi_state_reset()
+    def reset_fault_injection(self):
+        self._reset_fault_injection_state()
         self.corrupted_model = None
         logging.info("Fault injector reset.")
 
-    def _fi_state_reset(self):
+    def _reset_fault_injection_state(self):
         (
             self.current_layer,
             self.corrupt_batch,
@@ -152,8 +152,8 @@ class FaultInjection:
 
         return handles
 
-    def declare_weight_fi(self, **kwargs):
-        self._fi_state_reset()
+    def declare_weight_fault_injection(self, **kwargs):
+        self._reset_fault_injection_state()
         custom_injection = False
         custom_function = False
 
@@ -217,8 +217,8 @@ class FaultInjection:
                 current_weight_layer += 1
         return self.corrupted_model
 
-    def declare_neuron_fi(self, **kwargs):
-        self._fi_state_reset()
+    def declare_neuron_fault_injection(self, **kwargs):
+        self._reset_fault_injection_state()
         custom_injection = False
         injection_function = False
 
@@ -274,9 +274,9 @@ class FaultInjection:
 
         logging.info("Checking bounds before runtime")
         for i in range(len(batch)):
-            self.assert_inj_bounds(i)
+            self.assert_injection_bounds(i)
 
-    def assert_inj_bounds(self, index: int):
+    def assert_injection_bounds(self, index: int):
         if index < 0:
             raise AssertionError(f"Invalid injection index: {index}")
         if self.corrupt_batch[index] >= self.batch_size:
@@ -328,7 +328,7 @@ class FaultInjection:
         logging.info(f"Layer {self.current_layer} injection list size: {len(inj_list)}")
         if layer_dim == 2:
             for i in inj_list:
-                self.assert_inj_bounds(index=i)
+                self.assert_injection_bounds(index=i)
                 logging.info(
                     f"Original value at [{self.corrupt_batch[i]}][{self.corrupt_dim[0][i]}]: {output[self.corrupt_batch[i]][self.corrupt_dim[0][i]]}"
                 )
@@ -338,7 +338,7 @@ class FaultInjection:
                 ] = self.corrupt_value[i]
         elif layer_dim == 3:
             for i in inj_list:
-                self.assert_inj_bounds(index=i)
+                self.assert_injection_bounds(index=i)
                 logging.info(
                     f"Original value at [{self.corrupt_batch[i]}][{self.corrupt_dim[0][i]}][{self.corrupt_dim[1][i]}]: {output[self.corrupt_batch[i]][self.corrupt_dim[0][i]][self.corrupt_dim[1][i]]}"
                 )
@@ -348,7 +348,7 @@ class FaultInjection:
                 ] = self.corrupt_value[i]
         elif layer_dim == 4:
             for i in inj_list:
-                self.assert_inj_bounds(index=i)
+                self.assert_injection_bounds(index=i)
                 logging.info(
                     f"Original value at [{self.corrupt_batch[i]}][{self.corrupt_dim[0][i]}][{self.corrupt_dim[1][i]}][{self.corrupt_dim[2][i]}]: {output[self.corrupt_batch[i]][self.corrupt_dim[0][i]][self.corrupt_dim[1][i]][self.corrupt_dim[2][i]]}"
                 )

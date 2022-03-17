@@ -42,7 +42,7 @@ class TestWeightFi:
         inj_value_base = 10000.0
         inj_value_i = [inj_value_base]
 
-        corrupt_model = self.p.declare_weight_fi(
+        corrupt_model = self.p.declare_weight_fault_injection(
             layer_num=layer_i, k=k, dim1=c_i, dim2=h_i, dim3=w_i, value=inj_value_i
         )
 
@@ -52,7 +52,7 @@ class TestWeightFi:
 
         assert not torch.all(corrupt_output.eq(self.golden_output))
 
-        corrupt_model = self.p.declare_weight_fi(
+        corrupt_model = self.p.declare_weight_fault_injection(
             layer_num=layer_i,
             k=k,
             dim1=c_i,
@@ -67,7 +67,7 @@ class TestWeightFi:
 
         assert torch.all(uncorrupted_output.eq(self.golden_output))
 
-        corrupt_model = self.p.declare_weight_fi(
+        corrupt_model = self.p.declare_weight_fault_injection(
             layer_num=layer_i,
             k=k,
             dim1=c_i,
@@ -91,7 +91,7 @@ class TestWeightFi:
         w_i = [0]
         inj_value_i = [10000.0]
 
-        corrupt_model = self.p.declare_weight_fi(
+        corrupt_model = self.p.declare_weight_fault_injection(
             layer_num=layer_i, k=k, dim1=c_i, dim2=h_i, dim3=w_i, value=inj_value_i
         )
 
@@ -110,7 +110,7 @@ class TestWeightFi:
         inj_value_base = 10000.0
         inj_value_i = [inj_value_base, inj_value_base, inj_value_base]
 
-        corrupt_model = self.p.declare_weight_fi(
+        corrupt_model = self.p.declare_weight_fault_injection(
             layer_num=layer_i, k=k, dim1=c_i, dim2=h_i, dim3=w_i, value=inj_value_i
         )
 

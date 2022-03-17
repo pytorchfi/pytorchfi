@@ -46,7 +46,7 @@ def random_neuron_inj(pfi: core.FaultInjection, min_val: int = -1, max_val: int 
     (layer, C, H, W) = random_neuron_location(pfi)
     err_val = random_value(min_val=min_val, max_val=max_val)
 
-    return pfi.declare_neuron_fi(
+    return pfi.declare_neuron_fault_injection(
         batch=[b], layer_num=[layer], dim1=[C], dim2=[H], dim3=[W], value=[err_val]
     )
 
@@ -79,7 +79,7 @@ def random_neuron_inj_batched(
         w_rand.append(W)
         value.append(err_val)
 
-    return pfi.declare_neuron_fi(
+    return pfi.declare_neuron_fault_injection(
         batch=batch,
         layer_num=layer_num,
         dim1=c_rand,
@@ -103,7 +103,7 @@ def random_inj_per_layer(pfi: core.FaultInjection, min_val: int = -1, max_val: i
         w_rand.append(W)
         value.append(random_value(min_val=min_val, max_val=max_val))
 
-    return pfi.declare_neuron_fi(
+    return pfi.declare_neuron_fault_injection(
         batch=batch,
         layer_num=layer_num,
         dim1=c_rand,
@@ -142,7 +142,7 @@ def random_inj_per_layer_batched(
             w_rand.append(W)
             value.append(err_val)
 
-    return pfi.declare_neuron_fi(
+    return pfi.declare_neuron_fault_injection(
         batch=batch,
         layer_num=layer_num,
         dim1=c_rand,
@@ -247,7 +247,7 @@ class single_bit_flip_func(core.FaultInjection):
                 )
             )
             for i in inj_list:
-                self.assert_inj_bounds(index=i)
+                self.assert_injection_bounds(index=i)
                 prev_value = output[self.corrupt_batch[i]][self.corrupt_dim[0][i]][
                     self.corrupt_dim[1][i]
                 ][self.corrupt_dim[2][i]]
@@ -299,7 +299,7 @@ def random_neuron_single_bit_inj_batched(
     # Convert list of tuples [(1, 3), (2, 4)] to list of list [[1, 2], [3, 4]]
     random_layers, random_c, random_h, random_w = map(list, zip(*locations))
 
-    return pfi.declare_neuron_fi(
+    return pfi.declare_neuron_fault_injection(
         batch=range(pfi.batch_size),
         layer_num=random_layers,
         dim1=random_c,
@@ -316,7 +316,7 @@ def random_neuron_single_bit_inj(pfi: core.FaultInjection, layer_ranges):
     batch = random_batch_element(pfi)
     (layer, C, H, W) = random_neuron_location(pfi)
 
-    return pfi.declare_neuron_fi(
+    return pfi.declare_neuron_fault_injection(
         batch=[batch],
         layer_num=[layer],
         dim1=[C],

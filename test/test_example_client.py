@@ -38,7 +38,7 @@ class TestCoreExampleClient:
 
     def test_single_specified_neuron(self):
         (b, layer, C, H, W, err_val) = ([0], [3], [4], [2], [4], [10000])
-        inj = self.p.declare_neuron_fi(
+        inj = self.p.declare_neuron_fault_injection(
             batch=b, layer_num=layer, dim1=C, dim2=H, dim3=W, value=err_val
         )
         inj_output = inj(self.image)
@@ -56,7 +56,7 @@ class TestCoreExampleClient:
             [3, 4],
             [20000, 10000],
         )
-        inj = self.p.declare_neuron_fi(
+        inj = self.p.declare_neuron_fault_injection(
             batch=b, layer_num=layer, dim1=C, dim2=H, dim3=W, value=err_val
         )
         inj_output = inj(self.image)
