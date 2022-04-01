@@ -5,6 +5,8 @@ from pytorchfi.weight_error_models import (
     random_weight_location,
     random_weight_inj,
     zero_func_rand_weight,
+    FFRA,
+    _zero_rand_weight
 )
 
 from .util_test import CIFAR10_set_up_custom
@@ -84,5 +86,16 @@ class TestWeightErrorModels:
         with torch.no_grad():
             corrupt_output = corrupt_model(self.images)
 
+        if torch.all(corrupt_output.eq(self.golden_output)):
+            raise AssertionError
+
+    def test_FFRA(self):
+        random.seed(1)
+        
+        corrupt_model = FFRA(self.p,1e-5,_zero_rand_weight)
+        corrupt_model.eval()
+        with torch.no_grad():
+            corrupt_output = corrupt_model(self.images)
+        
         if torch.all(corrupt_output.eq(self.golden_output)):
             raise AssertionError
