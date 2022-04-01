@@ -1,3 +1,8 @@
+'''
+Author: Forceless
+Date: 2022-04-01 18:33:39
+LastEditTime: 2022-04-01 19:30:48
+'''
 """pytorchfi.error_models provides different error models out-of-the-box for use."""
 
 import logging

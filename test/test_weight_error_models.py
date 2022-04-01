@@ -1,3 +1,8 @@
+'''
+Author: Forceless
+Date: 2022-04-01 18:33:39
+LastEditTime: 2022-04-01 19:53:39
+'''
 import torch
 import random
 from pytorchfi.core import fault_injection as pfi_core
@@ -9,6 +14,9 @@ from pytorchfi.weight_error_models import (
     FFRA,
     _zero_rand_weight
 )
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from .util_test import CIFAR10_set_up_custom
 
 class TestWeightErrorModels:
