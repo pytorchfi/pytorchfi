@@ -182,7 +182,7 @@ class fault_injection:
             if isinstance(layer, tuple(self.get_inj_layer_types())):
                 inj_list = list(
                     filter(
-                        lambda x: corrupt_layer[x] == current_weight_layer,
+                        lambda x: corrupt_layer[x][0] == current_weight_layer,
                         range(len(corrupt_layer)),
                     )
                 )

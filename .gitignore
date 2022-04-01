@@ -5,3 +5,4 @@ data
 test/__init__.py*
 test/unit_tests/__init__.py*
 venv/
+/.vscode
