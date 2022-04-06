@@ -58,7 +58,6 @@ def _zero_rand_weight(data, location):
     return new_data
 
 def FFRA(pfi, sdc_p,function):
-    errors = 0
     error_index = [[], [], [], [],[]]
     for layer_idx in range(pfi.get_total_layers()):
         shape = pfi.get_weights_size(layer_idx)
