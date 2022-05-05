@@ -54,3 +54,29 @@ def zero_func_rand_weight(pfi: core.FaultInjection):
 def _zero_rand_weight(data, location):
     new_data = data[location] * 0
     return new_data
+
+
+def multi_weight_inj(pfi, sdc_p=1e-5, function=_zero_rand_weight):
+    corrupt_idx = [[], [], [], [], []]
+    for layer_idx in range(pfi.get_total_layers()):
+        shape = list(pfi.get_weights_size(layer_idx))
+        dim_len = len(shape)
+        shape.extend([1 for i in range(4 - len(shape))])
+        for k in range(shape[0]):
+            for dim1 in range(shape[1]):
+                for dim2 in range(shape[2]):
+                    for dim3 in range(shape[3]):
+                        if random.random() < sdc_p:
+                            idx = [layer_idx, k, dim1, dim2, dim3]
+                            for i in range(dim_len + 1):
+                                corrupt_idx[i].append(idx[i])
+                            for i in range(dim_len + 1, 5):
+                                corrupt_idx[i].append(None)
+    return pfi.declare_weight_fault_injection(
+        layer_num=corrupt_idx[0],
+        k=corrupt_idx[1],
+        dim1=corrupt_idx[2],
+        dim2=corrupt_idx[3],
+        dim3=corrupt_idx[4],
+        function=function,
+    )
