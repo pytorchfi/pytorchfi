@@ -393,9 +393,7 @@ class FaultInjection:
 
     def get_tensor_dim(self, layer, dim):
         if dim > len(self.layers_dim):
-            raise AssertionError(
-                f"Dimension {dim} is out of bounds for layer {layer}"
-            )
+            raise AssertionError(f"Dimension {dim} is out of bounds for layer {layer}")
         return self.output_size[layer][dim]
 
     def print_pytorchfi_layer_summary(self):
