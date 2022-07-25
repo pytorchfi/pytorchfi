@@ -357,7 +357,7 @@ class FaultInjection:
                     self.corrupt_dim[1][i]
                 ][self.corrupt_dim[2][i]] = self.corrupt_value[i]
 
-        self.current_layer += 1
+        self.update_layer()
 
     def _save_output_size(self, module, input_val, output):
         shape = list(output.size())
@@ -366,6 +366,12 @@ class FaultInjection:
         self.layers_type.append(type(module))
         self.layers_dim.append(dim)
         self.output_size.append(shape)
+
+    def update_layer(self, value=1):
+        self.current_layer += value
+    
+    def reset_current_layer(self):
+        self.current_layer = 0
 
     def get_weights_size(self, layer_num):
         return self.weights_size[layer_num]
@@ -385,14 +391,8 @@ class FaultInjection:
     def get_total_layers(self):
         return len(self.output_size)
 
-    def get_fmaps_C(self, layer):
-        return self.output_size[layer][1]
-
-    def get_fmaps_H(self, layer):
-        return self.output_size[layer][2]
-
-    def get_fmaps_W(self, layer):
-        return self.output_size[layer][3]
+    def get_fmaps_dim(self, layer):
+        return self.output_size[layer][0:]
 
     def print_pytorchfi_layer_summary(self):
         summary_str = (

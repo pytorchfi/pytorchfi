@@ -274,9 +274,9 @@ class single_bit_flip_func(core.FaultInjection):
                     self.corrupt_dim[2]
                 ] = new_value
 
-        self.current_layer += 1
+        self.update_layer()
         if self.current_layer >= len(self.output_size):
-            self.current_layer = 0
+            self.reset_current_layer()
 
 
 def random_neuron_single_bit_inj_batched(
