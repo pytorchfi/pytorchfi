@@ -369,7 +369,7 @@ class FaultInjection:
 
     def update_layer(self, value=1):
         self.current_layer += value
-    
+
     def reset_current_layer(self):
         self.current_layer = 0
 
