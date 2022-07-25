@@ -79,26 +79,24 @@ class TestCoreGetFuncs:
     def test_layer_output_size(self):
         assert len(self.p.output_size) == 6
 
-    def test_get_fmap_C(self):
-        assert self.p.get_fmaps_C(0) == 64
-        assert self.p.get_fmaps_C(1) == 192
-        assert self.p.get_fmaps_C(2) == 384
-        assert self.p.get_fmaps_C(3) == 256
-        assert self.p.get_fmaps_C(4) == 256
+    def test_get_tensor_dim(self):
+        assert self.p.get_tensor_dim(0, 1) == 64
+        assert self.p.get_tensor_dim(1, 1) == 192
+        assert self.p.get_tensor_dim(2, 1) == 384
+        assert self.p.get_tensor_dim(3, 1) == 256
+        assert self.p.get_tensor_dim(4, 1) == 256
 
-    def test_get_fmaps_H(self):
-        assert self.p.get_fmaps_H(0) == 8
-        assert self.p.get_fmaps_H(1) == 4
-        assert self.p.get_fmaps_H(2) == 2
-        assert self.p.get_fmaps_H(3) == 2
-        assert self.p.get_fmaps_H(4) == 2
+        assert self.p.get_tensor_dim(0, 2) == 8
+        assert self.p.get_tensor_dim(1, 2) == 4
+        assert self.p.get_tensor_dim(2, 2) == 2
+        assert self.p.get_tensor_dim(3, 2) == 2
+        assert self.p.get_tensor_dim(4, 2) == 2
 
-    def test_get_fmaps_W(self):
-        assert self.p.get_fmaps_W(0) == 8
-        assert self.p.get_fmaps_W(1) == 4
-        assert self.p.get_fmaps_W(2) == 2
-        assert self.p.get_fmaps_W(3) == 2
-        assert self.p.get_fmaps_W(4) == 2
+        assert self.p.get_tensor_dim(0, 3) == 8
+        assert self.p.get_tensor_dim(1, 3) == 4
+        assert self.p.get_tensor_dim(2, 3) == 2
+        assert self.p.get_tensor_dim(3, 3) == 2
+        assert self.p.get_tensor_dim(4, 3) == 2
 
     def test_print_func(self):
         output = self.p.print_pytorchfi_layer_summary()
