@@ -1,6 +1,7 @@
 import torch
 import torchvision.models as models
-from pytorchfi.core import fault_injection
+
+from pytorchfi.core import FaultInjection
 
 
 class TestCoreExampleClient:
@@ -25,7 +26,7 @@ class TestCoreExampleClient:
         self.golden_softmax = self.softmax(self.output)
         self.golden_label = list(torch.argmax(self.golden_softmax, dim=1))[0].item()
 
-        self.p = fault_injection(
+        self.p = FaultInjection(
             self.model,
             batch_size,
             input_shape=[c, h, w],
@@ -33,20 +34,18 @@ class TestCoreExampleClient:
         )
 
     def test_golden_inference(self):
-        if self.golden_label != 556:
-            raise AssertionError
+        assert self.golden_label == 556
 
     def test_single_specified_neuron(self):
         (b, layer, C, H, W, err_val) = ([0], [3], [4], [2], [4], [10000])
-        inj = self.p.declare_neuron_fi(
+        inj = self.p.declare_neuron_fault_injection(
             batch=b, layer_num=layer, dim1=C, dim2=H, dim3=W, value=err_val
         )
         inj_output = inj(self.image)
         inj_softmax = self.softmax(inj_output)
         inj_label = list(torch.argmax(inj_softmax, dim=1))[0].item()
 
-        if inj_label != 578:
-            raise AssertionError
+        assert inj_label == 578
 
     def test_multiple_specified_neuron(self):
         (b, layer, C, H, W, err_val) = (
@@ -57,12 +56,11 @@ class TestCoreExampleClient:
             [3, 4],
             [20000, 10000],
         )
-        inj = self.p.declare_neuron_fi(
+        inj = self.p.declare_neuron_fault_injection(
             batch=b, layer_num=layer, dim1=C, dim2=H, dim3=W, value=err_val
         )
         inj_output = inj(self.image)
         inj_softmax = self.softmax(inj_output)
         inj_label = list(torch.argmax(inj_softmax, dim=1))[0].item()
 
-        if inj_label != 843:
-            raise AssertionError
+        assert inj_label == 843

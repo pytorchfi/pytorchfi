@@ -1,6 +1,7 @@
 import pytest
 import torch
-from pytorchfi.core import fault_injection as pfi_core
+
+from pytorchfi.core import FaultInjection as pfi_core
 
 from .util_test import CIFAR10_set_up_custom
 
@@ -39,8 +40,7 @@ class TestSingleNeuron:
             use_cuda=False,
         )
 
-        if p.get_original_model() is not self.model:
-            raise AssertionError
+        assert p.original_model is self.model
 
     @pytest.mark.skipif(
         not torch.cuda.is_available(), reason="GPU not supported on this machine"
@@ -65,8 +65,7 @@ class TestSingleNeuron:
             use_cuda=True,
         )
 
-        if p.get_original_model() is not self.model:
-            raise AssertionError
+        assert p.original_model is self.model
 
 
 class TestDtypes:
