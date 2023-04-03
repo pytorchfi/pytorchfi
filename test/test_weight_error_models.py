@@ -4,10 +4,10 @@ import torch
 
 from pytorchfi.core import FaultInjection as pfi_core
 from pytorchfi.weight_error_models import (
+    multi_weight_inj,
     random_weight_inj,
     random_weight_location,
     zero_func_rand_weight,
-    multi_weight_inj
 )
 
 from .util_test import CIFAR10_set_up_custom
@@ -84,7 +84,6 @@ class TestWeightErrorModels:
             corrupt_output = corrupt_model(self.images)
 
         assert not torch.all(corrupt_output.eq(self.golden_output))
-
 
     def test_multi_weight_inj(self):
         random.seed(1)
