@@ -11,12 +11,12 @@ import torch.nn as nn
 
 class FaultInjection:
     def __init__(
-        self,
-        model,
-        batch_size: int,
-        input_shape: List[int] = None,
-        layer_types=None,
-        **kwargs,
+            self,
+            model,
+            batch_size: int,
+            input_shape: List[int] = None,
+            layer_types=None,
+            **kwargs,
     ):
         if not input_shape:
             input_shape = [3, 224, 224]
@@ -104,6 +104,12 @@ class FaultInjection:
             if list(layer.children()) == []:
                 if "all" in layer_types:
                     handles.append(layer.register_forward_hook(self._save_output_size))
+
+                    weights_shape.append(
+                        layer.weight.shape if
+                        any(param.requires_grad for param in layer.parameters())
+                        else None
+                    )
                 else:
                     for i in layer_types:
                         if isinstance(layer, i):
@@ -265,10 +271,10 @@ class FaultInjection:
 
     def check_bounds(self, batch, layer, dim):
         if (
-            len(batch) != len(layer)
-            or len(batch) != len(dim[0])
-            or len(batch) != len(dim[1])
-            or len(batch) != len(dim[2])
+                len(batch) != len(layer)
+                or len(batch) != len(dim[0])
+                or len(batch) != len(dim[1])
+                or len(batch) != len(dim[2])
         ):
             raise AssertionError("Injection location missing values.")
 
@@ -300,8 +306,8 @@ class FaultInjection:
                 )
 
         if layer_dim <= 2 and (
-            self.corrupt_dim[1][index] is not None
-            or self.corrupt_dim[2][index] is not None
+                self.corrupt_dim[1][index] is not None
+                or self.corrupt_dim[2][index] is not None
         ):
             warnings.warn(
                 f"Values in Dim2 and Dim3 ignored, since layer is {layer_type}"
@@ -398,14 +404,14 @@ class FaultInjection:
 
     def print_pytorchfi_layer_summary(self):
         summary_str = (
-            "============================ PYTORCHFI INIT SUMMARY =============================="
-            + "\n\n"
+                "============================ PYTORCHFI INIT SUMMARY =============================="
+                + "\n\n"
         )
 
         summary_str += "Layer types allowing injections:\n"
         summary_str += (
-            "----------------------------------------------------------------------------------"
-            + "\n"
+                "----------------------------------------------------------------------------------"
+                + "\n"
         )
         for l_type in self._inj_layer_types:
             summary_str += "{:>5}".format("- ")
@@ -415,8 +421,8 @@ class FaultInjection:
 
         summary_str += "Model Info:\n"
         summary_str += (
-            "----------------------------------------------------------------------------------"
-            + "\n"
+                "----------------------------------------------------------------------------------"
+                + "\n"
         )
 
         summary_str += "   - Shape of input into the model: ("
@@ -429,30 +435,31 @@ class FaultInjection:
 
         summary_str += "Layer Info:\n"
         summary_str += (
-            "----------------------------------------------------------------------------------"
-            + "\n"
+                "----------------------------------------------------------------------------------"
+                + "\n"
         )
-        line_new = "{:>5}  {:>15}  {:>10} {:>20} {:>20}".format(
+        line_new = "{:>5}  {:>20}  {:>10} {:>20} {:>20}".format(
             "Layer #", "Layer type", "Dimensions", "Weight Shape", "Output Shape"
         )
         summary_str += line_new + "\n"
         summary_str += (
-            "----------------------------------------------------------------------------------"
-            + "\n"
+                "----------------------------------------------------------------------------------"
+                + "\n"
         )
         for layer, _dim in enumerate(self.output_size):
-            line_new = "{:>5}  {:>15}  {:>10} {:>20} {:>20}".format(
+            weight_shape = list(self.weights_size[layer]) if self.weights_size[layer] else None
+            line_new = "{:>5}  {:>20}  {:>10} {:>20} {:>20}".format(
                 layer,
                 str(self.layers_type[layer]).split(".")[-1].split("'")[0],
                 str(self.layers_dim[layer]),
-                str(list(self.weights_size[layer])),
+                str(weight_shape),
                 str(self.output_size[layer]),
             )
             summary_str += line_new + "\n"
 
         summary_str += (
-            "=================================================================================="
-            + "\n"
+                "=================================================================================="
+                + "\n"
         )
 
         logging.info(summary_str)
